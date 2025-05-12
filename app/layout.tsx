@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata } from "next/types";
 import { Playfair_Display, Poppins } from "next/font/google";
 import "./globals.css";
 import Layout from "@/components/layout/Layout";

@@ -1,4 +1,4 @@
-import { Metadata } from "next";
+import { Metadata } from "next/types";
 import CareerClient from "@/components/sections/CareerClient";
 
 export const metadata: Metadata = {

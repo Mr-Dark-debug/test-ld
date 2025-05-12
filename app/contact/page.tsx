@@ -1,4 +1,4 @@
-import { Metadata } from "next";
+import { Metadata } from "next/types";
 import ContactInfo from "@/components/sections/ContactInfo";
 import { contactInfo } from "@/data/contact";
 

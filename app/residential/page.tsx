@@ -1,4 +1,4 @@
-import { Metadata } from "next";
+import { Metadata } from "next/types";
 import FeaturedProjects from "@/components/sections/FeaturedProjects";
 import CtaBanner from "@/components/sections/CtaBanner";
 import { allProjects } from "@/data/projects";

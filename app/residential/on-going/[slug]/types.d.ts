@@ -1,5 +1,5 @@
 // Types for the [slug] route
-import { Metadata } from 'next';
+import { Metadata } from 'next/types';
 
 // Define the parameters for dynamic routes
 export interface SlugPageParams {

@@ -1,4 +1,4 @@
-import { Metadata } from "next";
+import { Metadata } from "next/types";
 import FeatureGrid from "@/components/sections/FeatureGrid";
 import { companyFeatures } from "@/data/features";
 import { testimonials } from "@/data/testimonials";

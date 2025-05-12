@@ -1,4 +1,4 @@
-import { Metadata } from "next";
+import { Metadata } from "next/types";
 import { notFound } from "next/navigation";
 import ProjectDetails from "@/components/sections/ProjectDetails";
 import Gallery from "@/components/sections/Gallery";
