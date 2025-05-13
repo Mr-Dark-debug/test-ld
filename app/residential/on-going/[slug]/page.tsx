@@ -10,8 +10,7 @@ import { SlugPageParams } from "./types";
 export async function generateMetadata(
   { params }: SlugPageParams
 ): Promise<Metadata> {
-  const slug = params.slug;
-  const project = projectDetails[slug];
+  const project = projectDetails[params.slug];
 
   if (!project) {
     return {
@@ -29,8 +28,7 @@ export async function generateMetadata(
 export default async function ProjectPage(
   { params }: SlugPageParams
 ) {
-  const slug = params.slug;
-  const project = projectDetails[slug];
+  const project = projectDetails[params.slug];
 
   if (!project || project.type !== "residential" || project.status !== "ongoing") {
     notFound();

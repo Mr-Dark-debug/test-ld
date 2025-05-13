@@ -82,6 +82,10 @@ export default function Header() {
     ? isScrolled ? "bg-white/80 backdrop-blur-lg shadow-lg" : "bg-transparent" 
     : isScrolled ? "bg-primary/80 backdrop-blur-lg shadow-lg" : "bg-transparent";
 
+  // Define the logo and text colors based on theme
+  const logoTextColor = theme === "light" ? "#334390" : "#ffffff";
+  const navHoverColor = theme === "light" ? "#334390" : "#be9e67";
+
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${headerBgClass}`}
@@ -102,7 +106,7 @@ export default function Header() {
               />
             </div>
             {/* Company name as text */}
-            <span className="text-2xl font-display font-semibold" style={{ color: "#be9e67" }}>Laxmi Developers</span>
+            <span className="text-2xl font-display font-semibold" style={{ color: logoTextColor }}>Laxmi Developers</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -111,7 +115,7 @@ export default function Header() {
               <div key={item.title} className="relative group">
                 <Link
                   href={item.href}
-                  className="text-foreground hover:text-[#be9e67] transition-colors duration-300 py-2"
+                  className={`text-foreground hover:text-[${navHoverColor}] transition-colors duration-300 py-2`}
                 >
                   {item.title}
                 </Link>
@@ -123,7 +127,7 @@ export default function Header() {
                         <Link
                           key={subitem.title}
                           href={subitem.href}
-                          className="block px-4 py-2 text-sm hover:bg-muted rounded-md transition-colors duration-300"
+                          className={`block px-4 py-2 text-sm hover:bg-muted rounded-md transition-colors duration-300 hover:text-[${navHoverColor}]`}
                         >
                           {subitem.title}
                         </Link>
@@ -189,7 +193,7 @@ export default function Header() {
                     <>
                       <button
                         onClick={() => toggleSubmenu(item.title)}
-                        className="flex items-center justify-between w-full py-2 text-foreground hover:text-[#be9e67] transition-colors"
+                        className={`flex items-center justify-between w-full py-2 text-foreground hover:text-[${navHoverColor}] transition-colors`}
                       >
                         <span>{item.title}</span>
                         <svg
@@ -215,7 +219,7 @@ export default function Header() {
                             <Link
                               key={subitem.title}
                               href={subitem.href}
-                              className="block py-1 text-sm text-foreground hover:text-[#be9e67] transition-colors"
+                              className={`block py-1 text-sm text-foreground hover:text-[${navHoverColor}] transition-colors`}
                               onClick={toggleMobileMenu}
                             >
                               {subitem.title}
@@ -227,7 +231,7 @@ export default function Header() {
                   ) : (
                     <Link
                       href={item.href}
-                      className="block py-2 text-foreground hover:text-[#be9e67] transition-colors"
+                      className={`block py-2 text-foreground hover:text-[${navHoverColor}] transition-colors`}
                       onClick={toggleMobileMenu}
                     >
                       {item.title}

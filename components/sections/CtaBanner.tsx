@@ -1,6 +1,9 @@
+"use client";
+
 import React from "react";
 import { Button } from "@/components/ui/Button";
 import Image from "next/image";
+import { useTheme } from "@/lib/theme-context";
 
 interface CtaBannerProps {
   title: string;
@@ -21,11 +24,18 @@ export default function CtaBanner({
   buttons,
   align = "center",
 }: CtaBannerProps) {
+  const { theme } = useTheme();
   const alignmentClasses = {
     left: "text-left items-start",
     center: "text-center items-center",
     right: "text-right items-end",
   };
+
+  // Adjust overlay opacity based on theme
+  const overlayOpacity = theme === "light" ? "bg-primary/40" : "bg-primary/70";
+  const gradientBg = theme === "light" 
+    ? "bg-gradient-to-r from-primary/40 via-primary/30 to-primary/40" 
+    : "bg-gradient-to-r from-primary via-primary/90 to-primary";
 
   return (
     <section className="relative py-16 md:py-24 overflow-hidden">
@@ -39,11 +49,11 @@ export default function CtaBanner({
               fill
               className="object-cover"
             />
-            <div className="absolute inset-0 bg-primary/70"></div>
+            <div className={`absolute inset-0 ${overlayOpacity}`}></div>
           </div>
         </>
       ) : (
-        <div className="absolute inset-0 bg-gradient-to-r from-primary via-primary/90 to-primary"></div>
+        <div className={`absolute inset-0 ${gradientBg}`}></div>
       )}
 
       {/* Content */}

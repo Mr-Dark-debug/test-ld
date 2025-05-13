@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/Button";
+import { useTheme } from "@/lib/theme-context";
 
 interface HeroProps {
   title: string;
@@ -29,6 +30,7 @@ export default function Hero({
   images = [],
 }: HeroProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const { theme } = useTheme();
 
   useEffect(() => {
     if (backgroundType === "carousel" && images.length > 1) {
@@ -41,6 +43,9 @@ export default function Hero({
       return () => clearInterval(interval);
     }
   }, [backgroundType, images.length]);
+
+  // Adjust overlay opacity based on theme
+  const overlayOpacity = theme === "light" ? "bg-primary/30" : "bg-primary/50";
 
   return (
     <section className="relative h-screen flex items-center justify-center overflow-hidden">
@@ -75,7 +80,7 @@ export default function Hero({
             </div>
           ))
         )}
-        <div className="absolute inset-0 bg-primary/50"></div>
+        <div className={`absolute inset-0 ${overlayOpacity}`}></div>
       </div>
 
       {/* Content */}
