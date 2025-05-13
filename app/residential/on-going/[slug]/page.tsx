@@ -26,7 +26,7 @@ export async function generateMetadata(
 }
 
 // Define the page component
-export default function ProjectPage(
+export default async function ProjectPage(
   { params }: SlugPageParams
 ) {
   const slug = params.slug;
@@ -115,11 +115,6 @@ export default function ProjectPage(
             text: "Contact Us",
             href: "/contact",
             variant: "default",
-          },
-          {
-            text: "Download Brochure",
-            href: project.brochureUrl || "#",
-            variant: "outline",
           },
         ]}
       />

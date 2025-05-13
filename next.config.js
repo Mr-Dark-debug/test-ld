@@ -6,6 +6,18 @@ const nextConfig = {
     // This is a temporary workaround and should be removed once the type issues are resolved
     ignoreBuildErrors: true,
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'randomuser.me',
+      },
+    ],
+  },
 }
 
 module.exports = nextConfig 
