@@ -2,6 +2,7 @@ import type { Metadata } from "next/types";
 import { Playfair_Display, Poppins } from "next/font/google";
 import "./globals.css";
 import Layout from "@/components/layout/Layout";
+import { ThemeProvider } from "@/lib/theme-context";
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
@@ -32,7 +33,9 @@ export default function RootLayout({
       <body
         className={`${playfair.variable} ${poppins.variable} antialiased`}
       >
-        <Layout>{children}</Layout>
+        <ThemeProvider>
+          <Layout>{children}</Layout>
+        </ThemeProvider>
       </body>
     </html>
   );

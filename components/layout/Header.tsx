@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import ThemeToggle from "../ui/ThemeToggle";
+import { useTheme } from "@/lib/theme-context";
 
 type MenuItem = {
   title: string;
@@ -47,6 +49,7 @@ export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
+  const { theme } = useTheme();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -75,13 +78,13 @@ export default function Header() {
     }
   };
 
+  const headerBgClass = theme === "light" 
+    ? isScrolled ? "bg-white/80 backdrop-blur-lg shadow-lg" : "bg-transparent" 
+    : isScrolled ? "bg-primary/80 backdrop-blur-lg shadow-lg" : "bg-transparent";
+
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled
-          ? "bg-primary/80 backdrop-blur-lg shadow-lg"
-          : "bg-transparent"
-      }`}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${headerBgClass}`}
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
@@ -130,38 +133,48 @@ export default function Header() {
                 )}
               </div>
             ))}
+            
+            {/* Theme Toggle */}
+            <div className="ml-2">
+              <ThemeToggle />
+            </div>
           </nav>
 
-          {/* Mobile menu button */}
-          <button
-            className="lg:hidden text-foreground"
-            onClick={toggleMobileMenu}
-            aria-label="Toggle menu"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              className="h-6 w-6"
+          <div className="lg:hidden flex items-center gap-2">
+            {/* Theme Toggle - Mobile */}
+            <ThemeToggle />
+            
+            {/* Mobile menu button */}
+            <button
+              className="text-foreground"
+              onClick={toggleMobileMenu}
+              aria-label="Toggle menu"
             >
-              {isMobileMenuOpen ? (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              ) : (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              )}
-            </svg>
-          </button>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                className="h-6 w-6"
+              >
+                {isMobileMenuOpen ? (
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                ) : (
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
+                )}
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
 
