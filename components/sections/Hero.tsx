@@ -45,7 +45,7 @@ export default function Hero({
   }, [backgroundType, images.length]);
 
   // Adjust overlay opacity based on theme
-  const overlayOpacity = theme === "light" ? "bg-primary/30" : "bg-primary/50";
+  const overlayOpacity = theme === "light" ? "bg-primary/15" : "bg-primary/30";
 
   return (
     <section className="relative h-screen flex items-center justify-center overflow-hidden">

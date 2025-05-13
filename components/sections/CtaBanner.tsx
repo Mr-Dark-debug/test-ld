@@ -31,11 +31,11 @@ export default function CtaBanner({
     right: "text-right items-end",
   };
 
-  // Adjust overlay opacity based on theme
-  const overlayOpacity = theme === "light" ? "bg-primary/40" : "bg-primary/70";
+  // Adjust overlay opacity based on theme - reduced further
+  const overlayOpacity = theme === "light" ? "bg-primary/20" : "bg-primary/40";
   const gradientBg = theme === "light" 
-    ? "bg-gradient-to-r from-primary/40 via-primary/30 to-primary/40" 
-    : "bg-gradient-to-r from-primary via-primary/90 to-primary";
+    ? "bg-gradient-to-r from-primary/20 via-primary/15 to-primary/20" 
+    : "bg-gradient-to-r from-primary/70 via-primary/60 to-primary/70";
 
   return (
     <section className="relative py-16 md:py-24 overflow-hidden">

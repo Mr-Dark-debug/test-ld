@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import ThemeToggle from "../ui/ThemeToggle";
 import { useTheme } from "@/lib/theme-context";
+import { usePathname } from "next/navigation";
 
 type MenuItem = {
   title: string;
@@ -50,6 +51,7 @@ export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
   const { theme } = useTheme();
+  const pathname = usePathname();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -84,7 +86,15 @@ export default function Header() {
 
   // Define the logo and text colors based on theme
   const logoTextColor = theme === "light" ? "#334390" : "#ffffff";
-  const navHoverColor = theme === "light" ? "#334390" : "#be9e67";
+  const navHoverColor = theme === "light" ? "#334390" : "#334390";
+
+  // Check if a nav item is active
+  const isActive = (href: string) => {
+    if (href === '/') {
+      return pathname === '/';
+    }
+    return pathname.startsWith(href);
+  };
 
   return (
     <header
@@ -115,19 +125,31 @@ export default function Header() {
               <div key={item.title} className="relative group">
                 <Link
                   href={item.href}
-                  className={`text-foreground hover:text-[${navHoverColor}] transition-colors duration-300 py-2`}
+                  className={`text-foreground hover:text-[${navHoverColor}] transition-colors duration-300 py-2 relative ${
+                    isActive(item.href) ? 'text-[#334390] font-medium' : ''
+                  }`}
                 >
                   {item.title}
+                  {isActive(item.href) && (
+                    <span className="absolute bottom-0 left-0 w-full h-0.5 bg-[#334390] transform scale-x-100 transition-transform duration-300"></span>
+                  )}
+                  {!isActive(item.href) && (
+                    <span className="absolute bottom-0 left-0 w-full h-0.5 bg-[#334390] transform scale-x-0 transition-transform duration-300 group-hover:scale-x-100"></span>
+                  )}
                 </Link>
                 
                 {item.submenu && (
-                  <div className="absolute left-0 mt-2 w-64 bg-card rounded-md shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+                  <div className="absolute left-1/2 -translate-x-1/2 mt-2 w-64 bg-card rounded-md shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
                     <div className="p-2">
                       {item.submenu.map((subitem) => (
                         <Link
                           key={subitem.title}
                           href={subitem.href}
-                          className={`block px-4 py-2 text-sm hover:bg-muted rounded-md transition-colors duration-300 hover:text-[${navHoverColor}]`}
+                          className={`block px-4 py-2 text-sm rounded-md transition-colors duration-300 ${
+                            pathname === subitem.href 
+                              ? 'text-[#334390] font-medium bg-muted/50' 
+                              : 'hover:bg-muted hover:text-[#334390]'
+                          }`}
                         >
                           {subitem.title}
                         </Link>
@@ -193,7 +215,9 @@ export default function Header() {
                     <>
                       <button
                         onClick={() => toggleSubmenu(item.title)}
-                        className={`flex items-center justify-between w-full py-2 text-foreground hover:text-[${navHoverColor}] transition-colors`}
+                        className={`flex items-center justify-between w-full py-2 text-foreground hover:text-[${navHoverColor}] transition-colors ${
+                          isActive(item.href) ? 'text-[#334390] font-medium' : ''
+                        }`}
                       >
                         <span>{item.title}</span>
                         <svg
@@ -219,7 +243,9 @@ export default function Header() {
                             <Link
                               key={subitem.title}
                               href={subitem.href}
-                              className={`block py-1 text-sm text-foreground hover:text-[${navHoverColor}] transition-colors`}
+                              className={`block py-1 text-sm text-foreground hover:text-[#334390] transition-colors ${
+                                pathname === subitem.href ? 'text-[#334390] font-medium' : ''
+                              }`}
                               onClick={toggleMobileMenu}
                             >
                               {subitem.title}
@@ -231,7 +257,9 @@ export default function Header() {
                   ) : (
                     <Link
                       href={item.href}
-                      className={`block py-2 text-foreground hover:text-[${navHoverColor}] transition-colors`}
+                      className={`block py-2 text-foreground hover:text-[${navHoverColor}] transition-colors ${
+                        isActive(item.href) ? 'text-[#334390] font-medium' : ''
+                      }`}
                       onClick={toggleMobileMenu}
                     >
                       {item.title}
