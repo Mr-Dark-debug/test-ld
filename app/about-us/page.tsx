@@ -5,6 +5,7 @@ import CtaBanner from "@/components/sections/CtaBanner";
 import { testimonials } from "@/data/testimonials";
 import { FeatureCard } from "@/components/ui/FeatureCard";
 import { Award, Eye, Zap } from "@/components/ui/LucideIcons";
+import AnimatedTitle from "@/components/ui/AnimatedTitle";
 
 export const metadata: Metadata = {
   title: "About Us | Laxmi Developers",
@@ -35,9 +36,9 @@ export default function AboutUsPage() {
       {/* Hero Section */}
       <section className="relative py-24 bg-primary">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl md:text-5xl font-display text-foreground mb-6">
+          <AnimatedTitle as="h1" className="text-foreground">
             About Laxmi Developers
-          </h1>
+          </AnimatedTitle>
           <p className="text-xl text-foreground/80 max-w-3xl mx-auto">
             Crafting exceptional living and working spaces since 2001.
           </p>
@@ -49,7 +50,9 @@ export default function AboutUsPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-3xl font-display mb-6">Our Story</h2>
+              <AnimatedTitle as="h2" className="mb-6">
+                Our Story
+              </AnimatedTitle>
               <p className="text-foreground/80 mb-6">
                 Established in 2001, Laxmi Developers has grown to become one of Surat's most trusted names in real estate development. What began as a modest vision has evolved into a distinguished company known for creating premium residential and commercial spaces across the city.
               </p>
@@ -74,9 +77,9 @@ export default function AboutUsPage() {
       <section className="py-16 bg-muted">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-display mb-4">
+            <AnimatedTitle as="h2" className="mb-4">
               Our Mission, Vision & Values
-            </h2>
+            </AnimatedTitle>
             <p className="text-lg text-gray-400 max-w-2xl mx-auto">
               Guided by strong principles and a clear direction
             </p>
@@ -99,9 +102,9 @@ export default function AboutUsPage() {
       <section className="py-16 bg-background">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-display mb-4">
+            <AnimatedTitle as="h2" className="mb-4">
               Our Leadership Team
-            </h2>
+            </AnimatedTitle>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               Meet the experienced professionals guiding Laxmi Developers
             </p>

@@ -4,6 +4,7 @@ import React from "react";
 import { Button } from "@/components/ui/Button";
 import Image from "next/image";
 import { useTheme } from "@/lib/theme-context";
+import AnimatedTitle from "@/components/ui/AnimatedTitle";
 
 interface CtaBannerProps {
   title: string;
@@ -59,9 +60,9 @@ export default function CtaBanner({
       {/* Content */}
       <div className="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8">
         <div className={`flex flex-col ${alignmentClasses[align]} max-w-3xl mx-auto`}>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-display text-foreground mb-6">
+          <AnimatedTitle as="h2" className="text-foreground mb-6 text-3xl md:text-4xl lg:text-5xl">
             {title}
-          </h2>
+          </AnimatedTitle>
           {description && (
             <p className="text-lg md:text-xl text-foreground/80 mb-8 max-w-2xl">
               {description}

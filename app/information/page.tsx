@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { FeatureCard } from "@/components/ui/FeatureCard";
 import { Calculate, BarChart } from "@/components/ui/LucideIcons";
+import AnimatedTitle from "@/components/ui/AnimatedTitle";
 
 export const metadata: Metadata = {
   title: "Information | Laxmi Developers",
@@ -30,7 +31,9 @@ export default function InformationPage() {
       {/* Hero Section */}
       <section className="pt-32 pb-16 bg-gradient-to-b from-primary to-primary/90 text-foreground">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-4xl md:text-5xl font-display mb-6 text-center">Information & Resources</h1>
+          <AnimatedTitle as="h1" className="mb-6 text-center">
+            Information & Resources
+          </AnimatedTitle>
           <p className="text-xl text-center max-w-3xl mx-auto mb-8">
             Explore our helpful tools and resources to make informed decisions about your real estate investments.
           </p>
@@ -57,7 +60,9 @@ export default function InformationPage() {
       {/* FAQ Section */}
       <section className="py-16 bg-muted">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-display mb-12 text-center">Frequently Asked Questions</h2>
+          <AnimatedTitle as="h2" className="mb-12 text-center">
+            Frequently Asked Questions
+          </AnimatedTitle>
           <div className="max-w-3xl mx-auto space-y-6">
             <div className="bg-gradient-to-br from-amber-50 to-white border border-amber-100 rounded-lg p-6 shadow-sm">
               <h3 className="text-xl font-semibold mb-3 text-gray-800">What is RERA?</h3>

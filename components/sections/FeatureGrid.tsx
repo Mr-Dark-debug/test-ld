@@ -1,5 +1,6 @@
 import React from "react";
 import { FeatureCard } from "@/components/ui/FeatureCard";
+import AnimatedTitle from "@/components/ui/AnimatedTitle";
 
 interface Feature {
   id: string;
@@ -19,7 +20,9 @@ export default function FeatureGrid({ title, subtitle, features }: FeatureGridPr
     <section className="py-20 bg-muted">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-display mb-4">{title}</h2>
+          <AnimatedTitle as="h2" className="mb-4">
+            {title}
+          </AnimatedTitle>
           {subtitle && (
             <p className="text-lg text-gray-400 max-w-2xl mx-auto">
               {subtitle}

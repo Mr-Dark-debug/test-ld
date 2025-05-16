@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
+import AnimatedTitle from "@/components/ui/AnimatedTitle";
 
 export interface Project {
   id: string;
@@ -44,7 +45,9 @@ export default function FeaturedProjects({
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-display mb-4">{title}</h2>
+          <AnimatedTitle as="h2" className="mb-4">
+            {title}
+          </AnimatedTitle>
           {subtitle && (
             <p className="text-lg text-foreground/70 max-w-2xl mx-auto">
               {subtitle}

@@ -4,6 +4,8 @@ import { companyFeatures } from "@/data/features";
 import { testimonials } from "@/data/testimonials";
 import TestimonialMarquee from "@/components/sections/TestimonialMarquee";
 import CtaBanner from "@/components/sections/CtaBanner";
+import AnimatedTitle from "@/components/ui/AnimatedTitle";
+import FlowingMenu from "@/components/reactbits/FlowingMenu/FlowingMenu";
 
 export const metadata: Metadata = {
   title: "Why Choose Laxmi Developers | Laxmi Developers",
@@ -11,25 +13,68 @@ export const metadata: Metadata = {
 };
 
 export default function WhyLaxmiPage() {
+  const whyUsItems = [
+    { 
+      link: '#quality-excellence', 
+      text: 'Quality Excellence', 
+      image: '/images/flowing-menu/quality.jpg' 
+    },
+    { 
+      link: '#customer-centric', 
+      text: 'Customer-Centric', 
+      image: '/images/flowing-menu/customer.jpg' 
+    },
+    { 
+      link: '#innovative-design', 
+      text: 'Innovative Design', 
+      image: '/images/flowing-menu/design.jpg' 
+    },
+    { 
+      link: '#timely-delivery', 
+      text: 'Timely Delivery', 
+      image: '/images/flowing-menu/delivery.jpg' 
+    }
+  ];
+
   return (
     <main>
       {/* Hero Section */}
       <section className="relative py-24 bg-primary">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl md:text-5xl font-display text-foreground mb-6">
+          <AnimatedTitle as="h1" className="text-foreground mb-6">
             Why Choose Laxmi Developers?
-          </h1>
+          </AnimatedTitle>
           <p className="text-xl text-foreground/80 max-w-3xl mx-auto">
             For over two decades, we have been building trust and delivering excellence in every project we undertake.
           </p>
         </div>
       </section>
 
-      {/* Company Intro */}
+      {/* Flowing Menu Section */}
       <section className="py-16 bg-background">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-3xl mx-auto text-center mb-10">
+            <AnimatedTitle as="h2" className="mb-6">
+              Our Core Values
+            </AnimatedTitle>
+            <p className="text-foreground/80">
+              At Laxmi Developers, our success is built on these foundational values that guide everything we do.
+            </p>
+          </div>
+          
+          <div className="w-full h-[500px] md:h-[600px] relative rounded-lg overflow-hidden shadow-xl border border-gray-100 dark:border-gray-800">
+            <FlowingMenu items={whyUsItems} />
+          </div>
+        </div>
+      </section>
+
+      {/* Company Intro */}
+      <section className="py-16 bg-muted" id="quality-excellence">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl font-display mb-6">Our Legacy of Excellence</h2>
+            <AnimatedTitle as="h2" className="mb-6">
+              Our Legacy of Excellence
+            </AnimatedTitle>
             <p className="text-foreground/80 mb-6">
               Laxmi Developers was established in 2001 with a vision to transform the real estate landscape of Surat. Over the years, we have successfully delivered premium residential and commercial projects that stand as testaments to our commitment to excellence and innovation.
             </p>
@@ -48,11 +93,13 @@ export default function WhyLaxmiPage() {
       />
 
       {/* Our Approach */}
-      <section className="py-16 bg-background">
+      <section className="py-16 bg-background" id="customer-centric">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
             <div>
-              <h2 className="text-3xl font-display mb-6">Our Approach</h2>
+              <AnimatedTitle as="h2" className="mb-6">
+                Our Customer-Centric Approach
+              </AnimatedTitle>
               <p className="text-foreground/80 mb-6">
                 At Laxmi Developers, we follow a meticulous approach in every project we undertake, from initial concept to final delivery. Our process is designed to ensure that each property not only meets but exceeds industry standards and client expectations.
               </p>
@@ -80,7 +127,9 @@ export default function WhyLaxmiPage() {
               </ul>
             </div>
             <div className="bg-gradient-to-br from-amber-50 to-white border border-amber-100 p-8 rounded-lg shadow-md">
-              <h3 className="text-2xl font-display mb-6 text-gray-800">Our Achievements</h3>
+              <AnimatedTitle as="h3" className="mb-6 text-gray-800">
+                Our Achievements
+              </AnimatedTitle>
               <div className="space-y-6">
                 <div className="flex items-center">
                   <div className="w-16 h-16 bg-[#be9e67]/20 rounded-full flex items-center justify-center mr-4">
@@ -118,6 +167,85 @@ export default function WhyLaxmiPage() {
                     <p className="text-gray-600">For excellence in real estate</p>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Innovative Design Section */}
+      <section className="py-16 bg-muted" id="innovative-design">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <AnimatedTitle as="h2" className="mb-4">
+              Innovative Design Philosophy
+            </AnimatedTitle>
+            <p className="text-lg text-foreground/70 max-w-2xl mx-auto">
+              Our designs blend aesthetics with functionality to create spaces that inspire
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="bg-card p-8 rounded-lg shadow-md">
+              <h3 className="text-xl font-display mb-4">Contemporary Aesthetics</h3>
+              <p className="text-foreground/80">
+                We embrace modern architectural trends while incorporating timeless design principles to create properties that remain relevant and appealing for generations.
+              </p>
+            </div>
+            <div className="bg-card p-8 rounded-lg shadow-md">
+              <h3 className="text-xl font-display mb-4">Functional Layouts</h3>
+              <p className="text-foreground/80">
+                Every square foot matters. Our spaces are thoughtfully designed to maximize utility while providing a comfortable living environment.
+              </p>
+            </div>
+            <div className="bg-card p-8 rounded-lg shadow-md">
+              <h3 className="text-xl font-display mb-4">Sustainable Practices</h3>
+              <p className="text-foreground/80">
+                From material selection to energy-efficient designs, sustainability is integrated into our development process to minimize environmental impact.
+              </p>
+            </div>
+            <div className="bg-card p-8 rounded-lg shadow-md">
+              <h3 className="text-xl font-display mb-4">Smart Home Integration</h3>
+              <p className="text-foreground/80">
+                We incorporate the latest smart home technologies to enhance convenience, security, and energy efficiency in our premium properties.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Timely Delivery Section */}
+      <section className="py-16 bg-background" id="timely-delivery">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <AnimatedTitle as="h2" className="mb-4">
+              Our Commitment to Timely Delivery
+            </AnimatedTitle>
+            <p className="text-lg text-foreground/70 max-w-2xl mx-auto">
+              We understand the value of time and deliver our projects when promised
+            </p>
+          </div>
+          <div className="flex flex-col md:flex-row justify-center items-center bg-card p-8 rounded-lg shadow-md">
+            <div className="w-full md:w-2/3 pr-0 md:pr-8 mb-6 md:mb-0">
+              <h3 className="text-xl font-display mb-4">Rigorous Project Management</h3>
+              <p className="text-foreground/80 mb-4">
+                Our dedicated project management teams ensure that each phase of construction advances according to schedule. We utilize advanced project tracking tools and methodologies to monitor progress closely.
+              </p>
+              <p className="text-foreground/80 mb-4">
+                Regular quality checks and milestone reviews help us identify potential delays before they occur, allowing for proactive solutions and keeping projects on track.
+              </p>
+              <p className="text-foreground/80">
+                We maintain transparent communication with our clients about project timelines, providing regular updates and ensuring you're always informed about your investment.
+              </p>
+            </div>
+            <div className="w-full md:w-1/3 bg-[#be9e67]/10 p-6 rounded-lg">
+              <div className="text-center">
+                <div className="text-[#be9e67] text-5xl font-bold mb-2">95%</div>
+                <p className="text-foreground/80 font-medium">Projects delivered on time</p>
+              </div>
+              <hr className="my-4 border-[#be9e67]/20" />
+              <div className="text-center">
+                <div className="text-[#be9e67] text-5xl font-bold mb-2">98%</div>
+                <p className="text-foreground/80 font-medium">Client satisfaction rate</p>
               </div>
             </div>
           </div>
