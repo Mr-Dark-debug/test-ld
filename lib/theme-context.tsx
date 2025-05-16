@@ -39,6 +39,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }, [theme]);
 
   const toggleTheme = () => {
+    console.log("Toggle theme called, current theme:", theme);
     setTheme(prevTheme => prevTheme === "dark" ? "light" : "dark");
   };
 
@@ -55,4 +56,4 @@ export function useTheme() {
     throw new Error("useTheme must be used within a ThemeProvider");
   }
   return context;
-} 
+}
