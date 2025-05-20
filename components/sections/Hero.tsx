@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { Button } from "@/components/ui/Button";
 import { useTheme } from "@/lib/theme-context";
+import BlurText from "@/components/reactbits/BlurText/BlurText";
+import { ShimmerButton } from "@/components/magicui/shimmer-button";
 
 interface HeroProps {
   title: string;
@@ -30,6 +31,7 @@ export default function Hero({
   images = [],
 }: HeroProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [animationComplete, setAnimationComplete] = useState(false);
   const { theme } = useTheme();
 
   useEffect(() => {
@@ -44,8 +46,15 @@ export default function Hero({
     }
   }, [backgroundType, images.length]);
 
-  // Adjust overlay opacity based on theme
-  const overlayOpacity = theme === "light" ? "bg-primary/15" : "bg-primary/30";
+  // Handle animation completion
+  const handleTitleAnimationComplete = () => {
+    setAnimationComplete(true);
+  };
+
+  // Adjust overlay opacity and blur based on theme
+  const overlayStyle = theme === "light" 
+    ? "bg-black/25 backdrop-blur-[8px]" 
+    : "bg-black/40 backdrop-blur-[8px]";
 
   return (
     <section className="relative h-screen flex items-center justify-center overflow-hidden">
@@ -80,31 +89,70 @@ export default function Hero({
             </div>
           ))
         )}
-        <div className={`absolute inset-0 ${overlayOpacity}`}></div>
+        {/* Darker overlay with blur for better text readability */}
+        <div className={`absolute inset-0 ${overlayStyle}`}></div>
       </div>
 
-      {/* Content */}
+      {/* Content with improved visibility */}
       <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h1 className="text-4xl md:text-5xl lg:text-6xl font-display text-foreground leading-tight mb-6">{title}</h1>
-        {subtitle && (
-          <p className="text-xl md:text-2xl text-foreground/90 max-w-3xl mx-auto mb-8">
-            {subtitle}
-          </p>
-        )}
-        {ctaButtons.length > 0 && (
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            {ctaButtons.map((button, index) => (
-              <Button
-                key={index}
-                href={button.href}
-                variant={button.variant || (index === 0 ? "default" : "outline")}
-                size="lg"
-              >
-                {button.text}
-              </Button>
-            ))}
+        {/* Semi-transparent backdrop for text */}
+        <div className="inline-block ">
+          {/* Title */}
+          <div className="text-4xl md:text-5xl lg:text-6xl font-display leading-tight mb-6 text-white ">
+            <BlurText
+              text={title}
+              delay={100}
+              animateBy="words"
+              direction="top"
+              onAnimationComplete={handleTitleAnimationComplete}
+              className="font-display inline-block font-bold"
+              stepDuration={0.4}
+            />
           </div>
-        )}
+          
+          {/* Subtitle */}
+          {subtitle && (
+            <div className="text-xl md:text-2xl max-w-3xl mx-auto mb-8 text-white/90">
+              <BlurText
+                text={subtitle}
+                delay={150}
+                animateBy="words"
+                direction="bottom"
+                className="font-medium leading-relaxed"
+                stepDuration={0.35}
+              />
+            </div>
+          )}
+          
+          {/* Call-to-action buttons */}
+          {ctaButtons.length > 0 && (
+            <div className={`flex flex-col sm:flex-row items-center justify-center gap-4 transition-opacity duration-500 mt-6 ${animationComplete ? 'opacity-100' : 'opacity-0'}`}>
+              {ctaButtons.map((button, index) => (
+                index === 0 ? (
+                  <ShimmerButton
+                    key={index}
+                    onClick={() => window.location.href = button.href}
+                    shimmerColor="#3b82f6"
+                    background="rgba(59, 130, 246, 0.9)"
+                    className="font-medium"
+                  >
+                    {button.text}
+                  </ShimmerButton>
+                ) : (
+                  <ShimmerButton
+                    key={index}
+                    onClick={() => window.location.href = button.href}
+                    shimmerColor="#ffffff"
+                    background="rgba(255, 255, 255, 0.1)"
+                    className="font-medium"
+                  >
+                    {button.text}
+                  </ShimmerButton>
+                )
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Carousel Indicators */}
@@ -116,8 +164,8 @@ export default function Hero({
               onClick={() => setCurrentImageIndex(index)}
               className={`w-3 h-3 rounded-full transition-all ${
                 index === currentImageIndex
-                  ? "bg-highlight w-6"
-                  : "bg-foreground/50"
+                  ? "bg-white w-6"
+                  : "bg-white/50"
               }`}
               aria-label={`Go to slide ${index + 1}`}
             />

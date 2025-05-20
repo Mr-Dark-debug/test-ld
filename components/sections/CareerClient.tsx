@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/Button";
+import { ShimmerButton } from "@/components/magicui/shimmer-button";
 
 interface JobOpening {
   id: string;
@@ -193,13 +193,14 @@ export default function CareerClient({ jobOpenings }: CareerClientProps) {
                         {job.department} | {job.location} | {job.type}
                       </p>
                     </div>
-                    <Button
+                    <ShimmerButton
                       onClick={() => setSelectedJob(selectedJob === job.id ? null : job.id)}
-                      variant="ghost"
-                      className="mt-3 md:mt-0"
+                      shimmerColor="#ffffff"
+                      background="rgba(255, 255, 255, 0.1)"
+                      className="font-medium mt-3 md:mt-0"
                     >
                       {selectedJob === job.id ? "Hide Details" : "View Details"}
-                    </Button>
+                    </ShimmerButton>
                   </div>
                   <p className="text-foreground/80">{job.description}</p>
 
@@ -222,7 +223,7 @@ export default function CareerClient({ jobOpenings }: CareerClientProps) {
                         </ul>
                       </div>
                       <div className="mt-6">
-                        <Button
+                        <ShimmerButton
                           onClick={() => {
                             setFormData((prev) => ({
                               ...prev,
@@ -233,9 +234,12 @@ export default function CareerClient({ jobOpenings }: CareerClientProps) {
                               behavior: "smooth",
                             });
                           }}
+                          shimmerColor="#3b82f6"
+                          background="rgba(59, 130, 246, 0.9)"
+                          className="font-medium"
                         >
                           Apply Now
-                        </Button>
+                        </ShimmerButton>
                       </div>
                     </div>
                   )}
@@ -279,12 +283,12 @@ export default function CareerClient({ jobOpenings }: CareerClientProps) {
                 <p className="text-foreground/80 mb-6">
                   Thank you for your interest in joining Laxmi Developers. Our HR team will review your application and contact you if your qualifications match our requirements.
                 </p>
-                <Button
+                <ShimmerButton
                   onClick={() => setFormSubmitted(false)}
                   variant="outline"
                 >
                   Submit Another Application
-                </Button>
+                </ShimmerButton>
               </div>
             ) : (
               <div className="bg-card p-8 rounded-lg shadow-md">
@@ -409,13 +413,13 @@ export default function CareerClient({ jobOpenings }: CareerClientProps) {
                   </div>
 
                   <div>
-                    <Button
+                    <ShimmerButton
                       type="submit"
                       disabled={isSubmitting}
                       className="w-full"
                     >
                       {isSubmitting ? "Submitting..." : "Submit Application"}
-                    </Button>
+                    </ShimmerButton>
                   </div>
                 </form>
               </div>

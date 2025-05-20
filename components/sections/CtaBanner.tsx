@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Button } from "@/components/ui/Button";
+import { ShimmerButton } from "@/components/magicui/shimmer-button";
 import Image from "next/image";
 import { useTheme } from "@/lib/theme-context";
 import AnimatedTitle from "@/components/ui/AnimatedTitle";
@@ -70,14 +70,27 @@ export default function CtaBanner({
           )}
           <div className="flex flex-wrap gap-4 justify-center">
             {buttons.map((button, index) => (
-              <Button
-                key={index}
-                href={button.href}
-                variant={button.variant || (index === 0 ? "default" : "outline")}
-                size="lg"
-              >
-                {button.text}
-              </Button>
+              index === 0 ? (
+                <ShimmerButton
+                  key={index}
+                  onClick={() => window.location.href = button.href}
+                  shimmerColor="#3b82f6"
+                  background="rgba(59, 130, 246, 0.9)"
+                  className="font-medium"
+                >
+                  {button.text}
+                </ShimmerButton>
+              ) : (
+                <ShimmerButton
+                  key={index}
+                  onClick={() => window.location.href = button.href}
+                  shimmerColor="#ffffff"
+                  background="rgba(255, 255, 255, 0.1)"
+                  className="font-medium"
+                >
+                  {button.text}
+                </ShimmerButton>
+              )
             ))}
           </div>
         </div>

@@ -66,7 +66,7 @@ const FlowingMenu: React.FC<FlowingMenuProps> = ({ items }) => {
             ref={(el) => {
               itemRefs.current[index] = el;
             }}
-          >
+      >
             {/* Background Image */}
             <div className="absolute inset-0 w-full h-full">
               <Image
@@ -124,8 +124,8 @@ const FlowingMenu: React.FC<FlowingMenuProps> = ({ items }) => {
                     </motion.div>
                   )}
                 </AnimatePresence>
-              </div>
-            </div>
+          </div>
+        </div>
           </Link>
         );
       })}

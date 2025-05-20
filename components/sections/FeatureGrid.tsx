@@ -1,6 +1,10 @@
+"use client";
+
 import React from "react";
-import { FeatureCard } from "@/components/ui/FeatureCard";
+import SpotlightCard from "@/components/reactbits/SpotlightCard/SpotlightCard";
 import AnimatedTitle from "@/components/ui/AnimatedTitle";
+import FadeIn from "@/components/reactbits/FadeIn/FadeIn";
+import { Ripple } from "@/components/magicui/ripple";
 
 interface Feature {
   id: string;
@@ -17,27 +21,101 @@ interface FeatureGridProps {
 
 export default function FeatureGrid({ title, subtitle, features }: FeatureGridProps) {
   return (
-    <section className="py-20 bg-muted">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-20 bg-muted relative overflow-hidden">
+      {/* Main ripple effect covering the entire section */}
+      <Ripple 
+        className="absolute inset-0 opacity-50" 
+        mainCircleSize={600}
+        mainCircleOpacity={0.35}
+        numCircles={12}
+      />
+      
+      {/* Secondary ripples for more dynamic effect */}
+      <div className="absolute -left-20 top-1/4">
+        <Ripple 
+          className="opacity-40"
+          mainCircleSize={500} 
+          mainCircleOpacity={0.3}
+          numCircles={8}
+        />
+      </div>
+      
+      <div className="absolute -right-20 bottom-1/4">
+        <Ripple 
+          className="opacity-40"
+          mainCircleSize={550} 
+          mainCircleOpacity={0.25}
+          numCircles={10}
+        />
+      </div>
+      
+      <div className="absolute left-1/3 -bottom-40">
+        <Ripple 
+          className="opacity-35"
+          mainCircleSize={500} 
+          mainCircleOpacity={0.3}
+          numCircles={8}
+        />
+      </div>
+      
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center mb-16">
           <AnimatedTitle as="h2" className="mb-4">
             {title}
           </AnimatedTitle>
           {subtitle && (
-            <p className="text-lg text-gray-400 max-w-2xl mx-auto">
+            <p className="text-lg text-foreground/80 max-w-2xl mx-auto">
               {subtitle}
             </p>
           )}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {features.map((feature) => (
-            <FeatureCard
+          {features.map((feature, index) => (
+            <SpotlightCard 
               key={feature.id}
-              title={feature.title}
-              description={feature.description}
-              icon={feature.icon}
-            />
+              className="min-h-[300px] flex flex-col transition-all duration-300 hover:translate-y-[-8px] group"
+              spotlightColor="rgba(201, 167, 107, 0.5)" // Increased opacity for stronger visibility
+            >
+              <div className="flex flex-col h-full p-6">
+                {/* Icon with fade-in animation and enhanced hover effect */}
+                <FadeIn 
+                  delay={0.1 * index}
+                  y={20}
+                  className="flex-shrink-0 mb-6 w-14 h-14 rounded-2xl bg-accent/15 dark:bg-accent/25 p-3 flex items-center justify-center relative overflow-hidden group-hover:bg-accent/20 dark:group-hover:bg-accent/30 transition-colors duration-300"
+                >
+                  {/* Inner glow effect on hover */}
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-40 bg-accent/10 rounded-xl blur-lg transition-opacity duration-300"></div>
+                  
+                  {/* Icon with hover animation */}
+                  <div className="relative z-10 text-accent group-hover:text-accent transition-transform duration-300 group-hover:scale-110">
+                    {feature.icon}
+                  </div>
+                </FadeIn>
+                
+                <div className="space-y-4 flex-grow">
+                  {/* Title with fade-in animation and hover effect */}
+                  <FadeIn 
+                    delay={0.2 + (0.1 * index)}
+                    y={15}
+                  >
+                    <h3 className="text-xl font-semibold text-foreground dark:text-white group-hover:text-accent dark:group-hover:text-accent transition-colors duration-300">
+                      {feature.title}
+                    </h3>
+                  </FadeIn>
+                  
+                  {/* Description with fade-in animation and subtle hover effect */}
+                  <FadeIn 
+                    delay={0.3 + (0.1 * index)}
+                    y={10}
+                  >
+                    <p className="text-foreground/90 dark:text-gray-200 leading-relaxed group-hover:text-foreground dark:group-hover:text-white/95 transition-colors duration-300">
+                      {feature.description}
+                    </p>
+                  </FadeIn>
+                </div>
+              </div>
+            </SpotlightCard>
           ))}
         </div>
       </div>

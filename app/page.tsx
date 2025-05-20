@@ -4,6 +4,7 @@ import FeaturedProjects from "@/components/sections/FeaturedProjects";
 import TestimonialMarquee from "@/components/sections/TestimonialMarquee";
 import CtaBanner from "@/components/sections/CtaBanner";
 import AnimatedMetrics from "@/components/sections/AnimatedMetrics";
+import HomeFlowingMenu from "@/components/sections/HomeFlowingMenu";
 
 import { heroData } from "@/data/hero";
 import { companyFeatures } from "@/data/features";
@@ -22,6 +23,9 @@ export default function Home() {
         backgroundType={heroData.backgroundType}
         images={heroData.images}
       />
+
+      {/* Flowing Menu Section */}
+      <HomeFlowingMenu />
 
       {/* Animated Metrics */}
       <AnimatedMetrics metrics={metricsData} />
