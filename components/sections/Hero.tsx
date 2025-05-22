@@ -133,11 +133,7 @@ export default function Hero({
                   key={index}
                   onClick={() => window.location.href = button.href}
                   variant={button.variant || (index === 0 ? "default" : "outline")}
-                  className="px-6 py-3 font-medium"
-                  glowClassName={index === 0 ? 
-                    "from-highlight via-highlight/80 to-highlight/60" : 
-                    "from-highlight/70 via-highlight/50 to-highlight/30"
-                  }
+                  className="min-w-[160px] px-6 py-3 font-medium"
                 >
                   {button.text}
                 </AuroraButton>

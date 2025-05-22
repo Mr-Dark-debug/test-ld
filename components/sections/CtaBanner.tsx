@@ -58,27 +58,23 @@ export default function CtaBanner({
       )}
 
       {/* Content */}
-      <div className="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8">
-        <div className={`flex flex-col ${alignmentClasses[align]} max-w-3xl mx-auto`}>
+      <div className="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center">
+        <div className={`flex flex-col w-full max-w-3xl items-center text-center mx-auto`}>
           <AnimatedTitle as="h2" className="text-foreground mb-6 text-3xl md:text-4xl lg:text-5xl">
             {title}
           </AnimatedTitle>
           {description && (
-            <p className="text-lg md:text-xl text-foreground/80 mb-8 max-w-2xl">
+            <p className="text-lg md:text-xl text-foreground/80 mb-8 max-w-2xl mx-auto">
               {description}
             </p>
           )}
-          <div className="flex flex-wrap gap-4 justify-center">
+          <div className="flex flex-row flex-wrap gap-4 justify-center items-center w-full mt-2">
             {buttons.map((button, index) => (
               <AuroraButton
                 key={index}
                 onClick={() => window.location.href = button.href}
                 variant={button.variant || (index === 0 ? "default" : "outline")}
-                className="px-6 py-3 font-medium"
-                glowClassName={index === 0 ? 
-                  "from-highlight via-highlight/80 to-highlight/60" : 
-                  "from-highlight/70 via-highlight/50 to-highlight/30"
-                }
+                className="min-w-[170px] px-6 py-3 font-medium"
               >
                 {button.text}
               </AuroraButton>

@@ -48,8 +48,7 @@ export default function HomeFlowingMenu() {
             <AuroraButton
               onClick={() => window.location.href = '/projects'}
               variant="default"
-              className="px-6 py-3 font-medium"
-              glowClassName="from-highlight via-highlight/80 to-highlight/60"
+              className="min-w-[160px] px-6 py-3 font-medium"
             >
               View All Projects
             </AuroraButton>

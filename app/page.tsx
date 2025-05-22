@@ -19,7 +19,13 @@ export default function Home() {
       <Hero
         title={heroData.title}
         subtitle={heroData.subtitle}
-        ctaButtons={heroData.ctaButtons as { text: string; href: string; variant?: "default" | "outline" | "ghost" | "light" | "dark" }[]}
+        ctaButtons={
+          heroData.ctaButtons.map(({ text, href, variant }) => ({
+            text,
+            href,
+            variant: (["default", "outline", "ghost"].includes(variant) ? variant : undefined) as "default" | "outline" | "ghost" | undefined
+          }))
+        }
         backgroundType={heroData.backgroundType}
         images={heroData.images}
       />
