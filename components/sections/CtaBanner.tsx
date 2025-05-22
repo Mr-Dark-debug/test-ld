@@ -1,10 +1,10 @@
 "use client";
 
 import React from "react";
-import { ShimmerButton } from "@/components/magicui/shimmer-button";
 import Image from "next/image";
 import { useTheme } from "@/lib/theme-context";
 import AnimatedTitle from "@/components/ui/AnimatedTitle";
+import { AuroraButton } from "@/components/ui/aurora-button";
 
 interface CtaBannerProps {
   title: string;
@@ -13,7 +13,7 @@ interface CtaBannerProps {
   buttons: {
     text: string;
     href: string;
-    variant?: "default" | "outline" | "ghost" | "light" | "dark";
+    variant?: "default" | "outline" | "ghost";
   }[];
   align?: "left" | "center" | "right";
 }
@@ -70,27 +70,18 @@ export default function CtaBanner({
           )}
           <div className="flex flex-wrap gap-4 justify-center">
             {buttons.map((button, index) => (
-              index === 0 ? (
-                <ShimmerButton
-                  key={index}
-                  onClick={() => window.location.href = button.href}
-                  shimmerColor="#3b82f6"
-                  background="rgba(59, 130, 246, 0.9)"
-                  className="font-medium"
-                >
-                  {button.text}
-                </ShimmerButton>
-              ) : (
-                <ShimmerButton
-                  key={index}
-                  onClick={() => window.location.href = button.href}
-                  shimmerColor="#ffffff"
-                  background="rgba(255, 255, 255, 0.1)"
-                  className="font-medium"
-                >
-                  {button.text}
-                </ShimmerButton>
-              )
+              <AuroraButton
+                key={index}
+                onClick={() => window.location.href = button.href}
+                variant={button.variant || (index === 0 ? "default" : "outline")}
+                className="px-6 py-3 font-medium"
+                glowClassName={index === 0 ? 
+                  "from-highlight via-highlight/80 to-highlight/60" : 
+                  "from-highlight/70 via-highlight/50 to-highlight/30"
+                }
+              >
+                {button.text}
+              </AuroraButton>
             ))}
           </div>
         </div>

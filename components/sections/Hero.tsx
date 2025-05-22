@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useTheme } from "@/lib/theme-context";
 import BlurText from "@/components/reactbits/BlurText/BlurText";
-import { ShimmerButton } from "@/components/magicui/shimmer-button";
+import { AuroraButton } from "@/components/ui/aurora-button";
 
 interface HeroProps {
   title: string;
@@ -12,7 +12,7 @@ interface HeroProps {
   ctaButtons?: {
     text: string;
     href: string;
-    variant?: "default" | "outline" | "ghost" | "light" | "dark";
+    variant?: "default" | "outline" | "ghost";
   }[];
   backgroundType: "video" | "carousel";
   videoSrc?: string;
@@ -94,11 +94,11 @@ export default function Hero({
       </div>
 
       {/* Content with improved visibility */}
-      <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 text-left sm:text-center">
         {/* Semi-transparent backdrop for text */}
-        <div className="inline-block ">
+        <div className="inline-block max-w-full">
           {/* Title */}
-          <div className="text-4xl md:text-5xl lg:text-6xl font-display leading-tight mb-6 text-white ">
+          <div className="text-4xl md:text-5xl lg:text-6xl font-display leading-tight mb-6 text-white">
             <BlurText
               text={title}
               delay={100}
@@ -126,29 +126,21 @@ export default function Hero({
           
           {/* Call-to-action buttons */}
           {ctaButtons.length > 0 && (
-            <div className={`flex flex-col sm:flex-row items-center justify-center gap-4 transition-opacity duration-500 mt-6 ${animationComplete ? 'opacity-100' : 'opacity-0'}`}>
+            <div className={`flex flex-col sm:flex-row items-start sm:items-center sm:justify-center gap-4 transition-opacity duration-500 mt-6 ${animationComplete ? 'opacity-100' : 'opacity-0'}`}>
+              {/* Map over all buttons */}
               {ctaButtons.map((button, index) => (
-                index === 0 ? (
-                  <ShimmerButton
-                    key={index}
-                    onClick={() => window.location.href = button.href}
-                    shimmerColor="#3b82f6"
-                    background="rgba(59, 130, 246, 0.9)"
-                    className="font-medium"
-                  >
-                    {button.text}
-                  </ShimmerButton>
-                ) : (
-                  <ShimmerButton
-                    key={index}
-                    onClick={() => window.location.href = button.href}
-                    shimmerColor="#ffffff"
-                    background="rgba(255, 255, 255, 0.1)"
-                    className="font-medium"
-                  >
-                    {button.text}
-                  </ShimmerButton>
-                )
+                <AuroraButton
+                  key={index}
+                  onClick={() => window.location.href = button.href}
+                  variant={button.variant || (index === 0 ? "default" : "outline")}
+                  className="px-6 py-3 font-medium"
+                  glowClassName={index === 0 ? 
+                    "from-highlight via-highlight/80 to-highlight/60" : 
+                    "from-highlight/70 via-highlight/50 to-highlight/30"
+                  }
+                >
+                  {button.text}
+                </AuroraButton>
               ))}
             </div>
           )}

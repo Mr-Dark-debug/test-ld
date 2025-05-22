@@ -1,6 +1,6 @@
 import Header from "./Header";
 import Footer from "./Footer";
-import { SmoothCursor } from "@/components/ui/smooth-cursor";
+// import { SmoothCursor } from "@/components/ui/smooth-cursor";
 import ScrollFloatProvider from "@/components/reactbits/ScrollFloat/ScrollFloatProvider";
 
 interface LayoutProps {
@@ -10,7 +10,7 @@ interface LayoutProps {
 export default function Layout({ children }: LayoutProps) {
   return (
     <>
-      <SmoothCursor />
+      {/* <SmoothCursor /> */}
       <Header />
       <main className="min-h-screen">
         <ScrollFloatProvider>
@@ -20,4 +20,4 @@ export default function Layout({ children }: LayoutProps) {
       <Footer />
     </>
   );
-} 
+}

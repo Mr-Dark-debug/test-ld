@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'motion/react';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 
 interface FlowingMenuItem {
   link: string;
@@ -20,6 +21,7 @@ const FlowingMenu: React.FC<FlowingMenuProps> = ({ items }) => {
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<Array<HTMLAnchorElement | null>>([]);
+  const isMobile = useMediaQuery('(max-width: 768px)');
 
   // Auto-rotate the active item every 5 seconds if not being hovered
   useEffect(() => {
@@ -34,11 +36,19 @@ const FlowingMenu: React.FC<FlowingMenuProps> = ({ items }) => {
 
   // Calculate positions of menu items
   const getItemStyle = (index: number) => {
+    // On mobile, all items take full width
+    if (isMobile) {
+      return {
+        width: '100%',
+        height: `${100 / items.length}%`,
+      };
+    }
+
+    // Desktop layout (horizontal)
     const isActive = hoverIndex === index || (hoverIndex === null && activeIndex === index);
     const isHovering = hoverIndex !== null;
     const itemCount = items.length;
     const baseWidth = 100 / itemCount;
-    const expandedWidth = isActive ? 45 : (100 - 45) / (itemCount - 1);
     
     // When hovering, adjust widths to expand the hovered item
     const width = isHovering 
@@ -47,11 +57,15 @@ const FlowingMenu: React.FC<FlowingMenuProps> = ({ items }) => {
     
     return {
       width: `${width}%`,
+      height: '100%',
     };
   };
 
   return (
-    <div className="flex h-full w-full overflow-hidden relative" ref={menuRef}>
+    <div 
+      className={`h-full w-full overflow-hidden relative ${isMobile ? 'flex flex-col' : 'flex flex-row'}`} 
+      ref={menuRef}
+    >
       {items.map((item, index) => {
         const isActive = hoverIndex === index || (hoverIndex === null && activeIndex === index);
         
@@ -59,14 +73,14 @@ const FlowingMenu: React.FC<FlowingMenuProps> = ({ items }) => {
           <Link
             href={item.link}
             key={`${item.text}-${index}`}
-            className="relative h-full transition-all duration-700 ease-in-out overflow-hidden flex-grow"
+            className="relative transition-all duration-700 ease-in-out overflow-hidden flex-grow"
             style={getItemStyle(index)}
             onMouseEnter={() => setHoverIndex(index)}
             onMouseLeave={() => setHoverIndex(null)}
             ref={(el) => {
               itemRefs.current[index] = el;
             }}
-      >
+          >
             {/* Background Image */}
             <div className="absolute inset-0 w-full h-full">
               <Image
@@ -124,8 +138,8 @@ const FlowingMenu: React.FC<FlowingMenuProps> = ({ items }) => {
                     </motion.div>
                   )}
                 </AnimatePresence>
-          </div>
-        </div>
+              </div>
+            </div>
           </Link>
         );
       })}

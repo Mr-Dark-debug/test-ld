@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ShimmerButton } from "@/components/magicui/shimmer-button";
+import { AuroraButton } from "@/components/ui/aurora-button";
 import AnimatedTitle from "@/components/ui/AnimatedTitle";
 
 export interface Project {
@@ -173,14 +173,13 @@ export default function FeaturedProjects({
         {/* View All Button */}
         {viewAllHref && (
           <div className="mt-12 text-center">
-            <ShimmerButton
+            <AuroraButton
               onClick={() => window.location.href = viewAllHref}
-              shimmerColor="#ffffff"
-              background="rgba(255, 255, 255, 0.1)"
-              className="font-medium"
+              variant="outline"
+              className="px-6 py-3 font-medium"
             >
               View All Projects
-            </ShimmerButton>
+            </AuroraButton>
           </div>
         )}
       </div>

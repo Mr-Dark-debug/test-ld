@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ShimmerButton } from "@/components/magicui/shimmer-button";
+import { AuroraButton } from "@/components/ui/aurora-button";
 import { BrochureDownloadForm } from "@/components/BrochureDownloadForm";
 
 interface ProjectBrochureSectionProps {
@@ -28,14 +28,13 @@ export function ProjectBrochureSection({
                 Download our detailed brochure to learn more about the features, amenities, 
                 and specifications of this project.
               </p>
-              <ShimmerButton 
+              <AuroraButton 
                 onClick={() => setShowForm(true)}
-                shimmerColor="#3b82f6"
-                background="rgba(59, 130, 246, 0.9)"
-                className="font-medium"
+                variant="default"
+                className="px-6 py-3 font-medium"
               >
                 Download Brochure
-              </ShimmerButton>
+              </AuroraButton>
             </div>
           ) : (
             <BrochureDownloadForm 

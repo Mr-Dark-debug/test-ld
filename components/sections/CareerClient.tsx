@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ShimmerButton } from "@/components/magicui/shimmer-button";
+import { AuroraButton } from "@/components/ui/aurora-button";
 
 interface JobOpening {
   id: string;
@@ -193,14 +193,13 @@ export default function CareerClient({ jobOpenings }: CareerClientProps) {
                         {job.department} | {job.location} | {job.type}
                       </p>
                     </div>
-                    <ShimmerButton
+                    <AuroraButton
                       onClick={() => setSelectedJob(selectedJob === job.id ? null : job.id)}
-                      shimmerColor="#ffffff"
-                      background="rgba(255, 255, 255, 0.1)"
                       className="font-medium mt-3 md:mt-0"
+                      variant="outline"
                     >
                       {selectedJob === job.id ? "Hide Details" : "View Details"}
-                    </ShimmerButton>
+                    </AuroraButton>
                   </div>
                   <p className="text-foreground/80">{job.description}</p>
 
@@ -223,7 +222,7 @@ export default function CareerClient({ jobOpenings }: CareerClientProps) {
                         </ul>
                       </div>
                       <div className="mt-6">
-                        <ShimmerButton
+                        <AuroraButton
                           onClick={() => {
                             setFormData((prev) => ({
                               ...prev,
@@ -234,12 +233,11 @@ export default function CareerClient({ jobOpenings }: CareerClientProps) {
                               behavior: "smooth",
                             });
                           }}
-                          shimmerColor="#3b82f6"
-                          background="rgba(59, 130, 246, 0.9)"
                           className="font-medium"
+                          variant="default"
                         >
                           Apply Now
-                        </ShimmerButton>
+                        </AuroraButton>
                       </div>
                     </div>
                   )}
@@ -283,12 +281,12 @@ export default function CareerClient({ jobOpenings }: CareerClientProps) {
                 <p className="text-foreground/80 mb-6">
                   Thank you for your interest in joining Laxmi Developers. Our HR team will review your application and contact you if your qualifications match our requirements.
                 </p>
-                <ShimmerButton
+                <AuroraButton
                   onClick={() => setFormSubmitted(false)}
                   variant="outline"
                 >
                   Submit Another Application
-                </ShimmerButton>
+                </AuroraButton>
               </div>
             ) : (
               <div className="bg-card p-8 rounded-lg shadow-md">
@@ -413,13 +411,14 @@ export default function CareerClient({ jobOpenings }: CareerClientProps) {
                   </div>
 
                   <div>
-                    <ShimmerButton
+                    <AuroraButton
                       type="submit"
                       disabled={isSubmitting}
                       className="w-full"
+                      variant="default"
                     >
                       {isSubmitting ? "Submitting..." : "Submit Application"}
-                    </ShimmerButton>
+                    </AuroraButton>
                   </div>
                 </form>
               </div>
