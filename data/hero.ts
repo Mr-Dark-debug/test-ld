@@ -10,7 +10,7 @@ export const heroData = {
     {
       text: "Contact Us",
       href: "/contact",
-      variant: "outline",
+      variant: "default",
     },
   ],
   backgroundType: "carousel" as const,

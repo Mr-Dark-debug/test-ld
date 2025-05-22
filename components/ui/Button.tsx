@@ -10,7 +10,7 @@ const buttonVariants = cva(
         default: "bg-highlight text-white hover:bg-highlight/90",
         outline: "border border-highlight bg-transparent text-highlight hover:bg-highlight hover:text-white",
         ghost: "bg-transparent text-highlight hover:bg-highlight/10",
-        light: "bg-accent text-accent-foreground hover:bg-accent/90",
+        light: "bg-accent text-white hover:bg-accent/90",
         dark: "bg-primary text-foreground hover:bg-primary/80",
       },
       size: {

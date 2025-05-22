@@ -53,7 +53,7 @@ export default function CommercialPage() {
 
       {/* CTA Banner */}
       <CtaBanner
-        title="Secure Your Business Space Today"
+        title="Find Your Ideal Commercial Space"
         description="Contact our sales team for personalized assistance or to schedule a site visit."
         buttons={[
           {
@@ -64,7 +64,7 @@ export default function CommercialPage() {
           {
             text: "View Residential Projects",
             href: "/residential",
-            variant: "outline",
+            variant: "default",
           },
         ]}
       />

@@ -6,6 +6,7 @@ import TestimonialMarquee from "@/components/sections/TestimonialMarquee";
 import CtaBanner from "@/components/sections/CtaBanner";
 import AnimatedTitle from "@/components/ui/AnimatedTitle";
 import FlowingMenu from "@/components/reactbits/FlowingMenu/FlowingMenu";
+import { Button } from "@/components/ui/Button";
 
 export const metadata: Metadata = {
   title: "Why Choose Laxmi Developers | Laxmi Developers",
@@ -260,22 +261,24 @@ export default function WhyLaxmiPage() {
       />
 
       {/* CTA */}
-      <CtaBanner
-        title="Ready to Experience the Laxmi Difference?"
-        description="Explore our projects or get in touch with our team to learn more about how we can help you find your dream property."
-        buttons={[
-          {
-            text: "Explore Projects",
-            href: "/residential",
-            variant: "default",
-          },
-          {
-            text: "Contact Us",
-            href: "/contact",
-            variant: "outline",
-          },
-        ]}
-      />
+      <section className="py-20 bg-primary">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <AnimatedTitle as="h2" className="text-foreground mb-6">
+            Ready to Experience Excellence?
+          </AnimatedTitle>
+          <p className="text-xl text-foreground/80 max-w-3xl mx-auto mb-8">
+            Explore our projects or get in touch with our team to discuss your real estate needs.
+          </p>
+          <div className="flex flex-wrap justify-center gap-4">
+            <Button href="/residential" variant="default" size="lg">
+              Explore Projects
+            </Button>
+            <Button href="/contact" variant="default" size="lg">
+              Contact Us
+            </Button>
+          </div>
+        </div>
+      </section>
     </main>
   );
 } 

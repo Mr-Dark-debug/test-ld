@@ -38,10 +38,10 @@ export function AuroraButton({
           {
             // Solid button
             "bg-accent text-white border-accent hover:bg-accent/90": variant === "default",
-            // Modern outline button
-            "bg-transparent border-accent text-accent dark:text-accent-light hover:bg-accent/10 hover:text-accent dark:hover:bg-accent/20": variant === "outline",
+            // Modern outline button with improved visibility
+            "bg-transparent border-accent text-accent dark:text-white dark:border-white/80 hover:bg-accent/10 hover:border-accent dark:hover:bg-accent/20 dark:hover:border-white": variant === "outline",
             // Ghost button
-            "bg-transparent text-accent hover:bg-accent/10 dark:hover:bg-accent/20": variant === "ghost",
+            "bg-transparent text-accent dark:text-white hover:bg-accent/10 dark:hover:bg-accent/20": variant === "ghost",
           },
           className
         )}

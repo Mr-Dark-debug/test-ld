@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
@@ -26,38 +26,77 @@ export const MenuItem = ({
   children?: React.ReactNode;
   href?: string;
 }) => {
+  const [isHovering, setIsHovering] = useState(false);
+  
   return (
-    <div onMouseEnter={() => setActive(item)} className="relative">
-      <Link href={href || "#"}>
-        <motion.p
-          transition={{ duration: 0.3 }}
-          className="cursor-pointer text-black hover:opacity-[0.9] dark:text-white"
-        >
-          {item}
-        </motion.p>
-      </Link>
-      {active !== null && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.85, y: 10 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          transition={transition}
-        >
-          {active === item && (
-            <div className="absolute top-[calc(100%_+_1.2rem)] left-1/2 transform -translate-x-1/2 pt-4">
-              <motion.div
-                transition={transition}
-                layoutId="active" // layoutId ensures smooth animation
-                className="bg-white dark:bg-black backdrop-blur-sm rounded-2xl overflow-hidden border border-black/[0.2] dark:border-white/[0.2] shadow-xl"
-              >
-                <motion.div
-                  layout // layout ensures smooth animation
-                  className="w-max h-full p-4"
-                >
-                  {children}
-                </motion.div>
-              </motion.div>
-            </div>
+    <div 
+      className="relative"
+      onMouseEnter={() => {
+        setActive(item);
+        setIsHovering(true);
+      }}
+      onMouseLeave={() => {
+        setIsHovering(false);
+        // Don't reset active state here to allow hovering on submenu
+      }}
+    >
+      <Link href={href || "#"} className="relative group py-1 block">
+        <div className="flex items-center gap-1">
+          <motion.p
+            transition={{ duration: 0.3 }}
+            className="cursor-pointer text-black hover:opacity-[0.9] dark:text-white font-medium"
+          >
+            {item}
+          </motion.p>
+          {children && (
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              width="16" 
+              height="16" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="currentColor" 
+              strokeWidth="2" 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              className={`transition-transform duration-200 ${active === item ? "rotate-180" : ""}`}
+            >
+              <path d="m6 9 6 6 6-6"/>
+            </svg>
           )}
+        </div>
+        <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent group-hover:w-full transition-all duration-300"></span>
+      </Link>
+      
+      {children && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ 
+            opacity: active === item ? 1 : 0,
+            y: active === item ? 0 : 10,
+            visibility: active === item ? "visible" : "hidden"
+          }}
+          transition={transition}
+          className="absolute top-full left-1/2 transform -translate-x-1/2 z-50 pt-2 w-max"
+          onMouseEnter={() => {
+            setActive(item);
+            setIsHovering(true);
+          }}
+          onMouseLeave={() => {
+            setIsHovering(false);
+            // Small delay to check if we're hovering elsewhere
+            setTimeout(() => {
+              if (!isHovering) {
+                setActive("");
+              }
+            }, 50);
+          }}
+        >
+          <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm rounded-lg overflow-hidden border border-black/10 dark:border-white/10 shadow-xl">
+            <div className="w-max h-full p-4">
+              {children}
+            </div>
+          </div>
         </motion.div>
       )}
     </div>
@@ -75,8 +114,7 @@ export const Menu = ({
 }) => {
   return (
     <nav
-      onMouseLeave={() => setActive(null)} // resets the state
-      className="relative rounded-full dark:bg-black/80 bg-white/80 backdrop-blur-sm flex items-center justify-between px-8 py-4"
+      className="relative flex items-center justify-between px-8 py-4"
     >
       {/* Logo Section */}
       {logoSrc && (
@@ -142,9 +180,10 @@ export const HoveredLink = ({ children, ...rest }: any) => {
   return (
     <Link
       {...rest}
-      className="text-neutral-700 dark:text-neutral-200 hover:text-black "
+      className="text-neutral-700 dark:text-neutral-200 hover:text-accent dark:hover:text-accent transition-colors px-2 py-1.5 rounded-md hover:bg-black/5 dark:hover:bg-white/10 block w-full relative group"
     >
-      {children}
+      <span>{children}</span>
+      <span className="absolute -bottom-1 left-2 right-2 h-px bg-accent scale-x-0 group-hover:scale-x-100 transition-transform duration-200 origin-left"></span>
     </Link>
   );
 };

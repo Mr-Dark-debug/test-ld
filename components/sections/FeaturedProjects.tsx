@@ -128,7 +128,7 @@ export default function FeaturedProjects({
                   <div className="absolute top-4 left-4 bg-highlight text-primary px-3 py-1 rounded-md text-sm font-medium">
                     {project.type === "residential" ? "Residential" : "Commercial"}
                   </div>
-                  <div className="absolute top-4 right-4 bg-accent text-accent-foreground px-3 py-1 rounded-md text-sm font-medium capitalize">
+                  <div className="absolute top-4 right-4 bg-accent text-white px-3 py-1 rounded-md text-sm font-medium capitalize">
                     {project.status}
                   </div>
                 </div>

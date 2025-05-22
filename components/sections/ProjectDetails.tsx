@@ -62,7 +62,7 @@ export default function ProjectDetails({
                 <span className="bg-highlight text-primary px-3 py-1 rounded-md text-sm font-medium capitalize">
                   {type}
                 </span>
-                <span className="bg-accent text-accent-foreground px-3 py-1 rounded-md text-sm font-medium capitalize">
+                <span className="bg-accent text-white px-3 py-1 rounded-md text-sm font-medium capitalize">
                   {status}
                 </span>
               </div>

@@ -5,7 +5,6 @@ import TestimonialMarquee from "@/components/sections/TestimonialMarquee";
 import CtaBanner from "@/components/sections/CtaBanner";
 import AnimatedMetrics from "@/components/sections/AnimatedMetrics";
 import HomeFlowingMenu from "@/components/sections/HomeFlowingMenu";
-
 import { heroData } from "@/data/hero";
 import { companyFeatures } from "@/data/features";
 import { featuredProjects } from "@/data/projects";
@@ -60,7 +59,7 @@ export default function Home() {
 
       {/* CTA Banner */}
       <CtaBanner
-        title="Ready to Find Your Perfect Property?"
+        title="Find Your Perfect Property"
         description="Explore our ongoing and upcoming projects or get in touch with our sales team for personalized assistance."
         buttons={[
           {
@@ -71,7 +70,7 @@ export default function Home() {
           {
             text: "Contact Us",
             href: "/contact",
-            variant: "outline",
+            variant: "default",
           },
         ]}
       />

@@ -145,7 +145,7 @@ export default function AboutUsPage() {
           {
             text: "Contact Us",
             href: "/contact",
-            variant: "outline",
+            variant: "default",
           },
         ]}
       />
