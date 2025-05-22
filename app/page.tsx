@@ -1,14 +1,13 @@
 import Hero from "@/components/sections/Hero";
 import FeatureGrid from "@/components/sections/FeatureGrid";
 import FeaturedProjects from "@/components/sections/FeaturedProjects";
-import TestimonialMarquee from "@/components/sections/TestimonialMarquee";
 import CtaBanner from "@/components/sections/CtaBanner";
 import AnimatedMetrics from "@/components/sections/AnimatedMetrics";
 import HomeFlowingMenu from "@/components/sections/HomeFlowingMenu";
+import { TestimonialCarouselDemo } from "@/components/ui/testimonial-carousel-demo";
 import { heroData } from "@/data/hero";
 import { companyFeatures } from "@/data/features";
 import { featuredProjects } from "@/data/projects";
-import { testimonials } from "@/data/testimonials";
 import { metricsData } from "@/data/metrics";
 
 export default function Home() {
@@ -50,12 +49,8 @@ export default function Home() {
         viewAllHref="/residential"
       />
 
-      {/* Testimonials */}
-      <TestimonialMarquee
-        title="What Our Clients Say"
-        subtitle="Hear from the people who have made Laxmi Developers their choice for premium real estate"
-        testimonials={testimonials}
-      />
+      {/* Testimonials - Using the new video testimonial carousel */}
+      <TestimonialCarouselDemo />
 
       {/* CTA Banner */}
       <CtaBanner
