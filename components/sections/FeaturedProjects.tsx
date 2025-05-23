@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { AuroraButton } from "@/components/ui/aurora-button";
 import AnimatedTitle from "@/components/ui/AnimatedTitle";
+import { cn } from "@/lib/utils";
 
 export interface Project {
   id: string;
@@ -30,6 +31,23 @@ export default function FeaturedProjects({
   viewAllHref,
 }: FeaturedProjectsProps) {
   const [activeFilter, setActiveFilter] = useState<string>("all");
+
+  const getStatusColor = (status: "ongoing" | "completed" | "upcoming") => {
+    switch (status) {
+      case "ongoing": return "bg-yellow-500/90 hover:bg-yellow-600/90 text-white";
+      case "completed": return "bg-green-500/90 hover:bg-green-600/90 text-white";
+      case "upcoming": return "bg-blue-500/90 hover:bg-blue-600/90 text-white";
+      default: return "bg-gray-500/90 hover:bg-gray-600/90 text-white";
+    }
+  };
+
+  const getTypeColor = (type: "residential" | "commercial") => {
+    switch (type) {
+      case "residential": return "bg-purple-500/90 hover:bg-purple-600/90 text-white";
+      case "commercial": return "bg-teal-500/90 hover:bg-teal-600/90 text-white";
+      default: return "bg-gray-500/90 hover:bg-gray-600/90 text-white";
+    }
+  };
 
   const filteredProjects = projects.filter((project) => {
     if (activeFilter === "all") return true;
@@ -125,10 +143,16 @@ export default function FeaturedProjects({
                     className="object-cover transition-transform duration-500 group-hover:scale-110"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent opacity-70"></div>
-                  <div className="absolute top-4 left-4 bg-highlight text-primary px-3 py-1 rounded-md text-sm font-medium">
-                    {project.type === "residential" ? "Residential" : "Commercial"}
+                  <div className={cn(
+                    "absolute top-4 left-4 px-3 py-1 rounded-md text-xs sm:text-sm font-medium shadow-md transition-colors duration-300",
+                    getTypeColor(project.type)
+                  )}>
+                    {project.type.charAt(0).toUpperCase() + project.type.slice(1)}
                   </div>
-                  <div className="absolute top-4 right-4 bg-accent text-white px-3 py-1 rounded-md text-sm font-medium capitalize">
+                  <div className={cn(
+                    "absolute top-4 right-4 px-3 py-1 rounded-md text-xs sm:text-sm font-medium shadow-md transition-colors duration-300 capitalize",
+                    getStatusColor(project.status)
+                  )}>
                     {project.status}
                   </div>
                 </div>

@@ -35,6 +35,7 @@ const navItems = [
     submenu: [
       { title: "About Us", href: "/about-us" },
       { title: "Why Laxmi?", href: "/why-laxmi" },
+      { title: "Blogs", href: "/blogs" },
       { title: "Information", href: "/information",
         submenu: [
           { title: "EMI Calculator", href: "/information/emi-calculator" },
@@ -69,6 +70,7 @@ const mobileNavItems = [
   },
   { title: "About Us", href: "/about-us" },
   { title: "Why Laxmi?", href: "/why-laxmi" },
+  { title: "Blogs", href: "/blogs" },
   {
     title: "Information",
     href: "/information",
@@ -200,7 +202,7 @@ export default function Header() {
       <header 
         className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 py-3 ${
           !headerVisible && !isMobileMenuOpen ? 'transform -translate-y-full' : 'transform translate-y-0'
-        }`}
+        } bg-background/70 dark:bg-gray-900/70 backdrop-blur-md shadow-sm`}
       >
         <div className="container mx-auto px-4 flex items-center justify-between">
           {/* Desktop Navigation */}
@@ -423,24 +425,24 @@ export default function Header() {
           visibility: visible;
         }
         
-        /* Ensure navbar has no background by default */
+        /* Ensure navbar has a base background for blur to work, but can be overridden by theme */
         header {
-          background: transparent !important;
+          /* background: transparent !important; */ /* Removed to allow specified bg with alpha */
         }
         
-        /* Remove background on scrolled state */
-        header.scrolled {
+        /* Remove background on scrolled state - not needed if base header has blur */
+        /* header.scrolled {
           background: transparent !important;
         }
         
         .dark header.scrolled {
           background: transparent !important;
-        }
+        } */
         
-        /* Override any potential bg colors */
-        nav, .navbar-item, .menu-container {
-          background: transparent !important;
-        }
+        /* Override any potential bg colors from children if necessary */
+        /* nav, .navbar-item, .menu-container {
+          background: transparent !important; 
+        } */
         
         /* Make menu items stand out on transparent navbar */
         .navbar-item a, .home-link {

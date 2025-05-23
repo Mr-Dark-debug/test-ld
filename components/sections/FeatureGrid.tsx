@@ -74,21 +74,21 @@ export default function FeatureGrid({ title, subtitle, features }: FeatureGridPr
           {features.map((feature, index) => (
             <SpotlightCard 
               key={feature.id}
-              className="min-h-[300px] flex flex-col transition-all duration-300 hover:translate-y-[-8px] group"
-              spotlightColor="rgba(201, 167, 107, 0.5)" // Increased opacity for stronger visibility
+              className="min-h-[300px] flex flex-col transition-all duration-300 hover:translate-y-[-8px] group bg-card dark:bg-gray-800/50 border border-transparent hover:border-accent/30 hover:shadow-2xl dark:hover:shadow-accent/10 rounded-xl p-6"
+              spotlightColor="rgba(201, 167, 107, 0.4)" // Slightly reduced opacity for a softer spotlight
             >
-              <div className="flex flex-col h-full p-6">
+              <div className="flex flex-col items-center text-center">
                 {/* Icon with fade-in animation and enhanced hover effect */}
                 <FadeIn 
                   delay={0.1 * index}
                   y={20}
-                  className="flex-shrink-0 mb-6 w-14 h-14 rounded-2xl bg-accent/15 dark:bg-accent/25 p-3 flex items-center justify-center relative overflow-hidden group-hover:bg-accent/20 dark:group-hover:bg-accent/30 transition-colors duration-300"
+                  className="flex-shrink-0 mb-6 w-16 h-16 rounded-2xl bg-accent/10 dark:bg-accent/20 p-3.5 flex items-center justify-center relative overflow-hidden group-hover:bg-accent/15 dark:group-hover:bg-accent/25 transition-all duration-300 transform group-hover:scale-110 group-hover:rotate-3 shadow-md group-hover:shadow-lg"
                 >
                   {/* Inner glow effect on hover */}
-                  <div className="absolute inset-0 opacity-0 group-hover:opacity-40 bg-accent/10 rounded-xl blur-lg transition-opacity duration-300"></div>
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-30 bg-accent/20 dark:bg-accent/30 rounded-xl blur-md transition-opacity duration-300"></div>
                   
-                  {/* Icon with hover animation */}
-                  <div className="relative z-10 text-accent group-hover:text-accent transition-transform duration-300 group-hover:scale-110">
+                  {/* Icon */}
+                  <div className="relative z-10 text-accent text-3xl">
                     {feature.icon}
                   </div>
                 </FadeIn>
@@ -109,7 +109,7 @@ export default function FeatureGrid({ title, subtitle, features }: FeatureGridPr
                     delay={0.3 + (0.1 * index)}
                     y={10}
                   >
-                    <p className="text-foreground/90 dark:text-gray-200 leading-relaxed group-hover:text-foreground dark:group-hover:text-white/95 transition-colors duration-300">
+                    <p className="text-foreground/80 dark:text-gray-300 leading-relaxed group-hover:text-foreground/90 dark:group-hover:text-gray-200 transition-colors duration-300">
                       {feature.description}
                     </p>
                   </FadeIn>
