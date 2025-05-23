@@ -54,6 +54,21 @@ export const projectAmenities: Amenity[] = [
     name: "Elevator",
     icon: <ElevatorIcon />
   },
+  {
+    id: "amenity-9",
+    name: "WiFi",
+    icon: <SecurityIcon /> // Using existing icon as placeholder, will be replaced by enhanced icon
+  },
+  {
+    id: "amenity-10",
+    name: "24-Hour Access",
+    icon: <SecurityIcon /> // Using existing icon as placeholder, will be replaced by enhanced icon
+  },
+  {
+    id: "amenity-11",
+    name: "Dining Facilities",
+    icon: <ClubhouseIcon /> // Using existing icon as placeholder, will be replaced by enhanced icon
+  }
 ];
 
 // Sample residential project specifications
