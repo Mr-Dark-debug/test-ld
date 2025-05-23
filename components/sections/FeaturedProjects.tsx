@@ -183,10 +183,14 @@ export default function FeaturedProjects({
                     </svg>
                     {project.location}
                   </p>
-                  <div className="flex justify-end">
-                    <span className="inline-flex items-center justify-center rounded-md text-sm font-medium text-highlight hover:bg-highlight/10 h-9 px-4 py-1.5">
+                  <div className="flex justify-end mt-auto pt-4">
+                    <AuroraButton
+                      onClick={() => window.location.href = project.href}
+                      variant="outline"
+                      className="px-4 py-1.5 text-sm"
+                    >
                       View Details
-                    </span>
+                    </AuroraButton>
                   </div>
                 </div>
               </Link>

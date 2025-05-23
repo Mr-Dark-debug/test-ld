@@ -5,6 +5,7 @@ import { Share2 } from "lucide-react";
 import { motion } from "framer-motion";
 import AnimatedTitle from "@/components/ui/AnimatedTitle";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 // Dummy blog post data - replace with actual data fetching
 const blogPosts = [
@@ -16,6 +17,7 @@ const blogPosts = [
     author: "AI Architect",
     category: "Architecture",
     imageUrl: "https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80",
+    slug: "the-future-of-sustainable-architecture-in-urban-development",
   },
   {
     id: 2,
@@ -25,6 +27,7 @@ const blogPosts = [
     author: "Tech Explorer",
     category: "Technology",
     imageUrl: "https://images.unsplash.com/photo-1529400971027-cadd71752d99?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80",
+    slug: "smart-homes-integrating-technology-for-a-modern-lifestyle",
   },
   {
     id: 3,
@@ -34,6 +37,7 @@ const blogPosts = [
     author: "Design Maven",
     category: "Interior Design",
     imageUrl: "https://images.unsplash.com/photo-1600210492493-419465538468?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80",
+    slug: "the-art-of-interior-design-creating-spaces-that-inspire",
   },
    {
     id: 4,
@@ -43,6 +47,7 @@ const blogPosts = [
     author: "Realty Expert",
     category: "Real Estate",
     imageUrl: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80",
+    slug: "navigating-the-real-estate-market-tips-for-first-time-buyers",
   },
   {
     id: 5,
@@ -52,10 +57,11 @@ const blogPosts = [
     author: "Urban Planner",
     category: "Lifestyle",
     imageUrl: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80",
+    slug: "community-living-the-benefits-of-choosing-a-well-planned-residential-project",
   },
 ];
 
-const BlogCard = ({ post }: { post: typeof blogPosts[0] }) => {
+const BlogCard = ({ post }: { post: typeof blogPosts[0] & { slug: string } }) => {
   const [isShared, setIsShared] = useState(false);
 
   const handleShare = async () => {
@@ -107,9 +113,11 @@ const BlogCard = ({ post }: { post: typeof blogPosts[0] }) => {
         </div>
       )}
       <div className="p-6 flex flex-col flex-grow">
-        <h3 className="text-xl font-display mb-2 text-foreground hover:text-highlight transition-colors">
-          {post.title}
-        </h3>
+        <Link href={`/blogs/${post.slug}`} className="block mb-2 group">
+          <h3 className="text-xl font-display text-foreground group-hover:text-highlight transition-colors">
+            {post.title}
+          </h3>
+        </Link>
         <p className="text-xs text-foreground/60 mb-3">
           By {post.author} on {post.date}
         </p>
@@ -117,12 +125,12 @@ const BlogCard = ({ post }: { post: typeof blogPosts[0] }) => {
           {post.excerpt}
         </p>
         <div className="mt-auto flex justify-between items-center pt-4 border-t border-border/60">
-          <button 
-            onClick={() => alert("Read more functionality to be implemented!")} // Placeholder for navigation
+          <Link 
+            href={`/blogs/${post.slug}`}
             className="text-sm font-medium text-highlight hover:underline"
           >
             Read More
-          </button>
+          </Link>
           <button
             onClick={handleShare}
             className={cn(

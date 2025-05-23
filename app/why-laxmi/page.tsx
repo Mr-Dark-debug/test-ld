@@ -7,6 +7,7 @@ import CtaBanner from "@/components/sections/CtaBanner";
 import AnimatedTitle from "@/components/ui/AnimatedTitle";
 import FlowingMenu from "@/components/reactbits/FlowingMenu/FlowingMenu";
 import { Button } from "@/components/ui/Button";
+import ScrollingFeatureCards from "@/components/ui/ScrollingFeatureCards";
 
 export const metadata: Metadata = {
   title: "Why Choose Laxmi Developers | Laxmi Developers",
@@ -86,12 +87,20 @@ export default function WhyLaxmiPage() {
         </div>
       </section>
 
-      {/* Our Pillars */}
-      <FeatureGrid
-        title="The Pillars of Our Success"
-        subtitle="Our commitment to excellence is built on these core principles"
-        features={companyFeatures}
-      />
+      {/* Our Pillars - Updated to ScrollingFeatureCards */}
+      <section className="py-16 bg-muted">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12 md:mb-16">
+            <AnimatedTitle as="h2" className="mb-4">
+              The Pillars of Our Success
+            </AnimatedTitle>
+            <p className="text-lg text-foreground/70 max-w-2xl mx-auto">
+              Our commitment to excellence is built on these core principles
+            </p>
+          </div>
+          <ScrollingFeatureCards features={companyFeatures} speed={45} />
+        </div>
+      </section>
 
       {/* Our Approach */}
       <section className="py-16 bg-background" id="customer-centric">

@@ -1,10 +1,12 @@
 import Hero from "@/components/sections/Hero";
-import FeatureGrid from "@/components/sections/FeatureGrid";
+import ScrollingFeatureCards from "@/components/ui/ScrollingFeatureCards";
 import FeaturedProjects from "@/components/sections/FeaturedProjects";
 import CtaBanner from "@/components/sections/CtaBanner";
 import AnimatedMetrics from "@/components/sections/AnimatedMetrics";
+import AnimatedTitle from "@/components/ui/AnimatedTitle";
 import HomeFlowingMenu from "@/components/sections/HomeFlowingMenu";
 import { TestimonialCarouselDemo } from "@/components/ui/testimonial-carousel-demo";
+import { Ripple } from "@/components/magicui/ripple";
 import { heroData } from "@/data/hero";
 import { companyFeatures } from "@/data/features";
 import { featuredProjects } from "@/data/projects";
@@ -34,12 +36,21 @@ export default function Home() {
       {/* Animated Metrics */}
       <AnimatedMetrics metrics={metricsData} />
 
-      {/* Features/Why Choose Us */}
-      <FeatureGrid
-        title="Why Choose Laxmi Developers?"
-        subtitle="At Laxmi Developers, we are committed to excellence in every aspect of our work. Here's what sets us apart:"
-        features={companyFeatures}
-      />
+      {/* Features/Why Choose Us - Updated to ScrollingFeatureCards */}
+      <section className="py-20 bg-background relative overflow-hidden">
+        <Ripple mainCircleSize={800} mainCircleOpacity={0.08} numCircles={8} className="absolute inset-0" />
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center mb-12 md:mb-16">
+            <AnimatedTitle as="h2" className="mb-4">
+              Why Choose Laxmi Developers?
+            </AnimatedTitle>
+            <p className="text-lg text-foreground/70 max-w-2xl mx-auto">
+              At Laxmi Developers, we are committed to excellence in every aspect of our work. Here's what sets us apart:
+            </p>
+          </div>
+          <ScrollingFeatureCards features={companyFeatures} speed={40} />
+        </div>
+      </section>
 
       {/* Featured Projects */}
       <FeaturedProjects

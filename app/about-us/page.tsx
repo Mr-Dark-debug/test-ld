@@ -3,6 +3,7 @@ import CtaBanner from "@/components/sections/CtaBanner";
 import AnimatedTitle from "@/components/ui/AnimatedTitle";
 import ScrollReveal from "@/components/reactbits/ScrollReveal/ScrollReveal";
 import { TestimonialsColumns } from "@/components/ui/testimonials-columns";
+import ScrollingFeatureCards, { FeatureCardData } from "@/components/ui/ScrollingFeatureCards";
 import { Award, Eye, Zap } from "lucide-react";
 import { GridPattern } from "@/components/magicui/grid-pattern";
 
@@ -75,7 +76,7 @@ export default function AboutUsPage() {
         </div>
       </section>
       {/* Mission, Vision, Values - Full screen */}
-      <section className="min-h-screen py-16 md:py-24 bg-gradient-to-br from-accent/5 to-background flex items-center relative">
+      <section className="min-h-screen py-16 md:py-24 bg-gradient-to-br from-accent/5 to-background flex flex-col justify-center relative">
         {/* Grid pattern for mission/vision/values */}
         <div className="absolute inset-0 -z-10 pointer-events-none">
           <GridPattern width={48} height={48} strokeDasharray="2 4" className="opacity-10" />
@@ -89,25 +90,11 @@ export default function AboutUsPage() {
               Guided by strong principles and a clear direction
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto">
-            {missionVisionValues.map((item, index) => (
-              <div 
-                key={index} 
-                className="relative group h-full"
-              >
-                <div className="absolute inset-0 bg-accent/10 blur-xl rounded-3xl opacity-0 group-hover:opacity-70 transform scale-95 group-hover:scale-100 transition-all duration-300 ease-out -z-10"></div>
-                <div className="h-full bg-background border border-accent/20 rounded-2xl shadow-lg p-6 md:p-8 flex flex-col transition-all duration-300 group-hover:translate-y-[-5px] group-hover:shadow-xl overflow-hidden">
-                  <div className="flex justify-center items-center h-20 mb-4 md:mb-6">
-                    <div className="w-16 h-16 flex items-center justify-center rounded-full bg-accent/10 group-hover:bg-accent/20 transition-colors">
-                      {item.icon}
-                    </div>
-                  </div>
-                  <h3 className="text-xl md:text-2xl font-bold mb-3 md:mb-4 text-center text-foreground">{item.title}</h3>
-                  <p className="text-foreground/70 text-center grow text-base md:text-lg">{item.description}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+          <ScrollingFeatureCards 
+            features={missionVisionValues.map(item => ({ ...item, id: item.title }))} 
+            speed={35}
+            cardClassName="h-48 w-72"
+          />
         </div>
       </section>
       {/* Portfolio Section - Full width */}

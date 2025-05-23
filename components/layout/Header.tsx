@@ -202,7 +202,7 @@ export default function Header() {
       <header 
         className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 py-3 ${
           !headerVisible && !isMobileMenuOpen ? 'transform -translate-y-full' : 'transform translate-y-0'
-        } bg-background/70 dark:bg-gray-900/70 backdrop-blur-md shadow-sm`}
+        } backdrop-blur-md`}
       >
         <div className="container mx-auto px-4 flex items-center justify-between">
           {/* Desktop Navigation */}
