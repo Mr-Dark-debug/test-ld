@@ -160,14 +160,14 @@ export default function WhyInvestPage() {
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Button 
-              href="/residential" 
+              href="/projects"
               variant="default"
               size="lg"
             >
               Explore Residential Projects
             </Button>
             <Button 
-              href="/commercial" 
+              href="/projects"
               variant="outline"
               size="lg"
             >

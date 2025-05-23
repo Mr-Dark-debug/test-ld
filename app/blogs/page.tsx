@@ -107,7 +107,7 @@ const BlogCard = ({ post }: { post: typeof blogPosts[0] & { slug: string } }) =>
             alt={post.title}
             className="object-cover w-full h-full"
           />
-           <div className="absolute top-3 right-3 bg-black/50 text-white px-2 py-1 rounded-md text-xs font-medium backdrop-blur-sm">
+           <div className="absolute top-3 right-3 bg-gray-700/70 dark:bg-gray-600/70 text-white dark:text-gray-100 px-2 py-1 rounded-md text-xs font-medium backdrop-blur-sm">
             {post.category}
           </div>
         </div>
@@ -124,18 +124,18 @@ const BlogCard = ({ post }: { post: typeof blogPosts[0] & { slug: string } }) =>
         <p className="text-sm text-foreground/80 mb-4 flex-grow leading-relaxed">
           {post.excerpt}
         </p>
-        <div className="mt-auto flex justify-between items-center pt-4 border-t border-border/60">
+        <div className="mt-auto flex justify-between items-center pt-4 border-t border-border/60 dark:border-border-dark/60">
           <Link 
             href={`/blogs/${post.slug}`}
-            className="text-sm font-medium text-highlight hover:underline"
+            className="text-sm font-medium text-highlight dark:text-highlight-dark hover:underline"
           >
             Read More
           </Link>
           <button
             onClick={handleShare}
             className={cn(
-              "p-2 rounded-full transition-all duration-300 ease-in-out text-foreground/70 hover:text-highlight",
-              isShared ? "bg-green-500/20 text-green-500" : "hover:bg-muted"
+              "p-2 rounded-full transition-all duration-300 ease-in-out text-foreground/70 dark:text-foreground-dark/70 hover:text-highlight dark:hover:text-highlight-dark",
+              isShared ? "bg-green-500/20 text-green-500 dark:bg-green-400/20 dark:text-green-400" : "hover:bg-muted dark:hover:bg-muted-dark"
             )}
             title={isShared ? (navigator.share ? "Shared!" : "Link Copied!") : "Share Post"}
           >
@@ -152,7 +152,7 @@ export default function BlogsPage() {
   return (
     <div className="bg-background text-foreground min-h-screen">
       {/* Hero Section */}
-      <section className="py-16 md:py-24 bg-gradient-to-b from-muted/30 to-background relative overflow-hidden">
+      <section className="py-16 md:py-24 bg-gradient-to-b from-muted/30 dark:from-muted-dark/30 to-background dark:to-background-dark relative overflow-hidden">
         <div className="absolute inset-0 opacity-30">
           {/* Optional: subtle background pattern or image */}
         </div>

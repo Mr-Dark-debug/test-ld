@@ -57,7 +57,7 @@ export default function Home() {
         title="Our Featured Projects"
         subtitle="Discover our exceptional portfolio of residential and commercial properties"
         projects={featuredProjects}
-        viewAllHref="/residential"
+        viewAllHref="/projects"
       />
 
       {/* Testimonials - Using the new video testimonial carousel */}
@@ -70,7 +70,7 @@ export default function Home() {
         buttons={[
           {
             text: "Explore Projects",
-            href: "/residential",
+            href: "/projects",
             variant: "default",
           },
           {

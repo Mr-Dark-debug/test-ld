@@ -126,14 +126,14 @@ export default function BlogPostPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background text-foreground">
+      <div className="min-h-screen flex items-center justify-center bg-background dark:bg-background-dark text-foreground dark:text-foreground-dark">
         <div className="text-center">
           <AnimatedTitle as="h1" className="mb-4">
             {error}
           </AnimatedTitle>
           <Link
             href="/blogs"
-            className="mt-6 inline-flex items-center text-sm font-medium text-highlight hover:underline"
+            className="mt-6 inline-flex items-center text-sm font-medium text-highlight dark:text-highlight-dark hover:underline"
           >
             <ChevronLeft size={18} className="mr-1" />
             Back to Blogs
@@ -145,18 +145,18 @@ export default function BlogPostPage() {
 
   if (!post) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background text-foreground">
+      <div className="min-h-screen flex items-center justify-center bg-background dark:bg-background-dark text-foreground dark:text-foreground-dark">
         <div className="text-center">
           <AnimatedTitle as="h1" className="mb-4">
             Loading Post...
           </AnimatedTitle>
           <div className="animate-pulse space-y-4">
-            <div className="h-4 bg-muted rounded w-3/4 mx-auto"></div>
-            <div className="h-4 bg-muted rounded w-1/2 mx-auto"></div>
+            <div className="h-4 bg-muted dark:bg-muted-dark rounded w-3/4 mx-auto"></div>
+            <div className="h-4 bg-muted dark:bg-muted-dark rounded w-1/2 mx-auto"></div>
           </div>
           <Link
             href="/blogs"
-            className="mt-6 inline-flex items-center text-sm font-medium text-highlight hover:underline"
+            className="mt-6 inline-flex items-center text-sm font-medium text-highlight dark:text-highlight-dark hover:underline"
           >
             <ChevronLeft size={18} className="mr-1" />
             Back to Blogs
@@ -177,7 +177,7 @@ export default function BlogPostPage() {
         <meta property="og:type" content="article" />
         <meta name="twitter:card" content="summary_large_image" />
       </Head>
-      <div className="bg-background text-foreground min-h-screen">
+      <div className="bg-background dark:bg-background-dark text-foreground dark:text-foreground-dark min-h-screen">
         <header
           className="relative py-24 md:py-40 bg-cover bg-center"
           style={{
@@ -212,7 +212,7 @@ export default function BlogPostPage() {
           <div className="flex justify-between items-center mb-8">
             <Link
               href="/blogs"
-              className="inline-flex items-center text-sm font-medium text-highlight hover:underline group"
+              className="inline-flex items-center text-sm font-medium text-highlight dark:text-highlight-dark hover:underline group"
               aria-label="Back to all blog posts"
             >
               <ChevronLeft
@@ -228,7 +228,7 @@ export default function BlogPostPage() {
                 "flex items-center gap-2 p-2.5 rounded-lg transition-all duration-300 ease-in-out text-sm font-medium",
                 isShared
                   ? "bg-green-500/20 text-green-600 dark:text-green-400"
-                  : "bg-muted hover:bg-muted/80 text-foreground/70 hover:text-highlight"
+                  : "bg-muted dark:bg-muted-dark hover:bg-muted/80 dark:hover:bg-muted-dark/80 text-foreground/70 dark:text-foreground-dark/70 hover:text-highlight dark:hover:text-highlight-dark"
               )}
               aria-label={isShared ? "Link copied or shared" : "Share this post"}
             >
@@ -241,7 +241,7 @@ export default function BlogPostPage() {
             </button>
           </div>
 
-          <article className="prose prose-lg dark:prose-invert max-w-none prose-img:rounded-lg prose-img:shadow-md prose-headings:font-display prose-a:text-highlight hover:prose-a:underline prose-blockquote:border-l-highlight prose-blockquote:text-foreground/80">
+          <article className="prose prose-lg dark:prose-invert max-w-none prose-img:rounded-lg prose-img:shadow-md prose-headings:font-display prose-a:text-highlight dark:prose-a:text-highlight-dark hover:prose-a:underline prose-blockquote:border-l-highlight dark:prose-blockquote:border-l-highlight-dark prose-blockquote:text-foreground/80 dark:prose-blockquote:text-foreground-dark/80">
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
               components={{

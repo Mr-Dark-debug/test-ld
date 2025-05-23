@@ -37,11 +37,11 @@ export function AuroraButton({
           "border",
           {
             // Solid button
-            "bg-accent text-white border-accent hover:bg-accent/90": variant === "default",
+            "bg-accent text-white border-accent hover:bg-accent/90 active:bg-accent/80 focus:ring-2 focus:ring-accent/50 focus:outline-none": variant === "default",
             // Modern outline button with improved visibility
-            "bg-transparent border-accent text-accent dark:text-white dark:border-white/80 hover:bg-accent/10 hover:border-accent dark:hover:bg-accent/20 dark:hover:border-white": variant === "outline",
+            "bg-transparent border-accent text-accent dark:text-white dark:border-white/80 hover:bg-accent/10 hover:border-accent dark:hover:bg-accent/20 dark:hover:border-white focus:ring-2 focus:ring-accent/50 focus:outline-none": variant === "outline",
             // Ghost button
-            "bg-transparent text-accent dark:text-white hover:bg-accent/10 dark:hover:bg-accent/20": variant === "ghost",
+            "bg-transparent text-accent dark:text-white hover:bg-accent/10 dark:hover:bg-accent/20 focus:ring-2 focus:ring-accent/50 focus:outline-none": variant === "ghost",
           },
           className
         )}

@@ -126,7 +126,7 @@ export default function AboutUsPage() {
         buttons={[
           {
             text: "Explore Projects",
-            href: "/residential",
+            href: "/projects",
             variant: "default",
           },
           {

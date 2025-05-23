@@ -4,7 +4,7 @@ export const heroData = {
   ctaButtons: [
     {
       text: "Explore Projects",
-      href: "/residential",
+      href: "/projects",
       variant: "default",
     },
     {

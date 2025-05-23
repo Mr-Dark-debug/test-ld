@@ -14,19 +14,19 @@ const navItems = [
     title: "Our Projects",
     href: "/projects",
     submenu: [
-      { title: "Residential", href: "/residential", 
-        submenu: [
-          { title: "On-Going Projects", href: "/residential/on-going" },
-          { title: "Completed Projects", href: "/residential/completed" },
-        ] 
-      },
-      { title: "Commercial", href: "/commercial", 
-        submenu: [
-          { title: "On-Going Projects", href: "/commercial/on-going" },
-          { title: "Completed Projects", href: "/commercial/completed" },
-          { title: "Up-Coming Projects", href: "/commercial/upcoming" },
-        ] 
-      },
+      // { title: "Residential", href: "/residential", 
+      //   submenu: [
+      //     { title: "On-Going Projects", href: "/residential/on-going" },
+      //     { title: "Completed Projects", href: "/residential/completed" },
+      //   ] 
+      // },
+      // { title: "Commercial", href: "/commercial", 
+      //   submenu: [
+      //     { title: "On-Going Projects", href: "/commercial/on-going" },
+      //     { title: "Completed Projects", href: "/commercial/completed" },
+      //     { title: "Up-Coming Projects", href: "/commercial/upcoming" },
+      //   ] 
+      // },
     ],
   },
   { 
@@ -51,23 +51,7 @@ const navItems = [
 // Original navigation items for mobile view
 const mobileNavItems = [
   { title: "Home", href: "/" },
-  {
-    title: "Residential",
-    href: "/residential",
-    submenu: [
-      { title: "On-Going Projects", href: "/residential/on-going" },
-      { title: "Completed Projects", href: "/residential/completed" },
-    ],
-  },
-  {
-    title: "Commercial",
-    href: "/commercial",
-    submenu: [
-      { title: "On-Going Projects", href: "/commercial/on-going" },
-      { title: "Completed Projects", href: "/commercial/completed" },
-      { title: "Up-Coming Projects", href: "/commercial/upcoming" },
-    ],
-  },
+  { title: "All Projects", href: "/projects" },
   { title: "About Us", href: "/about-us" },
   { title: "Why Laxmi?", href: "/why-laxmi" },
   { title: "Blogs", href: "/blogs" },
