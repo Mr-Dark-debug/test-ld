@@ -4,8 +4,9 @@ import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { ShimmerButton } from "@/components/magicui/shimmer-button";
 import { AmenitiesFeatures } from "@/components/AmenitiesFeatures";
-import { motion, useAnimation, useInView } from "framer-motion";
+import { motion, AnimatePresence, useAnimation, useInView } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 
 export interface Amenity {
   id: string;
@@ -25,7 +26,7 @@ interface ProjectDetailsProps {
   status: "ongoing" | "completed" | "upcoming";
   type: "residential" | "commercial";
   imageSrc: string;
-  threeDModelUrl?: string; // Optional URL for the 3D model
+  threeDModelUrl?: string; // For future actual 3D model
   specifications: Specification[];
   amenities: Amenity[];
   brochureUrl?: string;
@@ -40,39 +41,29 @@ export default function ProjectDetails({
   status,
   type,
   imageSrc,
-  threeDModelUrl,
+  threeDModelUrl, // Will be used if/when an actual model URL is provided
   specifications,
   amenities,
   brochureUrl,
   contactPhone,
   reraNumber,
 }: ProjectDetailsProps) {
-  const [show3DView, setShow3DView] = useState(false);
+  const [currentSlide, setCurrentSlide] = useState(0); // 0 for image, 1 for 3D view
   const [isLoading3D, setIsLoading3D] = useState(false);
+  const [is3DModelLoaded, setIs3DModelLoaded] = useState(false);
   const [progress, setProgress] = useState(0);
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const inViewRef = useRef<HTMLDivElement>(null);
-  const isInView = useInView(inViewRef, { once: false, amount: 0.3 });
-  const controls = useAnimation();
 
-  useEffect(() => {
-    if (isInView && threeDModelUrl) {
-      controls.start({ opacity: 1, y: 0 });
-    } else {
-      controls.start({ opacity: 0, y: 20 });
-    }
-  }, [isInView, controls, threeDModelUrl]);
+  const has3DView = true; // Set to true to always show the 3D view slide option
 
   const handleLoad3DModel = () => {
     setIsLoading3D(true);
     setProgress(0);
-    // Simulate loading progress
     const interval = setInterval(() => {
       setProgress(prev => {
         if (prev >= 100) {
           clearInterval(interval);
           setIsLoading3D(false);
-          setShow3DView(true);
+          setIs3DModelLoaded(true);
           return 100;
         }
         return prev + 10;
@@ -80,6 +71,20 @@ export default function ProjectDetails({
     }, 200);
   };
 
+  const slides = ["image"];
+  if (has3DView) {
+    slides.push("3dview");
+  }
+
+  const changeSlide = (direction: number) => {
+    setCurrentSlide(prev => {
+      const newSlide = prev + direction;
+      if (newSlide < 0) return slides.length - 1;
+      if (newSlide >= slides.length) return 0;
+      return newSlide;
+    });
+  };
+  
   const getStatusColor = () => {
     switch (status) {
       case "ongoing": return "bg-yellow-500/90 hover:bg-yellow-600/90 text-white";
@@ -102,66 +107,109 @@ export default function ProjectDetails({
       <section className="py-12 md:py-20 bg-background">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12">
-            {/* Project Image / 3D View */}
-            <div ref={scrollContainerRef} className="relative h-[300px] sm:h-[400px] md:h-[500px] lg:h-full min-h-[450px] rounded-lg overflow-hidden shadow-xl group">
-              {!show3DView && (
-                <>
-                  <Image
-                    src={imageSrc}
-                    alt={title}
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                    priority
-                  />
-                  {threeDModelUrl && (
-                    <motion.div 
-                      initial={{opacity:0, y:10}}
-                      animate={{opacity:1, y:0}}
-                      transition={{delay:0.5}}
-                      className="absolute bottom-4 right-4 bg-black/70 text-white px-3 py-1.5 rounded-md text-xs sm:text-sm backdrop-blur-sm shadow-lg">
-                      Scroll down for 3D View ↓
-                    </motion.div>
-                  )}
-                </>
-              )}
-
-              {show3DView && threeDModelUrl && (
-                 <iframe 
-                    src={threeDModelUrl} 
-                    title={`${title} - 3D View`}
-                    className="w-full h-full border-0"
-                    allowFullScreen
-                  ></iframe>
-              )}
-              
-              {threeDModelUrl && !show3DView && (
-                <div ref={inViewRef} className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-t from-black/80 via-black/60 to-black/40 p-8 text-center" style={{ height: '100%', pointerEvents: isInView ? 'auto' : 'none' }}>
-                  <motion.div initial={{ opacity: 0, y: 20 }} animate={controls} transition={{ duration: 0.5, delay:0.2 }} className="flex flex-col items-center">
-                    <h3 className="text-2xl sm:text-3xl font-semibold text-white mb-3">Interactive 3D Tour</h3>
-                    <p className="text-gray-300 mb-6 text-sm sm:text-base max-w-md">Explore the project in immersive 3D. Click below to load the experience.</p>
-                    {!isLoading3D ? (
-                      <ShimmerButton
-                        onClick={handleLoad3DModel}
-                        shimmerColor="#FFFFFFCC"
-                        shimmerSize="0.1em"
-                        background="rgba(var(--highlight-rgb), 0.9)" // Using highlight color from theme
-                        className="font-medium px-8 py-3 text-sm sm:text-base rounded-lg shadow-lg hover:shadow-xl transition-all duration-300"
-                      >
-                        Load 3D View
-                      </ShimmerButton>
-                    ) : (
+            {/* Project Image / 3D View Slider */}
+            <div className="relative h-[350px] sm:h-[450px] md:h-[550px] lg:h-full min-h-[450px] rounded-lg shadow-xl group overflow-hidden">
+              <AnimatePresence initial={false} custom={currentSlide}>
+                {slides[currentSlide] === "image" && (
+                  <motion.div
+                    key="image"
+                    initial={{ opacity: 0, x: currentSlide === 0 ? 0 : (currentSlide > 0 ? 300 : -300) }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: currentSlide === 0 ? (currentSlide > 0 ? -300: 300) : 0}}
+                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                    className="absolute inset-0"
+                  >
+                    <Image
+                      src={imageSrc}
+                      alt={title}
+                      fill
+                      className="object-cover"
+                      priority
+                    />
+                  </motion.div>
+                )}
+                {slides[currentSlide] === "3dview" && (
+                  <motion.div
+                    key="3dview"
+                    initial={{ opacity: 0, x: currentSlide === 1 ? 0 : (currentSlide > 1 ? 300 : -300) }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: currentSlide === 1 ? (currentSlide > 0 ? -300 : 300) : 0 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                    className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-slate-800 via-slate-900 to-black p-8 text-center"
+                  >
+                    {!is3DModelLoaded && !isLoading3D && (
+                      <div className="flex flex-col items-center">
+                        <h3 className="text-2xl sm:text-3xl font-semibold text-white mb-3">Interactive 3D Tour</h3>
+                        <p className="text-gray-300 mb-6 text-sm sm:text-base max-w-md">Explore the project in immersive 3D. Click below to load the experience.</p>
+                        <ShimmerButton
+                          onClick={handleLoad3DModel}
+                          shimmerColor="#FFFFFFCC"
+                          shimmerSize="0.1em"
+                          background="rgba(var(--highlight-rgb), 0.9)"
+                          className="font-medium px-8 py-3 text-sm sm:text-base rounded-lg shadow-lg hover:shadow-xl transition-all duration-300"
+                        >
+                          Load 3D Model
+                        </ShimmerButton>
+                      </div>
+                    )}
+                    {isLoading3D && (
                       <div className="w-full max-w-xs flex flex-col items-center">
-                        <div className="h-3 w-full relative max-w-xs rounded-full overflow-hidden bg-gray-700/50">
+                        <div className="h-3 w-full relative max-w-xs rounded-full overflow-hidden bg-gray-700/50 mb-2.5">
                           <motion.div 
-                            className="h-full bg-highlight absolute transition-all duration-300 ease-linear"
+                            className="h-full bg-highlight absolute"
                             initial={{ width: "0%" }}
                             animate={{ width: `${progress}%` }}
+                            transition={{ duration: 0.2, ease: "linear"}}
                           />
                         </div>
-                        <p className="text-white text-xs sm:text-sm mt-2.5">Loading 3D Model... {progress}%</p>
+                        <p className="text-white text-xs sm:text-sm">Loading 3D Model... {progress}%</p>
+                      </div>
+                    )}
+                    {is3DModelLoaded && (
+                      <div className="text-white text-xl sm:text-2xl font-semibold">
+                        3D Model will be added here.
+                        {/* Replace above with actual <iframe> or 3D component when URL is available */}
+                        {/* e.g., <iframe src={threeDModelUrl} ... /> */}
                       </div>
                     )}
                   </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Navigation Arrows */}
+              {slides.length > 1 && (
+                <>
+                  <button 
+                    onClick={() => changeSlide(-1)} 
+                    className="absolute left-3 top-1/2 -translate-y-1/2 z-20 bg-black/40 hover:bg-black/60 p-2 rounded-full text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-highlight/80 shadow-lg"
+                    aria-label="Previous Slide"
+                  >
+                    <ChevronLeftIcon className="w-5 h-5 sm:w-6 sm:h-6" />
+                  </button>
+                  <button 
+                    onClick={() => changeSlide(1)} 
+                    className="absolute right-3 top-1/2 -translate-y-1/2 z-20 bg-black/40 hover:bg-black/60 p-2 rounded-full text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-highlight/80 shadow-lg"
+                    aria-label="Next Slide"
+                  >
+                    <ChevronRightIcon className="w-5 h-5 sm:w-6 sm:h-6" />
+                  </button>
+                </>
+              )}
+
+              {/* Dot Indicators */}
+              {slides.length > 1 && (
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex space-x-2">
+                  {slides.map((_, index) => (
+                    <button 
+                      key={index} 
+                      onClick={() => setCurrentSlide(index)}
+                      className={cn(
+                        "w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full transition-all duration-300 focus:outline-none",
+                        currentSlide === index ? "bg-highlight scale-125" : "bg-white/50 hover:bg-white/80"
+                      )}
+                      aria-label={`Go to slide ${index + 1}`}
+                    />
+                  ))}
                 </div>
               )}
             </div>
