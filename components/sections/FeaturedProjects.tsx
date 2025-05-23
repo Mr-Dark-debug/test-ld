@@ -3,7 +3,8 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Button } from "@/components/ui/Button";
+import { AuroraButton } from "@/components/ui/aurora-button";
+import AnimatedTitle from "@/components/ui/AnimatedTitle";
 
 export interface Project {
   id: string;
@@ -44,7 +45,9 @@ export default function FeaturedProjects({
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-display mb-4">{title}</h2>
+          <AnimatedTitle as="h2" className="mb-4">
+            {title}
+          </AnimatedTitle>
           {subtitle && (
             <p className="text-lg text-foreground/70 max-w-2xl mx-auto">
               {subtitle}
@@ -125,7 +128,7 @@ export default function FeaturedProjects({
                   <div className="absolute top-4 left-4 bg-highlight text-primary px-3 py-1 rounded-md text-sm font-medium">
                     {project.type === "residential" ? "Residential" : "Commercial"}
                   </div>
-                  <div className="absolute top-4 right-4 bg-accent text-accent-foreground px-3 py-1 rounded-md text-sm font-medium capitalize">
+                  <div className="absolute top-4 right-4 bg-accent text-white px-3 py-1 rounded-md text-sm font-medium capitalize">
                     {project.status}
                   </div>
                 </div>
@@ -170,9 +173,13 @@ export default function FeaturedProjects({
         {/* View All Button */}
         {viewAllHref && (
           <div className="mt-12 text-center">
-            <Button href={viewAllHref} variant="outline" size="lg">
+            <AuroraButton
+              onClick={() => window.location.href = viewAllHref}
+              variant="outline"
+              className="px-6 py-3 font-medium"
+            >
               View All Projects
-            </Button>
+            </AuroraButton>
           </div>
         )}
       </div>

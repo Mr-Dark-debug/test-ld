@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-import { Button } from "@/components/ui/Button";
+import { ShimmerButton } from "@/components/magicui/shimmer-button";
 import { AmenitiesFeatures } from "@/components/AmenitiesFeatures";
 import { ProjectBrochureSection } from "@/components/ProjectBrochureSection";
 
@@ -62,7 +62,7 @@ export default function ProjectDetails({
                 <span className="bg-highlight text-primary px-3 py-1 rounded-md text-sm font-medium capitalize">
                   {type}
                 </span>
-                <span className="bg-accent text-accent-foreground px-3 py-1 rounded-md text-sm font-medium capitalize">
+                <span className="bg-accent text-white px-3 py-1 rounded-md text-sm font-medium capitalize">
                   {status}
                 </span>
               </div>
@@ -141,9 +141,11 @@ export default function ProjectDetails({
               {/* Action Buttons */}
               <div className="flex flex-wrap gap-4 mb-8">
                 {contactPhone && (
-                  <Button
-                    href={`tel:${contactPhone.replace(/\s+/g, "")}`}
-                    variant="outline"
+                  <ShimmerButton
+                    onClick={() => window.location.href = `tel:${contactPhone.replace(/\s+/g, "")}`}
+                    shimmerColor="#ffffff"
+                    background="rgba(255, 255, 255, 0.1)"
+                    className="font-medium"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -160,7 +162,7 @@ export default function ProjectDetails({
                       />
                     </svg>
                     Contact Us
-                  </Button>
+                  </ShimmerButton>
                 )}
               </div>
             </div>

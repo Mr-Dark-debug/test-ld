@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Button } from "@/components/ui/Button";
+import { ShimmerButton } from "@/components/magicui/shimmer-button";
 
 interface ContactInfoProps {
   title?: string;
@@ -193,13 +193,15 @@ export default function ContactInfo({
                 </div>
 
                 <div>
-                  <Button
+                  <ShimmerButton
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full"
+                    shimmerColor="#3b82f6"
+                    background="rgba(59, 130, 246, 0.9)"
+                    className="font-medium w-full"
                   >
                     {isSubmitting ? "Sending..." : "Send Message"}
-                  </Button>
+                  </ShimmerButton>
                 </div>
               </form>
             )}

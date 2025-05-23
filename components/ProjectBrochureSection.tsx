@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/Button";
+import { AuroraButton } from "@/components/ui/aurora-button";
 import { BrochureDownloadForm } from "@/components/BrochureDownloadForm";
 
 interface ProjectBrochureSectionProps {
@@ -28,12 +28,13 @@ export function ProjectBrochureSection({
                 Download our detailed brochure to learn more about the features, amenities, 
                 and specifications of this project.
               </p>
-              <Button 
+              <AuroraButton 
                 onClick={() => setShowForm(true)}
-                className="px-6 py-2"
+                variant="default"
+                className="px-6 py-3 font-medium"
               >
                 Download Brochure
-              </Button>
+              </AuroraButton>
             </div>
           ) : (
             <BrochureDownloadForm 

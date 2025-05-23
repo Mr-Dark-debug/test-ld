@@ -1,5 +1,5 @@
 export const heroData = {
-  title: "Building Dreams, Delivering Excellence",
+  title: "Where we bring visionary ideas to life through exceptional real estate projects.",
   subtitle: "Premium Real Estate Developer in Surat, Gujarat",
   ctaButtons: [
     {
@@ -10,7 +10,7 @@ export const heroData = {
     {
       text: "Contact Us",
       href: "/contact",
-      variant: "outline",
+      variant: "default",
     },
   ],
   backgroundType: "carousel" as const,

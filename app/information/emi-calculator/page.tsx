@@ -52,7 +52,7 @@ export default function EmiCalculatorPage() {
       {/* EMI Calculator */}
       <section className="py-16 bg-background">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-4xl mx-auto bg-gradient-to-br from-amber-50 to-white border border-amber-100 rounded-xl p-8 shadow-md">
+          <div className="max-w-4xl mx-auto bg-gradient-to-br from-blue-50 to-white border border-blue-100 rounded-xl p-8 shadow-md">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div>
                 <h2 className="text-2xl font-display mb-6 text-gray-800">Loan Details</h2>
@@ -70,11 +70,11 @@ export default function EmiCalculatorPage() {
                     step="100000"
                     value={loanAmount}
                     onChange={(e) => setLoanAmount(Number(e.target.value))}
-                    className="w-full h-2 bg-amber-100 rounded-lg appearance-none cursor-pointer"
+                    className="w-full h-2 bg-blue-100 rounded-lg appearance-none cursor-pointer"
                   />
                   <div className="flex justify-between mt-2">
                     <span className="text-sm text-gray-600">₹5 Lacs</span>
-                    <span className="text-base font-medium text-[#be9e67]">{formatCurrency(loanAmount)}</span>
+                    <span className="text-base font-medium text-blue-700 dark:text-blue-400">{formatCurrency(loanAmount)}</span>
                     <span className="text-sm text-gray-600">₹5 Cr</span>
                   </div>
                 </div>
@@ -92,11 +92,11 @@ export default function EmiCalculatorPage() {
                     step="0.1"
                     value={interestRate}
                     onChange={(e) => setInterestRate(Number(e.target.value))}
-                    className="w-full h-2 bg-amber-100 rounded-lg appearance-none cursor-pointer"
+                    className="w-full h-2 bg-blue-100 rounded-lg appearance-none cursor-pointer"
                   />
                   <div className="flex justify-between mt-2">
                     <span className="text-sm text-gray-600">5%</span>
-                    <span className="text-base font-medium text-[#be9e67]">{interestRate}%</span>
+                    <span className="text-base font-medium text-blue-700 dark:text-blue-400">{interestRate}%</span>
                     <span className="text-sm text-gray-600">15%</span>
                   </div>
                 </div>
@@ -114,11 +114,11 @@ export default function EmiCalculatorPage() {
                     step="1"
                     value={loanTenure}
                     onChange={(e) => setLoanTenure(Number(e.target.value))}
-                    className="w-full h-2 bg-amber-100 rounded-lg appearance-none cursor-pointer"
+                    className="w-full h-2 bg-blue-100 rounded-lg appearance-none cursor-pointer"
                   />
                   <div className="flex justify-between mt-2">
                     <span className="text-sm text-gray-600">1 Year</span>
-                    <span className="text-base font-medium text-[#be9e67]">{loanTenure} Years</span>
+                    <span className="text-base font-medium text-blue-700 dark:text-blue-400">{loanTenure} Years</span>
                     <span className="text-sm text-gray-600">30 Years</span>
                   </div>
                 </div>
@@ -129,25 +129,25 @@ export default function EmiCalculatorPage() {
                 
                 <div className="space-y-6">
                   {/* Monthly EMI */}
-                  <div className="bg-amber-50 p-4 rounded-lg border border-amber-100">
+                  <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 dark:bg-blue-900/20 dark:border-blue-800/30">
                     <div className="text-sm text-gray-600 mb-1">Monthly EMI</div>
-                    <div className="text-2xl font-semibold text-[#be9e67]">{formatCurrency(emi)}</div>
+                    <div className="text-2xl font-semibold text-blue-700 dark:text-blue-400">{formatCurrency(emi)}</div>
                   </div>
                   
                   {/* Principal Amount */}
-                  <div className="bg-amber-50 p-4 rounded-lg border border-amber-100">
+                  <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 dark:bg-blue-900/20 dark:border-blue-800/30">
                     <div className="text-sm text-gray-600 mb-1">Principal Amount</div>
                     <div className="text-lg font-medium text-gray-800">{formatCurrency(loanAmount)}</div>
                   </div>
                   
                   {/* Total Interest */}
-                  <div className="bg-amber-50 p-4 rounded-lg border border-amber-100">
+                  <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 dark:bg-blue-900/20 dark:border-blue-800/30">
                     <div className="text-sm text-gray-600 mb-1">Total Interest Payable</div>
                     <div className="text-lg font-medium text-gray-800">{formatCurrency(totalInterest)}</div>
                   </div>
                   
                   {/* Total Amount */}
-                  <div className="bg-amber-50 p-4 rounded-lg border border-amber-100">
+                  <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 dark:bg-blue-900/20 dark:border-blue-800/30">
                     <div className="text-sm text-gray-600 mb-1">Total Amount Payable</div>
                     <div className="text-lg font-medium text-gray-800">{formatCurrency(totalAmount)}</div>
                   </div>
@@ -156,7 +156,7 @@ export default function EmiCalculatorPage() {
             </div>
 
             {/* Disclaimer */}
-            <div className="mt-8 pt-6 border-t border-amber-100">
+            <div className="mt-8 pt-6 border-t border-blue-100 dark:border-blue-900">
               <p className="text-sm text-gray-600">
                 <strong>Disclaimer:</strong> This calculator provides an estimate of your EMI based on the information provided. 
                 Actual EMI and other charges may vary depending on the lender's policies, processing fees, and other factors. 
@@ -177,13 +177,13 @@ export default function EmiCalculatorPage() {
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <a 
               href="/contact" 
-              className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-[#be9e67] hover:bg-[#b39058] transition-colors"
+              className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-700 hover:bg-blue-800 transition-colors dark:bg-blue-600 dark:hover:bg-blue-700"
             >
               Contact Us
             </a>
             <a 
               href="tel:+919978600222" 
-              className="inline-flex items-center justify-center px-6 py-3 border border-[#be9e67] text-base font-medium rounded-md text-[#be9e67] bg-transparent hover:bg-[#be9e67]/10 transition-colors"
+              className="inline-flex items-center justify-center px-6 py-3 border border-blue-700 text-base font-medium rounded-md text-blue-700 bg-transparent hover:bg-blue-50 transition-colors dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-900/30"
             >
               Call Now: +91 9978600222
             </a>

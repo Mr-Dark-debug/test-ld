@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/Button";
+import { ShimmerButton } from "@/components/magicui/shimmer-button";
 import {
   Card,
   CardContent,
@@ -100,15 +100,27 @@ export function BrochureDownloadForm({ projectName, brochureUrl }: BrochureDownl
                 </div>
               </div>
               <div className="mt-4">
-                <Button type="submit" className="w-full">Submit</Button>
+                <ShimmerButton 
+                  type="submit"
+                  shimmerColor="#3b82f6"
+                  background="rgba(59, 130, 246, 0.9)"
+                  className="font-medium w-full"
+                >
+                  Submit
+                </ShimmerButton>
               </div>
             </form>
           ) : (
             <div className="text-center py-4">
               <p className="mb-4">Your brochure is ready to download</p>
-              <Button onClick={handleDownload} className="w-full">
+              <ShimmerButton 
+                onClick={handleDownload}
+                shimmerColor="#3b82f6"
+                background="rgba(59, 130, 246, 0.9)"
+                className="font-medium w-full"
+              >
                 Download Brochure
-              </Button>
+              </ShimmerButton>
             </div>
           )}
         </CardContent>

@@ -1,14 +1,13 @@
 import Hero from "@/components/sections/Hero";
 import FeatureGrid from "@/components/sections/FeatureGrid";
 import FeaturedProjects from "@/components/sections/FeaturedProjects";
-import TestimonialMarquee from "@/components/sections/TestimonialMarquee";
 import CtaBanner from "@/components/sections/CtaBanner";
 import AnimatedMetrics from "@/components/sections/AnimatedMetrics";
-
+import HomeFlowingMenu from "@/components/sections/HomeFlowingMenu";
+import { TestimonialCarouselDemo } from "@/components/ui/testimonial-carousel-demo";
 import { heroData } from "@/data/hero";
 import { companyFeatures } from "@/data/features";
 import { featuredProjects } from "@/data/projects";
-import { testimonials } from "@/data/testimonials";
 import { metricsData } from "@/data/metrics";
 
 export default function Home() {
@@ -18,10 +17,19 @@ export default function Home() {
       <Hero
         title={heroData.title}
         subtitle={heroData.subtitle}
-        ctaButtons={heroData.ctaButtons as { text: string; href: string; variant?: "default" | "outline" | "ghost" | "light" | "dark" }[]}
+        ctaButtons={
+          heroData.ctaButtons.map(({ text, href, variant }) => ({
+            text,
+            href,
+            variant: (["default", "outline", "ghost"].includes(variant) ? variant : undefined) as "default" | "outline" | "ghost" | undefined
+          }))
+        }
         backgroundType={heroData.backgroundType}
         images={heroData.images}
       />
+
+      {/* Flowing Menu Section */}
+      <HomeFlowingMenu />
 
       {/* Animated Metrics */}
       <AnimatedMetrics metrics={metricsData} />
@@ -41,16 +49,12 @@ export default function Home() {
         viewAllHref="/residential"
       />
 
-      {/* Testimonials */}
-      <TestimonialMarquee
-        title="What Our Clients Say"
-        subtitle="Hear from the people who have made Laxmi Developers their choice for premium real estate"
-        testimonials={testimonials}
-      />
+      {/* Testimonials - Using the new video testimonial carousel */}
+      <TestimonialCarouselDemo />
 
       {/* CTA Banner */}
       <CtaBanner
-        title="Ready to Find Your Perfect Property?"
+        title="Find Your Perfect Property"
         description="Explore our ongoing and upcoming projects or get in touch with our sales team for personalized assistance."
         buttons={[
           {
@@ -61,7 +65,7 @@ export default function Home() {
           {
             text: "Contact Us",
             href: "/contact",
-            variant: "outline",
+            variant: "default",
           },
         ]}
       />

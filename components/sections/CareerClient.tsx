@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/Button";
+import { AuroraButton } from "@/components/ui/aurora-button";
 
 interface JobOpening {
   id: string;
@@ -193,13 +193,13 @@ export default function CareerClient({ jobOpenings }: CareerClientProps) {
                         {job.department} | {job.location} | {job.type}
                       </p>
                     </div>
-                    <Button
+                    <AuroraButton
                       onClick={() => setSelectedJob(selectedJob === job.id ? null : job.id)}
-                      variant="ghost"
-                      className="mt-3 md:mt-0"
+                      className="font-medium mt-3 md:mt-0"
+                      variant="outline"
                     >
                       {selectedJob === job.id ? "Hide Details" : "View Details"}
-                    </Button>
+                    </AuroraButton>
                   </div>
                   <p className="text-foreground/80">{job.description}</p>
 
@@ -222,7 +222,7 @@ export default function CareerClient({ jobOpenings }: CareerClientProps) {
                         </ul>
                       </div>
                       <div className="mt-6">
-                        <Button
+                        <AuroraButton
                           onClick={() => {
                             setFormData((prev) => ({
                               ...prev,
@@ -233,9 +233,11 @@ export default function CareerClient({ jobOpenings }: CareerClientProps) {
                               behavior: "smooth",
                             });
                           }}
+                          className="font-medium"
+                          variant="default"
                         >
                           Apply Now
-                        </Button>
+                        </AuroraButton>
                       </div>
                     </div>
                   )}
@@ -279,12 +281,12 @@ export default function CareerClient({ jobOpenings }: CareerClientProps) {
                 <p className="text-foreground/80 mb-6">
                   Thank you for your interest in joining Laxmi Developers. Our HR team will review your application and contact you if your qualifications match our requirements.
                 </p>
-                <Button
+                <AuroraButton
                   onClick={() => setFormSubmitted(false)}
                   variant="outline"
                 >
                   Submit Another Application
-                </Button>
+                </AuroraButton>
               </div>
             ) : (
               <div className="bg-card p-8 rounded-lg shadow-md">
@@ -409,13 +411,14 @@ export default function CareerClient({ jobOpenings }: CareerClientProps) {
                   </div>
 
                   <div>
-                    <Button
+                    <AuroraButton
                       type="submit"
                       disabled={isSubmitting}
                       className="w-full"
+                      variant="default"
                     >
                       {isSubmitting ? "Submitting..." : "Submit Application"}
-                    </Button>
+                    </AuroraButton>
                   </div>
                 </form>
               </div>

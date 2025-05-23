@@ -56,7 +56,7 @@ export default function ResidentialPage() {
           {
             text: "View Commercial Projects",
             href: "/commercial",
-            variant: "outline",
+            variant: "default",
           },
         ]}
       />
