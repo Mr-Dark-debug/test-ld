@@ -15,7 +15,7 @@ import Head from 'next/head';
 const allBlogPosts = [
   {
     id: 1,
-    slug: "future-of-sustainable-architecture",
+    slug: "the-future-of-sustainable-architecture-in-urban-development",
     title: "The Future of Sustainable Architecture in Urban Development",
     date: "October 26, 2023",
     readingTime: "7 min read",
