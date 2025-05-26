@@ -7,6 +7,7 @@ import ThemeToggle from "@/components/ui/ThemeToggle";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
+import { usePathname } from 'next/navigation';
 
 // Reorganized navigation items with two main categories
 const navItems = [
@@ -74,6 +75,7 @@ export default function Header() {
   const { theme, toggleTheme } = useTheme();
   const [active, setActive] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
 
   // Prevent body scroll when mobile menu is open
   useEffect(() => {
@@ -183,129 +185,132 @@ export default function Header() {
 
   return (
     <>
-      <header 
-        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 py-3 ${
-          !headerVisible && !isMobileMenuOpen ? 'transform -translate-y-full' : 'transform translate-y-0'
-        } backdrop-blur-md`}
-      >
-        <div className="container mx-auto px-4 flex items-center justify-between">
-          {/* Desktop Navigation */}
-          <div className="flex-grow lg:flex hidden items-center justify-between">
-            {/* Logo on the left */}
-            <div className="flex-shrink-0 flex items-center">
+      {/* Only show header if not in /cms-admin */}
+      {!(pathname && pathname.startsWith('/cms-admin')) && (
+        <header 
+          className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 py-3 ${
+            !headerVisible && !isMobileMenuOpen ? 'transform -translate-y-full' : 'transform translate-y-0'
+          } backdrop-blur-md`}
+        >
+          <div className="container mx-auto px-4 flex items-center justify-between">
+            {/* Desktop Navigation */}
+            <div className="flex-grow lg:flex hidden items-center justify-between">
+              {/* Logo on the left */}
+              <div className="flex-shrink-0 flex items-center">
+                <Link href="/" className="flex items-center">
+                  <Image
+                    src="/images/logo/logo.png"
+                    alt="Logo"
+                    width={120}
+                    height={40}
+                    className="h-10 w-auto"
+                  />
+                  <span className="ml-3 font-display text-xl font-semibold text-black dark:text-white">Laxmi Developers</span>
+                </Link>
+              </div>
+
+              {/* Main navigation on the right */}
+              <div className="flex items-center space-x-8">
+                <div className="flex space-x-8 items-center">
+                  <Link 
+                    href="/"
+                    className="text-black dark:text-white relative group py-1"
+                  >
+                    <span>Home</span>
+                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent group-hover:w-full transition-all duration-300"></span>
+                  </Link>
+                  {navItems.map((item) => (
+                    <div 
+                      key={item.title}
+                      className="navbar-item"
+                      onMouseEnter={() => handleMenuHover(item.title)}
+                    >
+                      <MenuItem
+                        setActive={setActive}
+                        active={active}
+                        item={item.title}
+                        href={item.href}
+                    >
+                        {item.submenu && renderNestedSubmenu(item.submenu)}
+                      </MenuItem>
+                    </div>
+                  ))}
+                </div>
+                
+                {/* Theme Toggle */}
+                <div className="flex-shrink-0">
+                  <ThemeToggle />
+                </div>
+              </div>
+            </div>
+
+            {/* Logo only for mobile view */}
+            <div className="lg:hidden flex-shrink-0 flex items-center">
               <Link href="/" className="flex items-center">
                 <Image
                   src="/images/logo/logo.png"
                   alt="Logo"
-                  width={120}
+                  width={100}
                   height={40}
-                  className="h-10 w-auto"
+                  className="h-8 w-auto"
                 />
-                <span className="ml-3 font-display text-xl font-semibold text-black dark:text-white">Laxmi Developers</span>
+                {!isScrolled && (
+                  <span className="ml-2 font-display text-lg font-semibold text-black dark:text-white">
+                    Laxmi Developers
+                  </span>
+                )}
               </Link>
             </div>
 
-            {/* Main navigation on the right */}
-            <div className="flex items-center space-x-8">
-              <div className="flex space-x-8 items-center">
-                <Link 
-                  href="/"
-                  className="text-black dark:text-white relative group py-1"
-                >
-                  <span>Home</span>
-                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent group-hover:w-full transition-all duration-300"></span>
-                </Link>
-                {navItems.map((item) => (
-                  <div 
-                    key={item.title}
-                    className="navbar-item"
-                    onMouseEnter={() => handleMenuHover(item.title)}
-                  >
-                    <MenuItem
-                      setActive={setActive}
-                      active={active}
-                      item={item.title}
-                      href={item.href}
-                  >
-                      {item.submenu && renderNestedSubmenu(item.submenu)}
-                    </MenuItem>
-                  </div>
-                ))}
-              </div>
-              
-              {/* Theme Toggle */}
-              <div className="flex-shrink-0">
+            {/* Mobile menu button and theme toggle for small screens */}
+            <div className="lg:hidden flex items-center absolute right-4 top-1/2 transform -translate-y-1/2 z-50">
+              {/* Theme Toggle - For mobile */}
+              <div className="mr-3">
                 <ThemeToggle />
               </div>
+              
+              <button
+                type="button"
+                className={`p-2 rounded-full ${isMobileMenuOpen ? 'bg-gray-100 dark:bg-gray-800' : 'bg-transparent'} shadow-none border-none`}
+                aria-label="Toggle mobile menu"
+                onClick={toggleMobileMenu}
+              >
+                {isMobileMenuOpen ? (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    className="h-6 w-6 text-black dark:text-white"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                ) : (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    className="h-6 w-6 text-black dark:text-white"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 6h16M4 12h16M4 18h16"
+                    />
+                  </svg>
+                )}
+              </button>
             </div>
           </div>
-
-          {/* Logo only for mobile view */}
-          <div className="lg:hidden flex-shrink-0 flex items-center">
-            <Link href="/" className="flex items-center">
-              <Image
-                src="/images/logo/logo.png"
-                alt="Logo"
-                width={100}
-                height={40}
-                className="h-8 w-auto"
-              />
-              {!isScrolled && (
-                <span className="ml-2 font-display text-lg font-semibold text-black dark:text-white">
-                  Laxmi Developers
-                </span>
-              )}
-            </Link>
-          </div>
-
-          {/* Mobile menu button and theme toggle for small screens */}
-          <div className="lg:hidden flex items-center absolute right-4 top-1/2 transform -translate-y-1/2 z-50">
-            {/* Theme Toggle - For mobile */}
-            <div className="mr-3">
-              <ThemeToggle />
-            </div>
-            
-            <button
-              type="button"
-              className={`p-2 rounded-full ${isMobileMenuOpen ? 'bg-gray-100 dark:bg-gray-800' : 'bg-transparent'} shadow-none border-none`}
-              aria-label="Toggle mobile menu"
-              onClick={toggleMobileMenu}
-            >
-              {isMobileMenuOpen ? (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  className="h-6 w-6 text-black dark:text-white"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              ) : (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  className="h-6 w-6 text-black dark:text-white"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 6h16M4 12h16M4 18h16"
-                  />
-                </svg>
-              )}
-            </button>
-          </div>
-        </div>
-      </header>
+        </header>
+      )}
 
       {/* Mobile Menu Overlay with Animation - Separate from header for proper z-index handling */}
       <AnimatePresence>
