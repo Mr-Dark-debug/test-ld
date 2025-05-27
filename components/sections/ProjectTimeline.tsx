@@ -1,127 +1,122 @@
 "use client";
 
-import { Calendar, MapPin } from "lucide-react"; // Assuming lucide-react for icons
+import { useEffect, useRef, useState } from 'react'; // Added useState
+import CircularGallery from "@/components/reactbits/CircularGallery/CircularGallery";
+import SplitText from "@/components/reactbits/SplitText/SplitText"; // Import SplitText
+import AnimatedContent from "@/components/reactbits/AnimatedContent/AnimatedContent"; // Import AnimatedContent
 
-// Placeholder project data - replace with your actual data source
+// Project data with mockup images and descriptions
 const projects = [
   {
     year: "2023",
     status: "Completed",
     title: "Sunset Apartments",
     location: "Downtown, Cityville",
-    description: "Modern residential complex with stunning city views.",
+    description: "Modern residential complex with stunning city views and luxury amenities.",
+    image: "https://picsum.photos/seed/timeline1/800/600?grayscale", 
   },
   {
     year: "2024",
     status: "Ongoing",
     title: "Oceanview Villas",
     location: "Coastal Route, Seaview",
-    description: "Luxury villas offering direct beach access and premium amenities.",
+    description: "Luxury villas offering direct beach access, private pools, and premium interior finishes.",
+    image: "https://picsum.photos/seed/timeline2/800/600?grayscale",
   },
   {
     year: "2024",
     status: "Completed",
     title: "Greenwood Plaza",
     location: "Suburbia, Townsville",
-    description: "A commercial hub with retail spaces and office units.",
+    description: "A vibrant commercial hub featuring diverse retail spaces, modern office units, and ample parking.",
+    image: "https://picsum.photos/seed/timeline3/800/600?grayscale",
   },
   {
     year: "2025",
     status: "Upcoming",
     title: "Skyline Tower",
     location: "Financial District, Metrocity",
-    description: "Iconic skyscraper set to redefine the city's skyline.",
+    description: "An iconic skyscraper set to redefine the city's skyline, offering panoramic views and state-of-the-art facilities.",
+    image: "https://picsum.photos/seed/timeline4/800/600?grayscale",
   },
   {
     year: "2025",
     status: "Upcoming",
     title: "Eco-Friendly Homes",
     location: "Rural Greens, Countryside",
-    description: "Sustainable housing project focused on green living.",
+    description: "A sustainable housing project focused on green living, energy efficiency, and community gardens.",
+    image: "https://picsum.photos/seed/timeline5/800/600?grayscale", 
   },
 ];
 
 const ProjectTimeline = () => {
+  const [hoveredItemDescription, setHoveredItemDescription] = useState<string | null>(null);
+
+  const galleryItems = projects.map(project => ({
+    image: project.image, 
+    text: `${project.title} (${project.year})`,
+    fullDescription: project.description, // Pass full description for hover
+  }));
+
+  const titleText = "Our Journey";
+  const descriptionText = "Explore our timeline of exceptional developments that have shaped communities and redefined living experiences";
+
   return (
-    <section className="py-20 bg-white">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            Our Project Journey
-          </h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            Explore our timeline of exceptional developments that have shaped
-            communities and redefined living experiences
-          </p>
+    <section className="py-16 md:py-20 lg:py-24 bg-white dark:bg-gray-900 overflow-hidden"> {/* Added overflow-hidden for fades */}
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-12 md:mb-16 lg:mb-20 relative z-10">
+          <AnimatedContent direction="vertical" distance={30} delay={0} threshold={0.1}>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold text-gray-900 dark:text-white mb-4 sm:mb-5">
+              <SplitText
+                text={titleText}
+                delay={50}
+                textAlign="center"
+                animationFrom={{ opacity: 0, transform: 'translate3d(0,20px,0)' }}
+                animationTo={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
+              />
+            </h2>
+          </AnimatedContent>
+          <AnimatedContent direction="vertical" distance={20} delay={titleText.length * 50 + 100} threshold={0.1}>
+            <p className="text-base sm:text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto font-sans"> {/* Using font-sans for description */}
+              {descriptionText}
+            </p>
+          </AnimatedContent>
         </div>
-        <div className="relative">
-          {/* Timeline line - enhanced for animation */}
-          <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-gray-200 transform -translate-y-1/2 hidden lg:block">
-            <div className="w-full h-full bg-blue-500 animate-timeline-line"></div>
-          </div>
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-4">
-            {projects.map((project, index) => (
-              <div
-                key={index}
-                className="relative group" // Added group for hover effects
-              >
-                {/* Timeline dot - enhanced */}
-                <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-white border-4 border-blue-500 rounded-full shadow-lg z-10 hidden lg:block group-hover:scale-125 transition-transform duration-300" />
-                <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-xl transition-all duration-300 ease-in-out mt-8 lg:mt-12 transform group-hover:-translate-y-2">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Calendar className="w-4 h-4 text-blue-500" />
-                    <span className="text-blue-600 font-semibold">
-                      {project.year}
-                    </span>
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium ml-auto ${
-                        project.status === "Ongoing"
-                          ? "bg-yellow-100 text-yellow-800 animate-pulse-slow" // Added slow pulse for ongoing
-                          : project.status === "Upcoming"
-                          ? "bg-blue-100 text-blue-800"
-                          : "bg-green-100 text-green-800"
-                      }`}
-                    >
-                      {project.status}
-                    </span>
-                  </div>
-                  <h3 className="font-bold text-gray-900 mb-2">
-                    {project.title}
-                  </h3>
-                  <div className="flex items-center gap-1 mb-3">
-                    <MapPin className="w-4 h-4 text-gray-400" />
-                    <span className="text-gray-600 text-sm">
-                      {project.location}
-                    </span>
-                  </div>
-                  <p className="text-gray-600 text-sm">{project.description}</p>
-                </div>
+        
+        <div className="relative w-full">
+          {/* Left fade overlay - shorter width */}
+          <div 
+            className="absolute left-0 top-0 bottom-0 z-10 w-12 sm:w-16 md:w-20 pointer-events-none 
+                       bg-gradient-to-r from-white via-white/50 to-transparent 
+                       dark:from-gray-900 dark:via-gray-900/50 dark:to-transparent"
+            style={{ backdropFilter: 'blur(2px)' }}
+          ></div>
+          
+          <div style={{ height: '600px' }} className="w-full mx-auto relative"> {/* Ensured relative for potential absolute children like tooltips */}
+            <CircularGallery 
+              items={galleryItems} 
+              bend={2} 
+              textColor="#374151" // Dark gray for text on light background
+              borderRadius={0.08} 
+              // onHoverItem={setHoveredItemDescription} // This will be handled internally by CircularGallery now
+            />
+            {/* Removed the black box description display */}
+            {/* {hoveredItemDescription && (
+              <div className="absolute bottom-5 left-1/2 -translate-x-1/2 bg-black/70 text-white p-3 rounded-md text-sm z-20 max-w-md">
+                {hoveredItemDescription}
               </div>
-            ))}
+            )} */}
           </div>
+
+          {/* Right fade overlay - shorter width */}
+          <div 
+            className="absolute right-0 top-0 bottom-0 z-10 w-12 sm:w-16 md:w-20 pointer-events-none 
+                       bg-gradient-to-l from-white via-white/50 to-transparent 
+                       dark:from-gray-900 dark:via-gray-900/50 dark:to-transparent"
+            style={{ backdropFilter: 'blur(2px)' }}
+          ></div>
         </div>
       </div>
-      <style jsx>{`
-        @keyframes timeline-line-progress {
-          from {
-            transform: scaleX(0);
-          }
-          to {
-            transform: scaleX(1);
-          }
-        }
-        .animate-timeline-line {
-          transform-origin: left;
-          animation: timeline-line-progress 2s ease-out forwards;
-        }
-        @keyframes pulse-slow {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.7; }
-        }
-        .animate-pulse-slow {
-          animation: pulse-slow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-      `}</style>
     </section>
   );
 };

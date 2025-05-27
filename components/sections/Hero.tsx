@@ -27,30 +27,30 @@ export default function Hero() {
     <section className="bg-white dark:bg-gray-900 pt-16 md:pt-20 lg:pt-24 pb-12 md:pb-16 lg:pb-20 overflow-x-hidden">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center relative mb-12 md:mb-16 lg:mb-20"> {/* Adjusted bottom margin */}
-          <Sparkle 
+          <Sparkle
             className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-blue-300 opacity-10 dark:opacity-5 z-0"
-            style={{ width: '280px', height: '280px' }} // Slightly larger sparkle 
+            style={{ width: '280px', height: '280px' }} // Slightly larger sparkle
             strokeWidth={0.5}
           />
           <div className="relative z-10 max-w-3xl mx-auto"> {/* Constrain width and center */}
-            <SplitText 
+            <SplitText
               text={titleLine1}
               className="text-4xl sm:text-5xl md:text-6xl lg:text-[64px] xl:text-[68px] font-serif leading-tight text-gray-900 dark:text-white block mb-2 sm:mb-3"
-              delay={baseDelay} 
+              delay={baseDelay}
               textAlign="center"
               animationFrom={{ opacity: 0, transform: 'translate3d(0,30px,0)' }}
               animationTo={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
             />
-            <span style={{ color: THEME_COLOR_HEX }}> {/* Apply color to this span */}
-              <SplitText 
+            <div style={{ color: THEME_COLOR_HEX }}> {/* Apply color to this div, ensuring it's a block for the second line */}
+              <SplitText
                 text={titleLine2}
                 className="text-4xl sm:text-5xl md:text-6xl lg:text-[64px] xl:text-[68px] font-serif leading-tight block"
-                delay={baseDelay} 
+                delay={baseDelay}
                 textAlign="center"
                 animationFrom={{ opacity: 0, transform: 'translate3d(0,30px,0)' }}
                 animationTo={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
               />
-            </span>
+            </div>
           </div>
 
           {/* CTA Button */}
@@ -99,7 +99,7 @@ export default function Hero() {
                   altText={item.alt}
                   captionText={`${item.title}`}
                   containerHeight="auto"
-                  containerWidth="230px" 
+                  containerWidth="230px"
                   imageHeight="250px"
                   imageWidth="100%"
                   rotateAmplitude={8}
