@@ -10,7 +10,7 @@ export default function UsersList() {
     {
       id: 1,
       name: 'Admin User',
-      email: 'admin@realestate.com',
+      email: 'admin@Laxmi Developer.com',
       role: 'Super Admin',
       status: 'Active',
       lastLogin: '2024-03-15 09:30 AM',
@@ -18,7 +18,7 @@ export default function UsersList() {
     {
       id: 2,
       name: 'Content Manager',
-      email: 'content@realestate.com',
+      email: 'content@laxmideveloper.com',
       role: 'Editor',
       status: 'Active',
       lastLogin: '2024-03-14 03:15 PM',

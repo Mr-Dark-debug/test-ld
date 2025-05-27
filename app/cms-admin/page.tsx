@@ -31,7 +31,7 @@ export default function LoginPage() {
             <Building2 className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            RealEstate CMS
+            Laxmi Developer CMS
           </h1>
           <p className="text-gray-600">Admin Dashboard Login</p>
         </div>
@@ -56,7 +56,7 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                  placeholder="admin@realestate.com"
+                  placeholder="admin@Laxmi Developer.com"
                   required
                 />
               </div>
@@ -140,7 +140,7 @@ export default function LoginPage() {
         {/* Footer */}
         <div className="text-center mt-6">
           <p className="text-sm text-gray-500">
-            © 2024 RealEstate CMS. All rights reserved.
+            © 2024 Laxmi Developer CMS. All rights reserved.
           </p>
         </div>
       </div>

@@ -3,11 +3,11 @@ import ScrollingFeatureCards from "@/components/ui/ScrollingFeatureCards";
 import FeaturedProjects from "@/components/sections/FeaturedProjects";
 import CtaBanner from "@/components/sections/CtaBanner";
 import AnimatedMetrics from "@/components/sections/AnimatedMetrics";
+import ProjectTimeline from "@/components/sections/ProjectTimeline";
 import AnimatedTitle from "@/components/ui/AnimatedTitle";
 import HomeFlowingMenu from "@/components/sections/HomeFlowingMenu";
 import { TestimonialCarouselDemo } from "@/components/ui/testimonial-carousel-demo";
 import { Ripple } from "@/components/magicui/ripple";
-import { heroData } from "@/data/hero";
 import { companyFeatures } from "@/data/features";
 import { featuredProjects } from "@/data/projects";
 import { metricsData } from "@/data/metrics";
@@ -16,25 +16,16 @@ export default function Home() {
   return (
     <main>
       {/* Hero Section */}
-      <Hero
-        title={heroData.title}
-        subtitle={heroData.subtitle}
-        ctaButtons={
-          heroData.ctaButtons.map(({ text, href, variant }) => ({
-            text,
-            href,
-            variant: (["default", "outline", "ghost"].includes(variant) ? variant : undefined) as "default" | "outline" | "ghost" | undefined
-          }))
-        }
-        backgroundType={heroData.backgroundType}
-        images={heroData.images}
-      />
+      <Hero />
 
       {/* Flowing Menu Section */}
       <HomeFlowingMenu />
 
       {/* Animated Metrics */}
       <AnimatedMetrics metrics={metricsData} />
+
+      {/* Project Timeline Section */}
+      <ProjectTimeline />
 
       {/* Features/Why Choose Us - Updated to ScrollingFeatureCards */}
       <section className="py-20 bg-background relative overflow-hidden">

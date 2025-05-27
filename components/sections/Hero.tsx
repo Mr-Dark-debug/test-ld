@@ -1,165 +1,121 @@
 "use client";
+import { Sparkle } from "lucide-react";
+import TiltedCard from "@/components/reactbits/TiltedCard/TiltedCard";
+import SplitText from "@/components/reactbits/SplitText/SplitText";
+import AnimatedContent from "@/components/reactbits/AnimatedContent/AnimatedContent";
+import { ShimmerButton } from "@/components/magicui/shimmer-button";
 
-import { useState, useEffect } from "react";
-import Image from "next/image";
-import { useTheme } from "@/lib/theme-context";
-import BlurText from "@/components/reactbits/BlurText/BlurText";
-import { AuroraButton } from "@/components/ui/aurora-button";
+// Define your theme color
+const THEME_COLOR_HEX = "#324189";
 
-interface HeroProps {
-  title: string;
-  subtitle?: string;
-  ctaButtons?: {
-    text: string;
-    href: string;
-    variant?: "default" | "outline" | "ghost";
-  }[];
-  backgroundType: "video" | "carousel";
-  videoSrc?: string;
-  images?: {
-    src: string;
-    alt: string;
-  }[];
-}
+// Property items for the TiltedCards - now 5 items
+const propertyItems = [
+  { imageSrc: "/images/hero/hero-1.jpg", alt: "Horizon, Greece", title: "Horizon, Greece" },
+  { imageSrc: "/images/projects/Aleta.jpg", alt: "Sunset Ridge Villa, USA", title: "Sunset Ridge Villa, USA" },
+  { imageSrc: "/images/projects/Millennium Park.jpg", alt: "Willowbrook Home, Oregon", title: "Willowbrook Home, Oregon" },
+  { imageSrc: "/images/projects/Laxmi Nova.jpg", alt: "Whispering Pines, Canada", title: "Whispering Pines, Canada" },
+  { imageSrc: "/images/projects/Alexa.jpg", alt: "Alexa Apartments", title: "Alexa Apartments" }, // Added fifth item
+];
 
-export default function Hero({
-  title,
-  subtitle,
-  ctaButtons = [],
-  backgroundType = "carousel",
-  videoSrc,
-  images = [],
-}: HeroProps) {
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [animationComplete, setAnimationComplete] = useState(false);
-  const { theme } = useTheme();
-
-  useEffect(() => {
-    if (backgroundType === "carousel" && images.length > 1) {
-      const interval = setInterval(() => {
-        setCurrentImageIndex((prevIndex) => 
-          prevIndex === images.length - 1 ? 0 : prevIndex + 1
-        );
-      }, 5000);
-
-      return () => clearInterval(interval);
-    }
-  }, [backgroundType, images.length]);
-
-  // Handle animation completion
-  const handleTitleAnimationComplete = () => {
-    setAnimationComplete(true);
-  };
-
-  // Adjust overlay opacity and blur based on theme
-  const overlayStyle = theme === "light" 
-    ? "bg-black/25 backdrop-blur-[8px]" 
-    : "bg-black/40 backdrop-blur-[8px]";
+export default function Hero() {
+  const titleLine1 = `Brick By Brick Building Excellence`;
+  const titleLine2 = `Laxmi Developers.`;
+  const baseDelay = 70;
+  const firstLineAnimationDuration = titleLine1.length * baseDelay;
 
   return (
-    <section className="relative h-screen flex items-center justify-center overflow-hidden">
-      {/* Background */}
-      <div className="absolute inset-0 z-0">
-        {backgroundType === "video" && videoSrc ? (
-          <video
-            autoPlay
-            muted
-            loop
-            playsInline
-            className="absolute inset-0 w-full h-full object-cover"
-          >
-            <source src={videoSrc} type="video/mp4" />
-            Your browser does not support the video tag.
-          </video>
-        ) : (
-          images.map((image, index) => (
-            <div
-              key={index}
-              className={`absolute inset-0 w-full h-full transition-opacity duration-1000 ${
-                index === currentImageIndex ? "opacity-100" : "opacity-0"
-              }`}
-            >
-              <Image
-                src={image.src}
-                alt={image.alt}
-                fill
-                priority={index === 0}
-                className="object-cover"
-              />
-            </div>
-          ))
-        )}
-        {/* Darker overlay with blur for better text readability */}
-        <div className={`absolute inset-0 ${overlayStyle}`}></div>
-      </div>
-
-      {/* Content with improved visibility */}
-      <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 text-left sm:text-center">
-        {/* Semi-transparent backdrop for text */}
-        <div className="inline-block max-w-full">
-          {/* Title */}
-          <div className="text-4xl md:text-5xl lg:text-6xl font-display leading-tight mb-6 text-white">
-            <BlurText
-              text={title}
-              delay={100}
-              animateBy="words"
-              direction="top"
-              onAnimationComplete={handleTitleAnimationComplete}
-              className="font-display inline-block font-bold"
-              stepDuration={0.4}
+    <section className="bg-white dark:bg-gray-900 pt-16 md:pt-20 lg:pt-24 pb-12 md:pb-16 lg:pb-20 overflow-x-hidden">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center relative mb-12 md:mb-16 lg:mb-20"> {/* Adjusted bottom margin */}
+          <Sparkle 
+            className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-blue-300 opacity-10 dark:opacity-5 z-0"
+            style={{ width: '280px', height: '280px' }} // Slightly larger sparkle 
+            strokeWidth={0.5}
+          />
+          <div className="relative z-10 max-w-3xl mx-auto"> {/* Constrain width and center */}
+            <SplitText 
+              text={titleLine1}
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-[64px] xl:text-[68px] font-serif leading-tight text-gray-900 dark:text-white block mb-2 sm:mb-3"
+              delay={baseDelay} 
+              textAlign="center"
+              animationFrom={{ opacity: 0, transform: 'translate3d(0,30px,0)' }}
+              animationTo={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
             />
-          </div>
-          
-          {/* Subtitle */}
-          {subtitle && (
-            <div className="text-xl md:text-2xl max-w-3xl mx-auto mb-8 text-white/90">
-              <BlurText
-                text={subtitle}
-                delay={150}
-                animateBy="words"
-                direction="bottom"
-                className="font-medium leading-relaxed"
-                stepDuration={0.35}
+            <span style={{ color: THEME_COLOR_HEX }}> {/* Apply color to this span */}
+              <SplitText 
+                text={titleLine2}
+                className="text-4xl sm:text-5xl md:text-6xl lg:text-[64px] xl:text-[68px] font-serif leading-tight block"
+                delay={baseDelay} 
+                textAlign="center"
+                animationFrom={{ opacity: 0, transform: 'translate3d(0,30px,0)' }}
+                animationTo={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
               />
+            </span>
+          </div>
+
+          {/* CTA Button */}
+          <AnimatedContent
+            direction="vertical"
+            distance={30}
+            delay={firstLineAnimationDuration + (titleLine2.length * baseDelay) + 100} // Delay after both title lines
+            threshold={0.1}
+          >
+            <div className="mt-8 md:mt-10 flex justify-center">
+              <ShimmerButton
+                background={THEME_COLOR_HEX}
+                shimmerColor="#A7C7E7" // A lighter, complementary blue for shimmer
+                shimmerDuration="5s" // Slower shimmer
+                borderRadius="0.375rem" // Tailwind's 'rounded-md'
+                className="px-8 py-3 text-base sm:text-lg font-medium text-white dark:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 dark:focus:ring-offset-gray-800"
+                // Ensure text remains white in dark mode if background is dark theme color
+                onClick={() => { console.log("Explore Projects clicked!"); /* Replace with actual navigation: e.g. router.push('/projects') */ }}
+              >
+                Explore Projects
+              </ShimmerButton>
             </div>
-          )}
-          
-          {/* Call-to-action buttons */}
-          {ctaButtons.length > 0 && (
-            <div className={`flex flex-col sm:flex-row items-start sm:items-center sm:justify-center gap-4 transition-opacity duration-500 mt-6 ${animationComplete ? 'opacity-100' : 'opacity-0'}`}>
-              {/* Map over all buttons */}
-              {ctaButtons.map((button, index) => (
-                <AuroraButton
-                  key={index}
-                  onClick={() => window.location.href = button.href}
-                  variant={button.variant || (index === 0 ? "default" : "outline")}
-                  className="min-w-[160px] px-6 py-3 font-medium"
-                >
-                  {button.text}
-                </AuroraButton>
-              ))}
-            </div>
-          )}
+          </AnimatedContent>
         </div>
       </div>
 
-      {/* Carousel Indicators */}
-      {backgroundType === "carousel" && images.length > 1 && (
-        <div className="absolute bottom-10 left-0 right-0 z-10 flex justify-center space-x-2">
-          {images.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentImageIndex(index)}
-              className={`w-3 h-3 rounded-full transition-all ${
-                index === currentImageIndex
-                  ? "bg-white w-6"
-                  : "bg-white/50"
-              }`}
-              aria-label={`Go to slide ${index + 1}`}
-            />
+      {/* Property Cards Section */}
+      <div className="mt-10 md:mt-12 lg:mt-16"> {/* Adjusted top margin for cards */}
+        <div className="flex flex-wrap justify-center items-start gap-x-4 sm:gap-x-6 lg:gap-x-8 gap-y-12 sm:gap-y-16 px-4">
+          {propertyItems.map((item, idx) => (
+            <AnimatedContent
+              key={item.title + idx + "-anim"}
+              direction="vertical"
+              distance={50}
+              delay={200 * idx} // Slightly increased stagger for cards
+              threshold={0.1}
+            >
+              <div
+                className="flex-shrink-0"
+                style={{
+                  transform: idx % 2 === 0 ? 'translateY(-20px)' : 'translateY(20px)',
+                }}
+              >
+                <TiltedCard
+                  imageSrc={item.imageSrc}
+                  altText={item.alt}
+                  captionText={`${item.title}`}
+                  containerHeight="auto"
+                  containerWidth="230px" 
+                  imageHeight="250px"
+                  imageWidth="100%"
+                  rotateAmplitude={8}
+                  scaleOnHover={1.05}
+                  showMobileWarning={false}
+                  showTooltip={true}
+                  displayOverlayContent={false}
+                />
+                <div className="mt-3 text-center w-[230px]">
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-white truncate">{item.title}</h3>
+                </div>
+              </div>
+            </AnimatedContent>
           ))}
         </div>
-      )}
+      </div>
     </section>
   );
-} 
+}
