@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
@@ -17,7 +17,10 @@ import {
   ChevronDown,
   ChevronRight,
   FileEdit,
-  Info
+  Info,
+  Globe,
+  Download,
+  Filter
 } from 'lucide-react'
 import Image from 'next/image'
 
@@ -44,8 +47,25 @@ const navigation = [
   },
   {
     name: 'Leads',
-    href: '/cms-admin/dashboard/leads',
     icon: Users,
+    submenu: true,
+    submenuItems: [
+      {
+        name: 'All Leads',
+        href: '/cms-admin/dashboard/leads',
+        icon: Filter,
+      },
+      {
+        name: 'Contact Inquiries',
+        href: '/cms-admin/dashboard/leads/contact',
+        icon: Globe,
+      },
+      {
+        name: 'Brochure Requests',
+        href: '/cms-admin/dashboard/leads/brochures',
+        icon: Download,
+      },
+    ],
   },
   {
     name: 'Testimonials',
@@ -62,12 +82,17 @@ const navigation = [
         href: '/cms-admin/dashboard/pages/about-us',
         icon: Info,
       },
+      {
+        name: 'Contact Us',
+        href: '/cms-admin/dashboard/pages/contact-us',
+        icon: MapPin,
+      },
+      {
+        name: 'Careers',
+        href: '/cms-admin/dashboard/pages/careers',
+        icon: Users,
+      },
     ],
-  },
-  {
-    name: 'Amenities',
-    href: '/cms-admin/dashboard/amenities',
-    icon: MapPin,
   },
   {
     name: 'Settings',
@@ -80,8 +105,25 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname() || ''
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null)
   
+  useEffect(() => {
+    navigation.forEach(item => {
+      if (item.submenu && item.submenuItems?.some(subItem => 
+        pathname === subItem.href || pathname.startsWith(`${subItem.href}/`))) {
+        setOpenSubmenu(item.name);
+      }
+    });
+  }, [pathname]);
+  
   const toggleSubmenu = (name: string) => {
     setOpenSubmenu(openSubmenu === name ? null : name)
+  }
+
+  const isCurrentPath = (itemPath: string) => {
+    return pathname === itemPath;
+  }
+  
+  const isActivePath = (itemPath: string) => {
+    return pathname.startsWith(`${itemPath}/`);
   }
   
   return (
@@ -121,7 +163,9 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         <nav className="mt-6 px-3">
           <div className="space-y-1">
             {navigation.map((item) => {
-              const isActive = pathname ? (item.submenu ? item.submenuItems?.some(subItem => pathname === subItem.href || pathname.startsWith(`${subItem.href}/`)) : pathname === item.href || pathname.startsWith(`${item.href}/`)) : false
+              const isActive = item.submenu 
+                ? item.submenuItems?.some(subItem => isCurrentPath(subItem.href) || isActivePath(subItem.href))
+                : (item.href && (isCurrentPath(item.href) || isActivePath(item.href)));
               
               return (
                 <div key={item.name}>
@@ -144,7 +188,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                       {openSubmenu === item.name && (
                         <div className="ml-6 mt-1 space-y-1">
                           {item.submenuItems?.map((subItem) => {
-                            const isSubItemActive = pathname === subItem.href || pathname.startsWith(`${subItem.href}/`)
+                            const isSubItemActive = isCurrentPath(subItem.href);
                             return (
                               <Link
                                 key={subItem.name}
@@ -163,7 +207,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                     item.href && (
                       <Link
                         href={item.href}
-                        className={`group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${isActive ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-700' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'}`}
+                        className={`group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${isCurrentPath(item.href) ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-700' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'}`}
                       >
                         <item.icon className="mr-3 h-5 w-5 flex-shrink-0" />
                         {item.name}

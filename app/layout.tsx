@@ -6,6 +6,7 @@ import Footer from "@/components/layout/Footer";
 import { ThemeProvider } from "@/lib/theme-context";
 import GlobalFloatingMenu from "@/components/layout/GlobalFloatingMenu";
 import { Toaster } from 'sonner';
+import { LoadingProvider } from '@/components/providers/loading-provider';
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const playfair = PlayfairDisplay({
@@ -33,11 +34,13 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} ${playfair.variable} ${montserrat.variable} font-sans antialiased flex flex-col min-h-screen`}>
         <ThemeProvider>
-          <Header />
-          <main className="flex-grow">{children}</main>
-          <Footer />
-          <GlobalFloatingMenu />
-          <Toaster richColors position="top-right" />
+          <LoadingProvider>
+            <Header />
+            <main className="flex-grow">{children}</main>
+            <Footer />
+            <GlobalFloatingMenu />
+            <Toaster richColors position="top-right" />
+          </LoadingProvider>
         </ThemeProvider>
       </body>
     </html>

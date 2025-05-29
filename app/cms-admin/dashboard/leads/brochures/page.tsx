@@ -2,101 +2,67 @@
 
 import React, { useState } from 'react'
 import { Toaster } from 'sonner'
-import { Search, Filter, Phone, Mail, Eye, Tag, Clock, Calendar, Building, Download, Globe, Users } from 'lucide-react'
-import Link from 'next/link'
+import { Search, Filter, Phone, Mail, Eye, Download, Calendar, RefreshCcw, Building, Tag } from 'lucide-react'
 import AnimatedBackground from '@/components/ui/animated-tabs'
 
-export default function LeadsList() {
-  // Combined leads data for the main leads page
+export default function BrochureLeadsList() {
+  // Sample brochure request lead data
   const leads = [
-    // Contact form leads
     {
       id: 1,
-      name: "Ravi Patel",
-      email: "ravi.patel@example.com",
-      phone: "+91 98765 43210",
-      project: "N/A",
-      status: "New",
-      source: "Contact Form",
-      date: "2024-05-15",
-    },
-    {
-      id: 2,
-      name: "Ananya Sharma",
-      email: "ananya.s@example.com",
-      phone: "+91 98765 12345",
-      project: "N/A",
-      status: "Contacted",
-      source: "Contact Form",
-      date: "2024-05-12",
-    },
-    // Brochure download leads
-    {
-      id: 3,
       name: "Karan Mehra",
       email: "karan.m@example.com",
       phone: "+91 98765 87654",
       project: "Skyline Towers",
       status: "New",
-      source: "Brochure Download",
-      date: "2024-05-16",
+      downloadDate: "2024-05-16",
+      notes: "Looking for 3BHK options"
     },
     {
-      id: 4,
+      id: 2,
       name: "Neha Desai",
       email: "neha.d@example.com",
       phone: "+91 87654 76543",
       project: "Green Valley",
       status: "Contacted",
-      source: "Brochure Download",
-      date: "2024-05-14",
+      downloadDate: "2024-05-14",
+      notes: "Interested in payment plans"
     },
     {
-      id: 5,
+      id: 3,
       name: "Rahul Joshi",
       email: "rahul.j@example.com",
       phone: "+91 76543 65432",
       project: "Skyline Towers",
       status: "Qualified",
-      source: "Brochure Download",
-      date: "2024-05-12",
-    },
-    // Other leads
-    {
-      id: 6,
-      name: "John Smith",
-      email: "john.smith@example.com",
-      phone: "+1 (555) 123-4567",
-      project: "Skyline Towers",
-      status: "New",
-      source: "Website",
-      date: "2024-03-15",
+      downloadDate: "2024-05-12",
+      notes: "Asked about possession date"
     },
     {
-      id: 7,
-      name: "Sarah Johnson",
-      email: "sarah.j@example.com",
-      phone: "+1 (555) 987-6543",
-      project: "Green Valley",
-      status: "Contacted",
-      source: "Property Portal",
-      date: "2024-03-12",
-    },
-    {
-      id: 8,
-      name: "Michael Brown",
-      email: "m.brown@example.com",
-      phone: "+1 (555) 456-7890",
+      id: 4,
+      name: "Deepa Shah",
+      email: "deepa.s@example.com",
+      phone: "+91 65432 54321",
       project: "Corporate Plaza",
-      status: "Qualified",
-      source: "Referral",
-      date: "2024-03-10",
+      status: "Negotiation",
+      downloadDate: "2024-05-10",
+      notes: "Looking for office space"
     },
+    {
+      id: 5,
+      name: "Suresh Patel",
+      email: "suresh.p@example.com",
+      phone: "+91 54321 43210",
+      project: "Green Valley",
+      status: "Closed",
+      downloadDate: "2024-05-08",
+      notes: "Scheduled site visit"
+    }
   ]
 
-  const [sourceFilter, setSourceFilter] = useState<string>('all')
+  const projects = ["All Projects", "Skyline Towers", "Green Valley", "Corporate Plaza"]
+  const [projectFilter, setProjectFilter] = useState<string>("All Projects")
   const [statusFilter, setStatusFilter] = useState<string>('all')
-  const [projectFilter, setProjectFilter] = useState<string>('all')
   const [searchQuery, setSearchQuery] = useState<string>('')
 
   const getStatusColor = (status: string) => {
@@ -116,44 +82,23 @@ export default function LeadsList() {
     }
   }
 
-  const getSourceIcon = (source: string) => {
-    switch (source) {
-      case 'Contact Form':
-        return <Globe className="w-4 h-4 text-blue-500 mr-2" />
-      case 'Brochure Download':
-        return <Download className="w-4 h-4 text-green-500 mr-2" />
-      case 'Website':
-        return <Globe className="w-4 h-4 text-indigo-500 mr-2" />
-      case 'Property Portal':
-        return <Building className="w-4 h-4 text-purple-500 mr-2" />
-      case 'Referral':
-        return <Users className="w-4 h-4 text-amber-500 mr-2" />
-      default:
-        return <Tag className="w-4 h-4 text-gray-400 mr-2" />
-    }
-  }
-
-  // Filter leads based on filters and search query
+  // Filter leads based on search query, project filter and status filter
   const filteredLeads = leads.filter(lead => {
     const matchesSearch = searchQuery === '' || 
       lead.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       lead.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      lead.project.toLowerCase().includes(searchQuery.toLowerCase());
+      lead.notes.toLowerCase().includes(searchQuery.toLowerCase())
     
-    const matchesStatus = statusFilter === 'all' || lead.status === statusFilter;
-    const matchesProject = projectFilter === 'all' || lead.project === projectFilter;
-    const matchesSource = sourceFilter === 'all' || lead.source === sourceFilter;
+    const matchesStatus = statusFilter === 'all' || lead.status === statusFilter
+    const matchesProject = projectFilter === "All Projects" || lead.project === projectFilter
     
-    return matchesSearch && matchesStatus && matchesProject && matchesSource;
-  });
+    return matchesSearch && matchesStatus && matchesProject
+  })
 
-  const projects = ['Skyline Towers', 'Green Valley', 'Corporate Plaza'];
-  const sources = ['Contact Form', 'Brochure Download', 'Website', 'Property Portal', 'Referral'];
-  
-  // Function to update lead status - in real implementation, this would call an API
+  // Function to update lead status
   const updateLeadStatus = (leadId: number, newStatus: string) => {
     // This would connect to an API in a real implementation
-    console.log(`Updating lead ${leadId} to status: ${newStatus}`);
+    console.log(`Updating lead ${leadId} to status: ${newStatus}`)
     
     // For demo purposes, update the leads array locally
     const updatedLeads = leads.map(lead => 
@@ -161,7 +106,7 @@ export default function LeadsList() {
     );
     
     // In a real app, you would update state here after API call success
-    alert(`Lead status updated to: ${newStatus}`);
+    alert(`Lead status updated to: ${newStatus}`)
   }
 
   return (
@@ -170,66 +115,18 @@ export default function LeadsList() {
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Leads Management</h1>
-            <p className="text-gray-600">Track and manage all your leads in one place</p>
+            <h1 className="text-2xl font-bold text-gray-900">Brochure Download Requests</h1>
+            <p className="text-gray-600">Manage leads from project brochure downloads</p>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <Link href="/cms-admin/dashboard/leads/contact" className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-              <Globe className="w-4 h-4 mr-2" />
-              Contact Inquiries
-            </Link>
-            <Link href="/cms-admin/dashboard/leads/brochures" className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
-              <Download className="w-4 h-4 mr-2" />
-              Brochure Requests
-            </Link>
-          </div>
-        </div>
-
-        {/* Summary Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-500">Total Leads</p>
-                <p className="text-2xl font-semibold">{leads.length}</p>
-              </div>
-              <div className="p-3 bg-blue-100 rounded-full">
-                <Users className="w-6 h-6 text-blue-600" />
-              </div>
-            </div>
-          </div>
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-500">Contact Inquiries</p>
-                <p className="text-2xl font-semibold">{leads.filter(l => l.source === 'Contact Form').length}</p>
-              </div>
-              <div className="p-3 bg-green-100 rounded-full">
-                <Globe className="w-6 h-6 text-green-600" />
-              </div>
-            </div>
-          </div>
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-500">Brochure Requests</p>
-                <p className="text-2xl font-semibold">{leads.filter(l => l.source === 'Brochure Download').length}</p>
-              </div>
-              <div className="p-3 bg-purple-100 rounded-full">
-                <Download className="w-6 h-6 text-purple-600" />
-              </div>
-            </div>
-          </div>
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-500">New Today</p>
-                <p className="text-2xl font-semibold">5</p>
-              </div>
-              <div className="p-3 bg-amber-100 rounded-full">
-                <Clock className="w-6 h-6 text-amber-600" />
-              </div>
-            </div>
+          <div className="flex gap-2">
+            <button className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+              <RefreshCcw className="w-4 h-4 mr-2" />
+              Refresh
+            </button>
+            <button className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+              <Mail className="w-4 h-4 mr-2" />
+              Email All
+            </button>
           </div>
         </div>
 
@@ -241,7 +138,7 @@ export default function LeadsList() {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
                   type="text"
-                  placeholder="Search leads..."
+                  placeholder="Search by name, email, or notes..."
                   className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -251,33 +148,24 @@ export default function LeadsList() {
             <div className="flex flex-wrap gap-2">
               <div className="border rounded-lg overflow-hidden">
                 <AnimatedBackground
-                  defaultValue={sourceFilter}
+                  defaultValue={projectFilter}
                   className="bg-blue-50"
                   transition={{
                     type: "spring",
                     bounce: 0.2,
                     duration: 0.3,
                   }}
-                  onValueChange={(value) => setSourceFilter(value || 'all')}
+                  onValueChange={(value) => setProjectFilter(value || 'All Projects')}
                 >
-                  <button
-                    data-id="all"
-                    className="py-2 px-3 text-sm font-medium text-gray-700 data-[checked=true]:text-blue-600"
-                  >
-                    All Sources
-                  </button>
-                  <button
-                    data-id="Contact Form"
-                    className="py-2 px-3 text-sm font-medium text-gray-700 data-[checked=true]:text-blue-600"
-                  >
-                    Contact
-                  </button>
-                  <button
-                    data-id="Brochure Download"
-                    className="py-2 px-3 text-sm font-medium text-gray-700 data-[checked=true]:text-blue-600"
-                  >
-                    Brochure
-                  </button>
+                  {projects.map((project) => (
+                    <button
+                      key={project}
+                      data-id={project}
+                      className="py-2 px-3 text-sm font-medium text-gray-700 data-[checked=true]:text-blue-600"
+                    >
+                      {project === "All Projects" ? "All" : project}
+                    </button>
+                  ))}
                 </AnimatedBackground>
               </div>
               
@@ -341,10 +229,10 @@ export default function LeadsList() {
                     Status
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Source
+                    Download Date
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Date
+                    Notes
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Actions
@@ -364,9 +252,12 @@ export default function LeadsList() {
                       <div className="text-sm text-gray-500">{lead.phone}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="text-sm text-gray-900">
-                        {lead.project}
-                      </span>
+                      <div className="flex items-center">
+                        <Building className="w-4 h-4 text-gray-400 mr-2" />
+                        <span className="text-sm text-gray-900">
+                          {lead.project}
+                        </span>
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
@@ -377,18 +268,15 @@ export default function LeadsList() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
-                        {getSourceIcon(lead.source)}
+                        <Calendar className="w-4 h-4 text-gray-400 mr-2" />
                         <span className="text-sm text-gray-900">
-                          {lead.source}
+                          {lead.downloadDate}
                         </span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <Calendar className="w-4 h-4 text-gray-400 mr-2" />
-                        <span className="text-sm text-gray-900">
-                          {lead.date}
-                        </span>
+                    <td className="px-6 py-4">
+                      <div className="text-sm text-gray-900 max-w-xs truncate">
+                        {lead.notes}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -472,4 +360,4 @@ export default function LeadsList() {
       </div>
     </>
   )
-}
+} 

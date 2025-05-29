@@ -48,7 +48,7 @@ export default function Hero() {
             <div style={{ color: THEME_COLOR_HEX }}>
               <SplitText
                 text={titleLine2}
-                className="text-3xl font-serif leading-tight block mb-1"
+                className="text-2xl font-serif leading-tight block mb-1"
                 delay={baseDelaySplitText}
                 textAlign="center"
                 animationFrom={{ opacity: 0, transform: 'translate3d(0,20px,0)' }}
@@ -78,7 +78,7 @@ export default function Hero() {
               <div style={{ color: THEME_COLOR_HEX }}>
                 <SplitText
                   text={titleLine2}
-                  className="text-4xl sm:text-5xl md:text-6xl lg:text-[68px] font-serif leading-tight block mb-2 sm:mb-3"
+                  className="text-3xl sm:text-4xl md:text-5xl lg:text-[58px] font-serif leading-tight block mb-2 sm:mb-3"
                   delay={baseDelaySplitText}
                   textAlign="center"
                   animationFrom={{ opacity: 0, transform: 'translate3d(0,30px,0)' }}

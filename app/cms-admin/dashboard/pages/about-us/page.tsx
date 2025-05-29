@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/Button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Loader2, Save, Upload, Image as ImageIcon } from 'lucide-react'
+import { Loader2, Save, Upload, Image as ImageIcon, Menu, ChevronLeft, ChevronRight, X } from 'lucide-react'
 
 interface AboutUsContent {
   heroSection: {
@@ -134,6 +134,29 @@ export default function AboutUsPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [activeTab, setActiveTab] = useState('hero')
+  const [menuOpen, setMenuOpen] = useState(false)
+  
+  const tabs = [
+    { id: 'hero', label: 'Hero Section' },
+    { id: 'company', label: 'Company Section' },
+    { id: 'mission', label: 'Mission & Values' },
+    { id: 'portfolio', label: 'Portfolio' },
+    { id: 'cta', label: 'CTA Section' }
+  ]
+  
+  const currentTabIndex = tabs.findIndex(tab => tab.id === activeTab)
+  
+  const goToNextTab = () => {
+    if (currentTabIndex < tabs.length - 1) {
+      setActiveTab(tabs[currentTabIndex + 1].id)
+    }
+  }
+  
+  const goToPrevTab = () => {
+    if (currentTabIndex > 0) {
+      setActiveTab(tabs[currentTabIndex - 1].id)
+    }
+  }
   
   // In a real implementation, you would fetch the content from an API or database
   useEffect(() => {
@@ -233,34 +256,125 @@ export default function AboutUsPage() {
   }
   
   return (
-    <div className="container mx-auto py-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Edit About Us Page</h1>
+    <div className="container mx-auto py-6 relative">
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
+        <div className="flex items-center w-full justify-between sm:justify-start">
+          <h1 className="text-2xl font-bold">Edit About Us Page</h1>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="sm:hidden"
+            onClick={() => setMenuOpen(true)}
+          >
+            <Menu className="h-6 w-6" />
+          </Button>
+        </div>
         <Button 
           onClick={handleSave} 
           disabled={isSaving}
-          className="flex items-center gap-2"
+          className="w-full sm:w-auto flex items-center justify-center gap-2"
         >
           {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
           {isSaving ? 'Saving...' : 'Save Changes'}
         </Button>
       </div>
       
+      {/* Section Navigation Overlay */}
+      {menuOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-start sm:hidden">
+          <div className="bg-white rounded-lg shadow-lg mt-16 w-[90%] max-w-md p-4">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold">Navigate Sections</h2>
+              <Button variant="ghost" size="icon" onClick={() => setMenuOpen(false)}>
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+            <div className="flex flex-col gap-2">
+              {tabs.map(tab => (
+                <Button 
+                  key={tab.id}
+                  variant={activeTab === tab.id ? "default" : "outline"}
+                  className="justify-start"
+                  onClick={() => {
+                    setActiveTab(tab.id)
+                    setMenuOpen(false)
+                  }}
+                >
+                  {tab.label}
+                </Button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+      
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid grid-cols-5 mb-8">
-          <TabsTrigger value="hero">Hero Section</TabsTrigger>
-          <TabsTrigger value="company">Company Section</TabsTrigger>
-          <TabsTrigger value="mission">Mission & Values</TabsTrigger>
-          <TabsTrigger value="portfolio">Portfolio</TabsTrigger>
-          <TabsTrigger value="cta">CTA Section</TabsTrigger>
+        {/* Desktop Tabs - Hidden on Mobile */}
+        <TabsList className="hidden sm:flex overflow-x-auto pb-2 mb-8 border-b">
+          <TabsTrigger 
+            value="hero" 
+            className="px-4 py-2 min-w-[120px] text-center rounded-t-md"
+          >
+            Hero Section
+          </TabsTrigger>
+          <TabsTrigger 
+            value="company" 
+            className="px-4 py-2 min-w-[120px] text-center rounded-t-md"
+          >
+            Company Section
+          </TabsTrigger>
+          <TabsTrigger 
+            value="mission" 
+            className="px-4 py-2 min-w-[120px] text-center rounded-t-md"
+          >
+            Mission & Values
+          </TabsTrigger>
+          <TabsTrigger 
+            value="portfolio" 
+            className="px-4 py-2 min-w-[120px] text-center rounded-t-md"
+          >
+            Portfolio
+          </TabsTrigger>
+          <TabsTrigger 
+            value="cta" 
+            className="px-4 py-2 min-w-[120px] text-center rounded-t-md"
+          >
+            CTA Section
+          </TabsTrigger>
         </TabsList>
         
+        {/* Mobile Pagination UI */}
+        <div className="flex sm:hidden items-center justify-between mb-4">
+          <Button 
+            variant="outline" 
+            size="icon" 
+            onClick={goToPrevTab}
+            disabled={currentTabIndex === 0}
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </Button>
+          
+          <div className="text-center font-medium">
+            {tabs[currentTabIndex].label}
+          </div>
+          
+          <Button 
+            variant="outline" 
+            size="icon"
+            onClick={goToNextTab}
+            disabled={currentTabIndex === tabs.length - 1}
+          >
+            <ChevronRight className="h-5 w-5" />
+          </Button>
+        </div>
+        
+        {/* Tab Content */}
         {/* Hero Section Tab */}
         <TabsContent value="hero" className="space-y-4">
           <Card className="p-6">
             <h2 className="text-xl font-semibold mb-4">Hero Section</h2>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium mb-1">Tagline</label>
@@ -321,7 +435,7 @@ export default function AboutUsPage() {
                       <Button 
                         variant="outline" 
                         size="sm" 
-                        className="absolute bottom-2 right-2 bg-white"
+                        className="absolute bottom-2 right-2 bg-white text-xs p-1 sm:p-2"
                         onClick={() => handleInputChange('heroSection', 'backgroundImage', '')}
                       >
                         Change
@@ -331,8 +445,8 @@ export default function AboutUsPage() {
                     <div className="text-center">
                       <ImageIcon className="w-12 h-12 mx-auto text-gray-400" />
                       <p className="mt-2 text-sm text-gray-500">Click to upload background image</p>
-                      <Button variant="outline" size="sm" className="mt-4">
-                        <Upload className="w-4 h-4 mr-2" />
+                      <Button variant="outline" size="sm" className="mt-2 text-xs p-1 sm:p-2 w-full sm:w-auto">
+                        <Upload className="w-3 h-3 mr-1" />
                         Upload Image
                       </Button>
                     </div>
@@ -348,7 +462,7 @@ export default function AboutUsPage() {
           <Card className="p-6">
             <h2 className="text-xl font-semibold mb-4">Company Section</h2>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium mb-1">Tagline</label>
@@ -404,7 +518,7 @@ export default function AboutUsPage() {
                       <Button 
                         variant="outline" 
                         size="sm" 
-                        className="absolute bottom-2 right-2 bg-white"
+                        className="absolute bottom-2 right-2 bg-white text-xs p-1 sm:p-2"
                         onClick={() => handleInputChange('companySection', 'image', '')}
                       >
                         Change
@@ -414,8 +528,8 @@ export default function AboutUsPage() {
                     <div className="text-center">
                       <ImageIcon className="w-12 h-12 mx-auto text-gray-400" />
                       <p className="mt-2 text-sm text-gray-500">Click to upload company image</p>
-                      <Button variant="outline" size="sm" className="mt-4">
-                        <Upload className="w-4 h-4 mr-2" />
+                      <Button variant="outline" size="sm" className="mt-2 text-xs p-1 sm:p-2 w-full sm:w-auto">
+                        <Upload className="w-3 h-3 mr-1" />
                         Upload Image
                       </Button>
                     </div>
@@ -432,7 +546,7 @@ export default function AboutUsPage() {
             <h2 className="text-xl font-semibold mb-4">Mission, Vision & Values</h2>
             
             <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-1">Section Tagline</label>
                   <Input 
@@ -464,7 +578,7 @@ export default function AboutUsPage() {
               <div className="border-t pt-4">
                 <h3 className="text-lg font-medium mb-4">Values Items</h3>
                 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                   {content.missionVisionValues.items.map((item, index) => (
                     <Card key={index} className="p-4">
                       <div className="space-y-3">
@@ -502,7 +616,7 @@ export default function AboutUsPage() {
             <h2 className="text-xl font-semibold mb-4">Portfolio Section</h2>
             
             <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-1">Section Tagline</label>
                   <Input 
@@ -543,7 +657,7 @@ export default function AboutUsPage() {
               <div className="border-t pt-4">
                 <h3 className="text-lg font-medium mb-4">Featured Projects</h3>
                 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                   {content.portfolioSection.projects.map((project, index) => (
                     <Card key={index} className="p-4">
                       <div className="space-y-3">
@@ -560,7 +674,7 @@ export default function AboutUsPage() {
                                 <Button 
                                   variant="outline" 
                                   size="sm" 
-                                  className="absolute bottom-2 right-2 bg-white"
+                                  className="absolute bottom-2 right-2 bg-white text-xs p-1 sm:p-2"
                                   onClick={() => handleArrayItemChange('portfolioSection', 'projects', index, 'image', '')}
                                 >
                                   Change
@@ -570,7 +684,7 @@ export default function AboutUsPage() {
                               <div className="text-center">
                                 <ImageIcon className="w-8 h-8 mx-auto text-gray-400" />
                                 <p className="mt-1 text-xs text-gray-500">Upload image</p>
-                                <Button variant="outline" size="sm" className="mt-2">
+                                <Button variant="outline" size="sm" className="mt-2 text-xs p-1 sm:p-2 w-full sm:w-auto">
                                   <Upload className="w-3 h-3 mr-1" />
                                   Upload
                                 </Button>
@@ -610,7 +724,7 @@ export default function AboutUsPage() {
           <Card className="p-6">
             <h2 className="text-xl font-semibold mb-4">Call to Action Section</h2>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium mb-1">Title</label>
@@ -636,7 +750,7 @@ export default function AboutUsPage() {
               <div className="space-y-4">
                 <div>
                   <h3 className="text-md font-medium mb-3">Primary Button</h3>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium mb-1">Text</label>
                       <Input 
@@ -658,7 +772,7 @@ export default function AboutUsPage() {
                 
                 <div>
                   <h3 className="text-md font-medium mb-3">Secondary Button</h3>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium mb-1">Text</label>
                       <Input 

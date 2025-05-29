@@ -80,9 +80,11 @@ export default function Stack({
 
   useEffect(() => {
     if (onActiveCardChange && cards.length > 0) {
-      onActiveCardChange(cards[cards.length - 1]);
+      requestAnimationFrame(() => {
+        onActiveCardChange(cards[cards.length - 1]);
+      });
     }
-  }, []);
+  }, [cards, onActiveCardChange]); // Added cards and onActiveCardChange to dependency array
 
   const sendToBack = (id: number) => {
     setCards((prev) => {
@@ -93,7 +95,9 @@ export default function Stack({
       newCards.unshift(card);
       
       if (onActiveCardChange && newCards.length > 0) {
-        onActiveCardChange(newCards[newCards.length - 1]);
+        requestAnimationFrame(() => {
+          onActiveCardChange(newCards[newCards.length - 1]);
+        });
       }
       return newCards;
     });

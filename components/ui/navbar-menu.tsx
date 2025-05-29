@@ -114,7 +114,7 @@ export const Menu = ({
 }) => {
   return (
     <nav
-      className="relative flex items-center justify-between px-8 py-4 before:content-[''] before:absolute before:bottom-0 before:left-0 before:right-0 before:h-12 before:bg-gradient-to-t before:from-background/80 before:to-transparent before:backdrop-blur-md before:z-10"
+      className="relative flex items-center justify-between px-8 py-4 after:content-[''] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-gradient-to-r after:from-transparent after:via-gray-200/60 after:to-transparent after:backdrop-blur-sm after:z-10 before:content-[''] before:absolute before:bottom-0 before:left-0 before:right-0 before:h-16 before:bg-gradient-to-t before:from-background/80 before:to-transparent before:backdrop-blur-md before:z-10"
     >
       {/* Logo Section */}
       {logoSrc && (
