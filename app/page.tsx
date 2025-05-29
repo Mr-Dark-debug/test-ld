@@ -19,7 +19,7 @@ interface StackCardData {
   img: string;
   title?: string;
   description?: string;
-  [key: string]: any; 
+  [key: string]: any;
 }
 
 const stackCardsData: StackCardData[] = [
@@ -50,55 +50,54 @@ export default function Home() {
       <ProjectTimeline />
 
       {/* New Section with Stack Component */}
-      <section className="py-20 bg-background relative overflow-hidden">
+      <section className="py-16 sm:py-20 bg-background relative overflow-hidden">
         <Ripple mainCircleSize={800} mainCircleOpacity={0.08} numCircles={8} className="absolute inset-0" />
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="text-center mb-12 md:mb-16">
-            <AnimatedTitle as="h2" className="mb-4">
+          <div className="text-center mb-10 md:mb-16">
+            <AnimatedTitle as="h2" className="text-3xl sm:text-4xl mb-3 sm:mb-4">
               Why Choose Laxmi Developers?
             </AnimatedTitle>
-            <p className="text-lg text-foreground/70 max-w-2xl mx-auto">
+            <p className="text-base sm:text-lg text-foreground/70 max-w-2xl mx-auto">
               Discover the Laxmi Developers difference through our core principles.
             </p>
           </div>
-          
-          {/* Adjusted main content div for centering and spacing */}
-          {/* Using a slightly wider max-width for the content area to give elements more room */}
+
           <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center md:items-start gap-8 md:gap-12 lg:gap-16">
-            {/* Left Column: Dynamic Text - more balanced width */}
-            <div className="w-full md:w-1/2 lg:w-5/12 text-center md:text-left flex flex-col justify-center min-h-[300px] md:min-h-[400px]">
+            {/* Left Column: Dynamic Text */}
+            <div className="w-full md:w-1/2 lg:w-5/12 text-center md:text-left flex flex-col justify-center min-h-[240px] sm:min-h-[300px] md:min-h-[400px]">
               {activeStackCard ? (
                 <>
-                  <AnimatedTitle 
-                    as="h3" 
-                    key={activeStackCard.id} 
-                    // Updated title color: text-primary (for blue in light mode) and dark:text-white
-                    className="text-3xl lg:text-4xl font-semibold mb-6 text-primary dark:text-white break-words"
+                  <AnimatedTitle
+                    as="h3"
+                    key={activeStackCard.id}
+                    className="text-2xl sm:text-3xl lg:text-4xl font-semibold mb-4 sm:mb-6 text-gray-900 dark:text-white break-words"
                   >
                     {activeStackCard.title || "Our Commitment"}
                   </AnimatedTitle>
-                  <p className="text-foreground/80 text-base lg:text-lg leading-relaxed mb-4 md:mb-0">
+                  <p className="text-foreground/80 text-sm sm:text-base lg:text-lg leading-relaxed mb-4 md:mb-0">
                     {activeStackCard.description || "Detailed information about this aspect will appear here."}
                   </p>
                 </>
               ) : (
-                <div className="min-h-[200px] flex items-center justify-center text-foreground/50">
-                  <p>Select a card to see details.</p>
+                <div className="min-h-[150px] sm:min-h-[200px] flex items-center justify-center text-foreground/50">
+                  <p className="text-sm sm:text-base">Select a card to see details.</p>
                 </div>
               )}
             </div>
 
-            {/* Right Column: Stack Component - ensure it can scale down on mobile if needed */}
+            {/* Right Column: Stack Component */}
             <div className="w-full md:w-1/2 lg:w-7/12 flex justify-center md:justify-start items-center">
-              {/* Container for stack to manage its size better on smaller screens within its column */}
-              <div className="w-full max-w-[400px] sm:max-w-md md:max-w-[400px] lg:max-w-lg mx-auto md:mx-0">
+              <div className="w-full max-w-[250px] sm:max-w-[300px] md:max-w-[350px] lg:max-w-[400px] mx-auto md:mx-0">
                 <Stack
                   cardsData={stackCardsData}
                   onActiveCardChange={setActiveStackCard}
                   randomRotation={true}
                   sensitivity={180}
                   sendToBackOnClick={false}
-                  cardDimensions={{ width: 400, height: 400 }} 
+                  cardDimensions={{
+                    width: typeof window !== 'undefined' && window.innerWidth < 480 ? 220 : (typeof window !== 'undefined' && window.innerWidth < 640 ? 260 : (typeof window !== 'undefined' && window.innerWidth < 768 ? 300 : 350)),
+                    height: typeof window !== 'undefined' && window.innerWidth < 480 ? 220 : (typeof window !== 'undefined' && window.innerWidth < 640 ? 260 : (typeof window !== 'undefined' && window.innerWidth < 768 ? 300 : 350))
+                  }}
                   animationConfig={{ stiffness: 260, damping: 20 }}
                 />
               </div>

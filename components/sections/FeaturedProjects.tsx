@@ -7,6 +7,9 @@ import { AuroraButton } from "@/components/ui/aurora-button";
 import AnimatedTitle from "@/components/ui/AnimatedTitle";
 import { cn } from "@/lib/utils";
 
+const NAVY_BLUE_BACKGROUND = "bg-[#324189]/80"; // 80% opacity navy blue
+const NAVY_BLUE_BACKGROUND_HOVER = "bg-[#324189]/90"; // 90% opacity for hover
+
 export interface Project {
   id: string;
   title: string;
@@ -32,20 +35,23 @@ export default function FeaturedProjects({
 }: FeaturedProjectsProps) {
   const [activeFilter, setActiveFilter] = useState<string>("all");
 
+  // Standardized to navy blue
   const getStatusColor = (status: "ongoing" | "completed" | "upcoming") => {
+    // Can differentiate by slight opacity or borders if needed, but base is navy
     switch (status) {
-      case "ongoing": return "bg-yellow-500/90 hover:bg-yellow-600/90 text-white";
-      case "completed": return "bg-green-500/90 hover:bg-green-600/90 text-white";
-      case "upcoming": return "bg-blue-500/90 hover:bg-blue-600/90 text-white";
-      default: return "bg-gray-500/90 hover:bg-gray-600/90 text-white";
+      case "ongoing": return `${NAVY_BLUE_BACKGROUND} hover:${NAVY_BLUE_BACKGROUND_HOVER} text-white shadow-md`;
+      case "completed": return `${NAVY_BLUE_BACKGROUND} hover:${NAVY_BLUE_BACKGROUND_HOVER} text-white shadow-md`; // Could be a slightly darker navy if desired, e.g., bg-[#242e65]/80
+      case "upcoming": return `${NAVY_BLUE_BACKGROUND} hover:${NAVY_BLUE_BACKGROUND_HOVER} text-white shadow-md`;// Could be a slightly lighter navy if desired, e.g., bg-[#4052a7]/80
+      default: return "bg-gray-500/80 hover:bg-gray-600/90 text-white shadow-md";
     }
   };
 
   const getTypeColor = (type: "residential" | "commercial") => {
+    // Both will use the same navy blue base
     switch (type) {
-      case "residential": return "bg-purple-500/90 hover:bg-purple-600/90 text-white";
-      case "commercial": return "bg-teal-500/90 hover:bg-teal-600/90 text-white";
-      default: return "bg-gray-500/90 hover:bg-gray-600/90 text-white";
+      case "residential": return `${NAVY_BLUE_BACKGROUND} hover:${NAVY_BLUE_BACKGROUND_HOVER} text-white shadow-md`;
+      case "commercial": return `${NAVY_BLUE_BACKGROUND} hover:${NAVY_BLUE_BACKGROUND_HOVER} text-white shadow-md`;
+      default: return "bg-gray-500/80 hover:bg-gray-600/90 text-white shadow-md";
     }
   };
 
@@ -59,15 +65,15 @@ export default function FeaturedProjects({
   });
 
   return (
-    <section className="py-20 bg-background">
+    <section className="py-16 sm:py-20 bg-background">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="text-center mb-12">
-          <AnimatedTitle as="h2" className="mb-4">
+        <div className="text-center mb-10 sm:mb-12">
+          <AnimatedTitle as="h2" className="text-3xl sm:text-4xl mb-3 sm:mb-4">
             {title}
           </AnimatedTitle>
           {subtitle && (
-            <p className="text-lg text-foreground/70 max-w-2xl mx-auto">
+            <p className="text-base sm:text-lg text-foreground/70 max-w-2xl mx-auto">
               {subtitle}
             </p>
           )}
@@ -185,9 +191,9 @@ export default function FeaturedProjects({
                   </p>
                   <div className="flex justify-end mt-auto pt-4">
                     <AuroraButton
-                      onClick={() => window.location.href = project.href}
-                      variant="outline"
-                      className="px-4 py-1.5 text-sm"
+                      as="a"
+                      href={project.href}
+                      className="px-4 py-1.5 text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-2 focus:ring-offset-2 focus:ring-primary/70 dark:focus:ring-offset-gray-800 rounded-md shadow-md"
                     >
                       View Details
                     </AuroraButton>
@@ -202,9 +208,9 @@ export default function FeaturedProjects({
         {viewAllHref && (
           <div className="mt-12 text-center">
             <AuroraButton
-              onClick={() => window.location.href = viewAllHref}
-              variant="outline"
-              className="px-6 py-3 font-medium"
+              as="a"
+              href={viewAllHref}
+              className="px-8 py-3 font-semibold text-lg bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-2 focus:ring-offset-2 focus:ring-primary/70 dark:focus:ring-offset-gray-800 rounded-md shadow-lg"
             >
               View All Projects
             </AuroraButton>
@@ -213,4 +219,4 @@ export default function FeaturedProjects({
       </div>
     </section>
   );
-} 
+}

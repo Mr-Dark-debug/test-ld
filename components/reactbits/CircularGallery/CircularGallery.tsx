@@ -41,74 +41,27 @@ function createTextTexture(
   gl: GL,
   text: string,
   font: string = "bold 30px monospace",
-  color: string = "black",
-  backgroundColor: string | null = null,
-  maxWidth: number | null = null,
-  padding: number = 10,
-  isDescription: boolean = false
+  color: string = "black"
 ): { texture: Texture; width: number; height: number } {
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d");
   if (!context) throw new Error("Could not get 2d context");
 
   context.font = font;
-  const lines: string[] = [];
-  let currentLine = "";
-
-  if (maxWidth && maxWidth > 0) {
-    const words = text.split(" ");
-    for (const word of words) {
-      const testLine = currentLine + (currentLine === "" ? "" : " ") + word;
-      const metricsTest = context.measureText(testLine);
-      if (metricsTest.width > maxWidth && currentLine !== "") {
-        lines.push(currentLine);
-        currentLine = word;
-      } else {
-        currentLine = testLine;
-      }
-    }
-    lines.push(currentLine.trim());
-  } else {
-    lines.push(text);
-  }
-
+  const metrics = context.measureText(text);
+  const textWidth = Math.ceil(metrics.width);
   const fontSize = getFontSize(font);
-  const lineHeight = fontSize * 1.2;
-  const textBlockHeight = lines.length * lineHeight;
+  const textHeight = Math.ceil(fontSize * 1.2);
 
-  let calculatedTextWidth = 0;
-  for (const line of lines) {
-    const metrics = context.measureText(line);
-    if (metrics.width > calculatedTextWidth) {
-      calculatedTextWidth = metrics.width;
-    }
-  }
-  
-  canvas.width = Math.ceil(calculatedTextWidth) + padding * 2;
-  canvas.height = Math.ceil(textBlockHeight) + padding * 2;
+  canvas.width = textWidth + 20;
+  canvas.height = textHeight + 20;
 
   context.font = font;
-  if (backgroundColor) {
-    context.fillStyle = backgroundColor;
-    context.fillRect(0, 0, canvas.width, canvas.height);
-  } else {
-    context.clearRect(0, 0, canvas.width, canvas.height);
-  }
-  
   context.fillStyle = color;
-
-  if (isDescription) {
-    context.textAlign = "left";
-    let y = padding + fontSize;
-    for (const line of lines) {
-      context.fillText(line, padding, y);
-      y += lineHeight;
-    }
-  } else {
-    context.textAlign = "center";
-    context.textBaseline = "middle";
-    context.fillText(lines.join(" "), canvas.width / 2, canvas.height / 2);
-  }
+  context.textBaseline = "middle";
+  context.textAlign = "center";
+  context.clearRect(0, 0, canvas.width, canvas.height);
+  context.fillText(text, canvas.width / 2, canvas.height / 2);
 
   const texture = new Texture(gl, { generateMipmaps: false });
   texture.image = canvas;
@@ -120,23 +73,17 @@ interface TitleProps {
   plane: Mesh;
   renderer: Renderer;
   text: string;
-  font?: string;
   textColor?: string;
-  backgroundColor?: string | null;
-  maxWidth?: number | null;
-  isDescription?: boolean;
+  font?: string;
 }
 
-class TextMesh {
+class Title {
   gl: GL;
   plane: Mesh;
   renderer: Renderer;
   text: string;
-  font: string;
   textColor: string;
-  backgroundColor: string | null;
-  maxWidth: number | null;
-  isDescription: boolean;
+  font: string;
   mesh!: Mesh;
 
   constructor({
@@ -144,22 +91,16 @@ class TextMesh {
     plane,
     renderer,
     text,
-    font = "30px sans-serif",
     textColor = "#545050",
-    backgroundColor = null,
-    maxWidth = null,
-    isDescription = false,
+    font = "30px sans-serif",
   }: TitleProps) {
     autoBind(this);
     this.gl = gl;
     this.plane = plane;
     this.renderer = renderer;
     this.text = text;
-    this.font = font;
     this.textColor = textColor;
-    this.backgroundColor = backgroundColor;
-    this.maxWidth = maxWidth;
-    this.isDescription = isDescription;
+    this.font = font;
     this.createMesh();
   }
 
@@ -168,11 +109,7 @@ class TextMesh {
       this.gl,
       this.text,
       this.font,
-      this.textColor,
-      this.backgroundColor,
-      this.maxWidth,
-      this.isDescription ? 8 : 10,
-      this.isDescription
+      this.textColor
     );
     const geometry = new Plane(this.gl);
     const program = new Program(this.gl, {
@@ -199,57 +136,15 @@ class TextMesh {
       `,
       uniforms: { tMap: { value: texture } },
       transparent: true,
-      depthWrite: false,
     });
     this.mesh = new Mesh(this.gl, { geometry, program });
-    
     const aspect = width / height;
-    let textHeightScaled, textWidthScaled;
-
-    if (this.isDescription) {
-      textWidthScaled = this.plane.scale.x * 0.85;
-      textHeightScaled = textWidthScaled / aspect;
-      this.mesh.position.y = -this.plane.scale.y * 0.5 + textHeightScaled * 0.5 + this.plane.scale.y * 0.05;
-    } else {
-      textHeightScaled = this.plane.scale.y * 0.12;
-      textWidthScaled = textHeightScaled / aspect;
-      this.mesh.position.y = -this.plane.scale.y * 0.5 - textHeightScaled * 0.5 - this.plane.scale.y * 0.08;
-    }
-    
+    const textHeightScaled = this.plane.scale.y * 0.15;
+    const textWidthScaled = textHeightScaled * aspect;
     this.mesh.scale.set(textWidthScaled, textHeightScaled, 1);
+    this.mesh.position.y =
+      -this.plane.scale.y * 0.5 - textHeightScaled * 0.5 - 0.05;
     this.mesh.setParent(this.plane);
-    this.mesh.visible = !this.isDescription;
-  }
-
-  updateText(newText: string) {
-    this.text = newText;
-    const { texture, width, height } = createTextTexture(
-      this.gl,
-      this.text,
-      this.font,
-      this.textColor,
-      this.backgroundColor,
-      this.maxWidth,
-      this.isDescription ? 8 : 10,
-      this.isDescription
-    );
-    (this.mesh.program.uniforms.tMap.value as Texture).image = texture.image;
-    (this.mesh.program.uniforms.tMap.value as Texture).needsUpdate = true;
-    
-    const aspect = width / height;
-    let textHeightScaled, textWidthScaled;
-    if (this.isDescription) {
-      textWidthScaled = this.plane.scale.x * 0.85;
-      textHeightScaled = textWidthScaled / aspect;
-    } else {
-      textHeightScaled = this.plane.scale.y * 0.12;
-      textWidthScaled = textHeightScaled / aspect;
-    }
-    this.mesh.scale.set(textWidthScaled, textHeightScaled, 1);
-  }
-
-  setVisibility(visible: boolean) {
-    this.mesh.visible = visible;
   }
 }
 
@@ -273,7 +168,6 @@ interface MediaProps {
   scene: Transform;
   screen: ScreenSize;
   text: string;
-  fullDescription: string;
   viewport: Viewport;
   bend: number;
   textColor: string;
@@ -292,7 +186,6 @@ class Media {
   scene: Transform;
   screen: ScreenSize;
   text: string;
-  fullDescription: string;
   viewport: Viewport;
   bend: number;
   textColor: string;
@@ -300,8 +193,7 @@ class Media {
   font?: string;
   program!: Program;
   plane!: Mesh;
-  titleMesh!: TextMesh;
-  descriptionMesh!: TextMesh;
+  title!: Title;
   scale!: number;
   padding!: number;
   width!: number;
@@ -310,7 +202,6 @@ class Media {
   speed: number = 0;
   isBefore: boolean = false;
   isAfter: boolean = false;
-  isHovered: boolean = false;
 
   constructor({
     geometry,
@@ -322,7 +213,6 @@ class Media {
     scene,
     screen,
     text,
-    fullDescription,
     viewport,
     bend,
     textColor,
@@ -338,17 +228,14 @@ class Media {
     this.scene = scene;
     this.screen = screen;
     this.text = text;
-    this.fullDescription = fullDescription;
     this.viewport = viewport;
     this.bend = bend;
     this.textColor = textColor;
     this.borderRadius = borderRadius;
     this.font = font;
-    autoBind(this);
     this.createShader();
     this.createMesh();
     this.createTitle();
-    this.createDescription();
     this.onResize();
   }
 
@@ -381,6 +268,7 @@ class Media {
         uniform float uBorderRadius;
         varying vec2 vUv;
         
+        // Rounded box SDF for UV space
         float roundedBoxSDF(vec2 p, vec2 b, float r) {
           vec2 d = abs(p) - b;
           return length(max(d, vec2(0.0))) + min(max(d.x, d.y), 0.0) - r;
@@ -397,6 +285,7 @@ class Media {
           );
           vec4 color = texture2D(tMap, uv);
           
+          // Apply rounded corners (assumes vUv in [0,1])
           float d = roundedBoxSDF(vUv - 0.5, vec2(0.5 - uBorderRadius), uBorderRadius);
           if(d > 0.0) {
             discard;
@@ -436,29 +325,13 @@ class Media {
   }
 
   createTitle() {
-    this.titleMesh = new TextMesh({
+    this.title = new Title({
       gl: this.gl,
       plane: this.plane,
       renderer: this.renderer,
       text: this.text,
       textColor: this.textColor,
       font: this.font,
-      isDescription: false,
-      maxWidth: null,
-    });
-  }
-
-  createDescription() {
-    this.descriptionMesh = new TextMesh({
-      gl: this.gl,
-      plane: this.plane,
-      renderer: this.renderer,
-      text: this.fullDescription,
-      font: "normal 17px sans-serif",
-      textColor: "#FFFFFF",
-      backgroundColor: "rgba(0, 0, 0, 0.65)",
-      isDescription: true,
-      maxWidth: 280,
     });
   }
 
@@ -505,21 +378,6 @@ class Media {
       this.extra += this.widthTotal;
       this.isBefore = this.isAfter = false;
     }
-    
-    const distFromCenter = Math.abs(this.plane.position.x);
-    const activationThreshold = this.plane.scale.x * 0.5;
-
-    if (distFromCenter < activationThreshold) {
-      if (!this.isHovered) {
-        this.isHovered = true;
-        this.descriptionMesh.setVisibility(true);
-      }
-    } else {
-      if (this.isHovered) {
-        this.isHovered = false;
-        this.descriptionMesh.setVisibility(false);
-      }
-    }
   }
 
   onResize({
@@ -549,18 +407,11 @@ class Media {
     this.width = this.plane.scale.x + this.padding;
     this.widthTotal = this.width * this.length;
     this.x = this.width * this.index;
-
-    if (this.titleMesh) {
-      this.titleMesh.updateText(this.titleMesh.text);
-    }
-    if (this.descriptionMesh) {
-      this.descriptionMesh.updateText(this.descriptionMesh.text);
-    }
   }
 }
 
 interface AppConfig {
-  items?: { image: string; text: string; fullDescription: string }[];
+  items?: { image: string; text: string }[];
   bend?: number;
   textColor?: string;
   borderRadius?: number;
@@ -583,7 +434,7 @@ class App {
   scene!: Transform;
   planeGeometry!: Plane;
   medias: Media[] = [];
-  mediasImages: { image: string; text: string; fullDescription: string }[] = [];
+  mediasImages: { image: string; text: string }[] = [];
   screen!: { width: number; height: number };
   viewport!: { width: number; height: number };
   raf: number = 0;
@@ -646,7 +497,7 @@ class App {
   }
 
   createMedias(
-    items: { image: string; text: string; fullDescription: string }[] | undefined,
+    items: { image: string; text: string }[] | undefined,
     bend: number = 1,
     textColor: string,
     borderRadius: number,
@@ -656,65 +507,53 @@ class App {
       {
         image: `https://picsum.photos/seed/1/800/600?grayscale`,
         text: "Bridge",
-        fullDescription: "A stunning grayscale bridge leading to unknown adventures.",
       },
       {
         image: `https://picsum.photos/seed/2/800/600?grayscale`,
         text: "Desk Setup",
-        fullDescription: "A detailed view of a desk setup with a computer and books.",
       },
       {
         image: `https://picsum.photos/seed/3/800/600?grayscale`,
         text: "Waterfall",
-        fullDescription: "A beautiful waterfall surrounded by lush greenery.",
       },
       {
         image: `https://picsum.photos/seed/4/800/600?grayscale`,
         text: "Strawberries",
-        fullDescription: "Fresh strawberries ripe for the picking.",
       },
       {
         image: `https://picsum.photos/seed/5/800/600?grayscale`,
         text: "Deep Diving",
-        fullDescription: "A diver exploring the depths of the ocean.",
       },
       {
         image: `https://picsum.photos/seed/16/800/600?grayscale`,
         text: "Train Track",
-        fullDescription: "A long train track stretching into the distance.",
       },
       {
         image: `https://picsum.photos/seed/17/800/600?grayscale`,
         text: "Santorini",
-        fullDescription: "The beautiful Greek island of Santorini.",
       },
       {
         image: `https://picsum.photos/seed/8/800/600?grayscale`,
         text: "Blurry Lights",
-        fullDescription: "A cityscape at night with blurry street lights.",
       },
       {
         image: `https://picsum.photos/seed/9/800/600?grayscale`,
         text: "New York",
-        fullDescription: "The bustling city of New York at night.",
       },
       {
         image: `https://picsum.photos/seed/10/800/600?grayscale`,
         text: "Good Boy",
-        fullDescription: "A happy dog enjoying a sunny day.",
       },
       {
         image: `https://picsum.photos/seed/21/800/600?grayscale`,
         text: "Coastline",
-        fullDescription: "The serene coastline with rolling waves.",
       },
       {
         image: `https://picsum.photos/seed/12/800/600?grayscale`,
         text: "Palm Trees",
-        fullDescription: "Relaxing view of palm trees against a gray sky.",
       },
     ];
-    const galleryItems = items && items.length ? items : defaultItems.map(item => ({...item, fullDescription: item.fullDescription || item.text }));
+    const galleryItems = items && items.length ? items : defaultItems;
     this.mediasImages = galleryItems.concat(galleryItems);
     this.medias = this.mediasImages.map((data, index) => {
       return new Media({
@@ -727,7 +566,6 @@ class App {
         scene: this.scene,
         screen: this.screen,
         text: data.text,
-        fullDescription: data.fullDescription,
         viewport: this.viewport,
         bend,
         textColor,
@@ -844,7 +682,7 @@ class App {
 }
 
 interface CircularGalleryProps {
-  items?: { image: string; text: string; fullDescription: string }[];
+  items?: { image: string; text: string }[];
   bend?: number;
   textColor?: string;
   borderRadius?: number;
