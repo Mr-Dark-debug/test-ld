@@ -1,10 +1,11 @@
-import type { Metadata } from "next";
+import type { Metadata } from 'next/dist/lib/metadata/types/metadata-interface';
 import { Inter, Playfair_Display as PlayfairDisplay, Montserrat } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { ThemeProvider } from "@/lib/theme-context";
 import GlobalFloatingMenu from "@/components/layout/GlobalFloatingMenu";
+import { Toaster } from 'sonner';
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const playfair = PlayfairDisplay({
@@ -31,16 +32,12 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} ${playfair.variable} ${montserrat.variable} font-sans antialiased flex flex-col min-h-screen`}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
+        <ThemeProvider>
           <Header />
           <main className="flex-grow">{children}</main>
           <Footer />
           <GlobalFloatingMenu />
+          <Toaster richColors position="top-right" />
         </ThemeProvider>
       </body>
     </html>

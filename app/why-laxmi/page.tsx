@@ -1,13 +1,10 @@
 import { Metadata } from "next/types";
-import FeatureGrid from "@/components/sections/FeatureGrid";
 import { companyFeatures } from "@/data/features";
-import { testimonials } from "@/data/testimonials";
-import TestimonialMarquee from "@/components/sections/TestimonialMarquee";
-import CtaBanner from "@/components/sections/CtaBanner";
 import AnimatedTitle from "@/components/ui/AnimatedTitle";
 import FlowingMenu from "@/components/reactbits/FlowingMenu/FlowingMenu";
 import { Button } from "@/components/ui/Button";
 import ScrollingFeatureCards from "@/components/ui/ScrollingFeatureCards";
+import { TestimonialCarouselDemo } from "@/components/ui/testimonial-carousel-demo";
 
 export const metadata: Metadata = {
   title: "Why Choose Laxmi Developers | Laxmi Developers",
@@ -263,11 +260,7 @@ export default function WhyLaxmiPage() {
       </section>
 
       {/* Testimonials */}
-      <TestimonialMarquee
-        title="Our Client Testimonials"
-        subtitle="Hear what our satisfied clients have to say about their experience with Laxmi Developers"
-        testimonials={testimonials}
-      />
+      <TestimonialCarouselDemo />
 
       {/* CTA */}
       <section className="py-20 bg-primary">
@@ -279,10 +272,10 @@ export default function WhyLaxmiPage() {
             Explore our projects or get in touch with our team to discuss your real estate needs.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Button href="/residential" variant="default" size="lg">
+            <Button variant="default" size="lg">
               Explore Projects
             </Button>
-            <Button href="/contact" variant="default" size="lg">
+            <Button variant="default" size="lg">
               Contact Us
             </Button>
           </div>
@@ -290,4 +283,4 @@ export default function WhyLaxmiPage() {
       </section>
     </main>
   );
-} 
+}
