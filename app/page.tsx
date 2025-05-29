@@ -31,6 +31,38 @@ const stackCardsData: StackCardData[] = [
 
 export default function Home() {
   const [activeStackCard, setActiveStackCard] = useState<StackCardData | null>(null);
+  // Default dimensions, matching the largest size (server-render estimate)
+  const [stackCardDimensions, setStackCardDimensions] = useState({ width: 350, height: 350 });
+
+  useEffect(() => {
+    const calculateDimensions = () => {
+      let width, height;
+      if (typeof window !== 'undefined') {
+        if (window.innerWidth < 480) {
+          width = 220; height = 220;
+        } else if (window.innerWidth < 640) {
+          width = 260; height = 260;
+        } else if (window.innerWidth < 768) {
+          width = 300; height = 300;
+        } else {
+          width = 350; height = 350;
+        }
+      } else {
+        // Fallback for environments where window is not defined (should not happen in useEffect)
+        width = 350; height = 350;
+      }
+      return { width, height };
+    };
+
+    setStackCardDimensions(calculateDimensions());
+
+    const handleResize = () => {
+      setStackCardDimensions(calculateDimensions());
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Define theme color for consistent use if desired
   const THEME_COLOR_HEX = "#324189";
@@ -94,10 +126,7 @@ export default function Home() {
                   randomRotation={true}
                   sensitivity={180}
                   sendToBackOnClick={false}
-                  cardDimensions={{
-                    width: typeof window !== 'undefined' && window.innerWidth < 480 ? 220 : (typeof window !== 'undefined' && window.innerWidth < 640 ? 260 : (typeof window !== 'undefined' && window.innerWidth < 768 ? 300 : 350)),
-                    height: typeof window !== 'undefined' && window.innerWidth < 480 ? 220 : (typeof window !== 'undefined' && window.innerWidth < 640 ? 260 : (typeof window !== 'undefined' && window.innerWidth < 768 ? 300 : 350))
-                  }}
+                  cardDimensions={stackCardDimensions}
                   animationConfig={{ stiffness: 260, damping: 20 }}
                 />
               </div>
