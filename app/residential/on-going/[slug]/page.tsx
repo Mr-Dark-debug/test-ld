@@ -7,9 +7,9 @@ import { SlugPageParams } from "./types";
 
 // Generate metadata for the page
 export async function generateMetadata(
-  { params }: SlugPageParams
+  { params: { slug } }: SlugPageParams
 ): Promise<Metadata> {
-  const project = projectDetails[params.slug as keyof typeof projectDetails];
+  const project = projectDetails[slug as keyof typeof projectDetails];
 
   if (!project) {
     return {
@@ -25,9 +25,9 @@ export async function generateMetadata(
 
 // Define the page component
 export default async function ProjectPage(
-  { params }: SlugPageParams
+  { params: { slug } }: SlugPageParams
 ) {
-  const project = projectDetails[params.slug as keyof typeof projectDetails];
+  const project = projectDetails[slug as keyof typeof projectDetails];
 
   if (!project || project.type !== "residential" || project.status !== "ongoing") {
     notFound();

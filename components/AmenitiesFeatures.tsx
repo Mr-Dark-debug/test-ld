@@ -7,6 +7,7 @@ import GlassIcons from "@/components/reactbits/GlassIcons/GlassIcons";
 import { useTheme } from "@/lib/theme-context";
 import { enhancedIconMap } from "@/components/ui/EnhancedAmenityIcons";
 import { BrochureDownloadForm } from "@/components/BrochureDownloadForm";
+import { HelpCircle } from 'lucide-react';
 
 interface AmenityProps {
   icon: React.ReactNode;
@@ -22,25 +23,37 @@ interface AmenitiesFeaturesProps {
   brochureUrl?: string;
 }
 
+interface ValidGlassIconItem {
+  icon: React.ReactElement;
+  color: string;
+  label: string;
+}
+
 export function AmenitiesFeatures({ amenities, projectName = "Project", brochureUrl = "" }: AmenitiesFeaturesProps) {
   const { theme } = useTheme();
   const [showBrochureForm, setShowBrochureForm] = useState(false);
   
-  // Map amenities to GlassIcons format
-  const glassIconItems = amenities.map((amenity, index) => {
-    // Cycle through colors for visual variety
-    const colors = ["blue", "purple", "red", "indigo", "orange", "green"];
-    const color = colors[index % colors.length];
-    
-    // Use enhanced icons if available, otherwise fall back to original
-    const enhancedIcon = enhancedIconMap[amenity.title] || amenity.icon;
-    
-    return {
-      icon: enhancedIcon,
-      color: color,
-      label: amenity.title,
-    };
-  });
+  // Standardized color for all icons (e.g., matching what Clubhouse might have been, or a desired standard)
+  const UNIFIED_ICON_COLOR = "blue"; // Or derive this from a specific amenity like Clubhouse if needed
+
+  const glassIconItems: ValidGlassIconItem[] = amenities
+    .map((amenity) => {
+      let iconNode = enhancedIconMap[amenity.title] || amenity.icon;
+      if (!React.isValidElement(iconNode)) {
+        // If you prefer a fallback icon instead of filtering:
+        // iconNode = <HelpCircle className="w-8 h-8" />;
+        // if (React.isValidElement(iconNode)) { // Check again if fallback is valid
+        //  return { icon: iconNode, color: UNIFIED_ICON_COLOR, label: amenity.title };
+        // }
+        return null; 
+      }
+      return {
+        icon: iconNode, // No need to cast here if source type is ReactNode and isValidElement passed
+        color: UNIFIED_ICON_COLOR, 
+        label: amenity.title,
+      };
+    })
+    .filter((item): item is ValidGlassIconItem => item !== null);
 
   return (
     <section id="amenities" className="relative py-20 text-foreground overflow-hidden bg-gradient-to-b from-background to-muted">

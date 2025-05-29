@@ -11,6 +11,9 @@ import { Search, MapPin, ListFilter, Building, CheckCircle, Clock, Star } from '
 import AnimatedTitle from '@/components/ui/AnimatedTitle';
 import { cn } from '@/lib/utils';
 
+const NAVY_BLUE_BACKGROUND = "bg-[#324189]/80";
+const NAVY_BLUE_BACKGROUND_HOVER = "bg-[#324189]/90";
+
 // Define Project type based on data/projects.tsx
 export interface Project {
   id: string;
@@ -27,18 +30,18 @@ export interface Project {
 const ProjectCard = ({ project }: { project: Project }) => {
   const getStatusColor = (status: Project['status']) => {
     switch (status) {
-      case "ongoing": return "bg-yellow-500/90 text-white";
-      case "completed": return "bg-green-500/90 text-white";
-      case "upcoming": return "bg-blue-500/90 text-white";
-      default: return "bg-gray-500/90 text-white";
+      case "ongoing": return `${NAVY_BLUE_BACKGROUND} hover:${NAVY_BLUE_BACKGROUND_HOVER} text-white shadow-md`;
+      case "completed": return `${NAVY_BLUE_BACKGROUND} hover:${NAVY_BLUE_BACKGROUND_HOVER} text-white shadow-md`;
+      case "upcoming": return `${NAVY_BLUE_BACKGROUND} hover:${NAVY_BLUE_BACKGROUND_HOVER} text-white shadow-md`;
+      default: return "bg-gray-500/80 hover:bg-gray-600/90 text-white shadow-md";
     }
   };
 
   const getTypeColor = (type: Project['type']) => {
     switch (type) {
-      case "residential": return "bg-purple-500/90 text-white";
-      case "commercial": return "bg-teal-500/90 text-white";
-      default: return "bg-gray-500/90 text-white";
+      case "residential": return `${NAVY_BLUE_BACKGROUND} hover:${NAVY_BLUE_BACKGROUND_HOVER} text-white shadow-md`;
+      case "commercial": return `${NAVY_BLUE_BACKGROUND} hover:${NAVY_BLUE_BACKGROUND_HOVER} text-white shadow-md`;
+      default: return "bg-gray-500/80 hover:bg-gray-600/90 text-white shadow-md";
     }
   };
 

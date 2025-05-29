@@ -1,26 +1,26 @@
-import type { Metadata } from "next/types";
-import { Playfair_Display, Poppins } from "next/font/google";
+import type { Metadata } from "next";
+import { Inter, Playfair_Display as PlayfairDisplay, Montserrat } from "next/font/google";
 import "./globals.css";
-import Layout from "@/components/layout/Layout";
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
 import { ThemeProvider } from "@/lib/theme-context";
+import GlobalFloatingMenu from "@/components/layout/GlobalFloatingMenu";
 
-const playfair = Playfair_Display({
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const playfair = PlayfairDisplay({
+  subsets: ["latin"],
+  weight: ["400", "700"],
   variable: "--font-playfair",
-  subsets: ["latin"],
-  display: "swap",
 });
-
-const poppins = Poppins({
-  variable: "--font-poppins",
-  weight: ["300", "400", "500", "600", "700"],
+const montserrat = Montserrat({
   subsets: ["latin"],
-  display: "swap",
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-montserrat",
 });
 
 export const metadata: Metadata = {
-  title: "Laxmi Developers | Premium Real Estate Developer in Surat",
-  description: "Laxmi Developers is a premium real estate developer in Surat, Gujarat, offering high-quality residential and commercial properties built with excellence and innovation.",
-  keywords: "Laxmi Developers, Real Estate, Property, Surat, Gujarat, Residential, Commercial, Premium Properties",
+  title: "Laxmi Developers - Surat | Real Estate & Construction",
+  description: "Discover premium residential and commercial properties by Laxmi Developers in Surat. Building excellence with quality, innovation, and customer satisfaction for over 20 years.",
 };
 
 export default function RootLayout({
@@ -29,12 +29,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${playfair.variable} ${poppins.variable} antialiased`}
-      >
-        <ThemeProvider>
-          <Layout>{children}</Layout>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${inter.variable} ${playfair.variable} ${montserrat.variable} font-sans antialiased flex flex-col min-h-screen`}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <Header />
+          <main className="flex-grow">{children}</main>
+          <Footer />
+          <GlobalFloatingMenu />
         </ThemeProvider>
       </body>
     </html>

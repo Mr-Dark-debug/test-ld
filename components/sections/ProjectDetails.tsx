@@ -6,7 +6,10 @@ import { ShimmerButton } from "@/components/magicui/shimmer-button";
 import { AmenitiesFeatures } from "@/components/AmenitiesFeatures";
 import { motion, AnimatePresence, useAnimation, useInView } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
+import { ChevronLeftIcon, ChevronRightIcon, MapPin, ExternalLink, XIcon, QrCodeIcon } from "lucide-react";
+
+const NAVY_BLUE_BACKGROUND = "bg-[#324189]/80";
+const NAVY_BLUE_BACKGROUND_HOVER = "bg-[#324189]/90";
 
 export interface Amenity {
   id: string;
@@ -52,6 +55,8 @@ export default function ProjectDetails({
   const [isLoading3D, setIsLoading3D] = useState(false);
   const [is3DModelLoaded, setIs3DModelLoaded] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [showMap, setShowMap] = useState(false); // State for map visibility
+  const [showReraQrPopup, setShowReraQrPopup] = useState(false); // State for RERA QR popup
 
   const has3DView = true; // Set to true to always show the 3D view slide option
 
@@ -87,19 +92,31 @@ export default function ProjectDetails({
   
   const getStatusColor = () => {
     switch (status) {
-      case "ongoing": return "bg-yellow-500/90 hover:bg-yellow-600/90 text-white";
-      case "completed": return "bg-green-500/90 hover:bg-green-600/90 text-white";
-      case "upcoming": return "bg-blue-500/90 hover:bg-blue-600/90 text-white";
-      default: return "bg-gray-500/90 hover:bg-gray-600/90 text-white";
+      case "ongoing": return `${NAVY_BLUE_BACKGROUND} hover:${NAVY_BLUE_BACKGROUND_HOVER} text-white`;
+      case "completed": return `${NAVY_BLUE_BACKGROUND} hover:${NAVY_BLUE_BACKGROUND_HOVER} text-white`;
+      case "upcoming": return `${NAVY_BLUE_BACKGROUND} hover:${NAVY_BLUE_BACKGROUND_HOVER} text-white`;
+      default: return "bg-gray-500/80 hover:bg-gray-600/90 text-white";
     }
   };
 
   const getTypeColor = () => {
     switch (type) {
-      case "residential": return "bg-purple-500/90 hover:bg-purple-600/90 text-white";
-      case "commercial": return "bg-teal-500/90 hover:bg-teal-600/90 text-white";
-      default: return "bg-gray-500/90 hover:bg-gray-600/90 text-white";
+      case "residential": return `${NAVY_BLUE_BACKGROUND} hover:${NAVY_BLUE_BACKGROUND_HOVER} text-white`;
+      case "commercial": return `${NAVY_BLUE_BACKGROUND} hover:${NAVY_BLUE_BACKGROUND_HOVER} text-white`;
+      default: return "bg-gray-500/80 hover:bg-gray-600/90 text-white";
     }
+  };
+
+  // Placeholder: Generate a Google Maps embed URL from the location string
+  // In a real app, you might use a geocoding API or have structured address data
+  const getMapEmbedUrl = (loc: string) => {
+    return `https://maps.google.com/maps?q=${encodeURIComponent(loc)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+  };
+
+  const getReraQrCodeUrl = (reraNum: string) => {
+    if (!reraNum) return "";
+    // Using a public QR code generator API
+    return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(reraNum)}`;
   };
 
   return (
@@ -226,51 +243,62 @@ export default function ProjectDetails({
               </div>
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-display mb-3">{title}</h1>
               
-              <div className="flex items-center mb-4 text-sm sm:text-base">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4 sm:h-5 sm:w-5 text-highlight mr-2 flex-shrink-0"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
+              {/* Location with Map Toggle */}
+              <button 
+                onClick={() => setShowMap(!showMap)} 
+                className="flex items-center mb-1 text-sm sm:text-base text-foreground/70 hover:text-highlight transition-colors duration-200 w-full text-left group"
+              >
+                <MapPin className="h-4 w-4 sm:h-5 sm:w-5 text-highlight mr-2 flex-shrink-0 group-hover:scale-110 transition-transform" />
+                <span>{location}</span>
+                <ChevronRightIcon className={`w-4 h-4 ml-auto transform transition-transform duration-300 ${showMap ? 'rotate-90' : ''}`} />
+              </button>
+              {showMap && (
+                <motion.div 
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="mb-4 overflow-hidden border rounded-md shadow-md"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1.5}
-                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                  />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1.5}
-                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                  />
-                </svg>
-                <span className="text-foreground/70">{location}</span>
-              </div>
+                  <div className="aspect-video">
+                    <iframe
+                      src={getMapEmbedUrl(location)}
+                      width="100%"
+                      height="100%"
+                      style={{ border: 0 }}
+                      allowFullScreen={false}
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                      title={`Map of ${title} at ${location}`}
+                    ></iframe>
+                  </div>
+                   <a 
+                    href={`https://maps.google.com/maps?q=${encodeURIComponent(location)}`} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="block text-xs text-center py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-foreground/70"
+                  >
+                    View on Google Maps <ExternalLink className="inline w-3 h-3 ml-1" />
+                  </a>
+                </motion.div>
+              )}
+              {/* End Location with Map Toggle */}
 
               {reraNumber && (
-                <div className="bg-muted/70 dark:bg-muted/30 px-3 py-1.5 rounded-md inline-flex items-center mb-4 text-xs sm:text-sm shadow-sm">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4 sm:h-5 sm:w-5 text-highlight mr-2 flex-shrink-0"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
+                <div className="mb-4 mt-2 text-xs sm:text-sm text-foreground/60">
+                  <button 
+                    onClick={() => setShowReraQrPopup(true)}
+                    className="bg-muted/50 dark:bg-gray-800/30 p-2.5 rounded-md inline-flex items-center hover:bg-muted dark:hover:bg-gray-800/60 transition-colors group"
+                    aria-label="Show RERA QR Code"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.5}
-                      d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                    />
-                  </svg>
-                  <span className="font-medium text-foreground/80">RERA:</span>&nbsp;<span className="text-foreground/70">{reraNumber}</span>
+                    RERA: {reraNumber}
+                    <QrCodeIcon className="w-4 h-4 ml-2 opacity-70 group-hover:opacity-100 transition-opacity" />
+                  </button>
                 </div>
               )}
-
-              <p className="text-foreground/80 mb-6 text-sm sm:text-base leading-relaxed hyphens-auto">{description}</p>
+              
+              <p className="text-foreground/80 mb-6 text-sm sm:text-base leading-relaxed">
+                {description}
+              </p>
 
               {/* Specifications */}
               {specifications && specifications.length > 0 && (
@@ -333,6 +361,51 @@ export default function ProjectDetails({
           projectName={title}
           brochureUrl={brochureUrl}
         />
+      )}
+
+      {/* RERA QR Code Popup */}
+      {showReraQrPopup && reraNumber && (
+        <AnimatePresence>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+            onClick={() => setShowReraQrPopup(false)} // Close on overlay click
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ type: "spring", damping: 15, stiffness: 200 }}
+              className="bg-card dark:bg-gray-800 p-6 sm:p-8 rounded-xl shadow-2xl max-w-xs w-full relative"
+              onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside modal
+            >
+              <button
+                onClick={() => setShowReraQrPopup(false)}
+                className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+                aria-label="Close RERA QR Code Popup"
+              >
+                <XIcon className="w-6 h-6" />
+              </button>
+              <div className="text-center">
+                <h3 className="text-lg sm:text-xl font-display mb-1 text-foreground dark:text-white">RERA Information</h3>
+                <p className="text-xs sm:text-sm text-foreground/70 dark:text-gray-300/80 mb-4">Scan the QR code or view details: <span className="font-semibold">{reraNumber}</span></p>
+                <div className="bg-white p-3 rounded-md inline-block shadow-inner">
+                  <Image
+                    src={getReraQrCodeUrl(reraNumber)}
+                    alt={`RERA QR Code for ${reraNumber}`}
+                    width={180}
+                    height={180}
+                    className="rounded"
+                  />
+                </div>
+                {/* Optional: Add a link to official RERA website if available */}
+                {/* <a href={`YOUR_RERA_VERIFICATION_URL_PREFIX/${reraNumber}`} target="_blank" rel="noopener noreferrer" className="text-sm text-highlight hover:underline mt-4 block">Verify on RERA Portal</a> */}
+              </div>
+            </motion.div>
+          </motion.div>
+        </AnimatePresence>
       )}
     </>
   );
