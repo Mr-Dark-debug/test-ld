@@ -20,7 +20,7 @@ const propertyItems = [
 // Helper function getRandomPosition is no longer needed and will be removed implicitly by not using it.
 
 export default function Hero() {
-  const titleLine1 = `Laxmi Developers.`;
+  const titleLine1 = `Laxmi Developers`;
   const titleLine2 = `Brick By Brick`;
   const titleLine3 = `Building Excellence`;
   const baseDelaySplitText = 70;
