@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, Suspense } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { GlobalLoader } from "@/components/ui/global-loader";
 
@@ -11,8 +11,8 @@ type LoadingContextType = {
 
 const LoadingContext = createContext<LoadingContextType | undefined>(undefined);
 
-export function LoadingProvider({ children }: { children: React.ReactNode }) {
-  const [isLoading, setIsLoading] = useState(false);
+// Create a component that uses navigation hooks
+function NavigationEventsHandler({ setIsLoading }: { setIsLoading: (loading: boolean) => void }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
@@ -26,10 +26,19 @@ export function LoadingProvider({ children }: { children: React.ReactNode }) {
     }, 1000);
 
     return () => clearTimeout(timer);
-  }, [pathname, searchParams]);
+  }, [pathname, searchParams, setIsLoading]);
+
+  return null;
+}
+
+export function LoadingProvider({ children }: { children: React.ReactNode }) {
+  const [isLoading, setIsLoading] = useState(false);
 
   return (
     <LoadingContext.Provider value={{ isLoading, setIsLoading }}>
+      <Suspense fallback={null}>
+        <NavigationEventsHandler setIsLoading={setIsLoading} />
+      </Suspense>
       {isLoading && <GlobalLoader />}
       {children}
     </LoadingContext.Provider>

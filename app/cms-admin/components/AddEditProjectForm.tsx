@@ -589,7 +589,7 @@ export function AddEditProjectForm({ projectId, onClose }: AddEditProjectFormPro
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Project Amenities</h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
               {availableAmenities.map((amenity) => {
-                const IconComponent = enhancedIconMap[amenity.title] || (() => <HelpCircle className="w-6 h-6 text-gray-400" />);
+                const AmenityIcon = () => enhancedIconMap[amenity.title] || <HelpCircle className="w-6 h-6 text-gray-400" />;
                 const isSelected = formData.amenities.includes(amenity.id);
 
                 return (
@@ -598,7 +598,7 @@ export function AddEditProjectForm({ projectId, onClose }: AddEditProjectFormPro
                     onClick={() => toggleAmenity(amenity.title)} 
                     className={`p-3 border rounded-lg cursor-pointer transition-all duration-200 flex flex-col items-center text-center ${isSelected ? 'border-blue-500 bg-blue-50 shadow-md scale-105' : 'border-gray-200 hover:bg-gray-50 hover:shadow-sm'}`}>
                     <div className={`w-10 h-10 mb-2 rounded-full flex items-center justify-center ${isSelected ? 'bg-blue-100' : 'bg-gray-100'}`}>
-                      <IconComponent className={`w-5 h-5 ${isSelected ? 'text-blue-600' : 'text-gray-500'}`} />
+                      <AmenityIcon />
                     </div>
                     <p className="text-xs font-medium text-gray-700">{amenity.title}</p>
                   </div>
