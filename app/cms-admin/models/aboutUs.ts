@@ -54,8 +54,8 @@ export interface AboutUsContent {
 export const defaultAboutUsContent: AboutUsContent = {
   heroSection: {
     tagline: 'Everything about us at Laxmi Developers 👋',
-    title: 'Brick by Brick Building',
-    titleHighlight: 'Excellence',
+    title: 'Brick by Brick ',
+    titleHighlight: 'Building Excellence',
     description: 'Laxmi Developers - Creating exceptional living and commercial spaces in Surat since 1995.',
     buttonText: 'Explore Careers →',
     backgroundImage: '/images/hero/hero-1.jpg'
