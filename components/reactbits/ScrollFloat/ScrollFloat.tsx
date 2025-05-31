@@ -30,8 +30,11 @@ const ScrollFloat: React.FC<ScrollFloatProps> = ({
   const containerRef = useRef<HTMLHeadingElement>(null);
 
   const splitText = useMemo(() => {
-    const text = typeof children === "string" ? children : "";
-    return text.split("").map((char, index) => (
+    if (typeof children !== "string") {
+      return children; // Return non-string children as-is
+    }
+    
+    return children.split("").map((char, index) => (
       <span className="inline-block" key={index}>
         {char === " " ? "\u00A0" : char}
       </span>
@@ -47,36 +50,63 @@ const ScrollFloat: React.FC<ScrollFloatProps> = ({
         ? scrollContainerRef.current
         : window;
 
-    const charElements = el.querySelectorAll(".inline-block");
+    // Only apply character animations if children is a string
+    if (typeof children === "string") {
+      const charElements = el.querySelectorAll(".inline-block");
 
-    gsap.fromTo(
-      charElements,
-      {
-        willChange: "opacity, transform",
-        opacity: 0,
-        yPercent: 120,
-        scaleY: 2.3,
-        scaleX: 0.7,
-        transformOrigin: "50% 0%"
-      },
-      {
-        duration: animationDuration,
-        ease: ease,
-        opacity: 1,
-        yPercent: 0,
-        scaleY: 1,
-        scaleX: 1,
-        stagger: stagger,
-        scrollTrigger: {
-          trigger: el,
-          scroller,
-          start: scrollStart,
-          end: scrollEnd,
-          scrub: true
+      gsap.fromTo(
+        charElements,
+        {
+          willChange: "opacity, transform",
+          opacity: 0,
+          yPercent: 120,
+          scaleY: 2.3,
+          scaleX: 0.7,
+          transformOrigin: "50% 0%"
         },
-      }
-    );
+        {
+          duration: animationDuration,
+          ease: ease,
+          opacity: 1,
+          yPercent: 0,
+          scaleY: 1,
+          scaleX: 1,
+          stagger: stagger,
+          scrollTrigger: {
+            trigger: el,
+            scroller,
+            start: scrollStart,
+            end: scrollEnd,
+            scrub: true
+          },
+        }
+      );
+    } else {
+      // Apply whole-element animation for non-string children
+      gsap.fromTo(
+        el,
+        {
+          willChange: "opacity, transform",
+          opacity: 0,
+          y: 40,
+        },
+        {
+          duration: animationDuration,
+          ease: ease,
+          opacity: 1,
+          y: 0,
+          scrollTrigger: {
+            trigger: el,
+            scroller,
+            start: scrollStart,
+            end: scrollEnd,
+            scrub: true
+          },
+        }
+      );
+    }
   }, [
+    children,
     scrollContainerRef,
     animationDuration,
     ease,
@@ -88,13 +118,17 @@ const ScrollFloat: React.FC<ScrollFloatProps> = ({
   return (
     <h2
       ref={containerRef}
-      className={`my-5 overflow-hidden ${containerClassName}`}
+      className={`my-5 overflow-hidden break-words ${containerClassName}`}
     >
-      <span
-        className={`inline-block text-[clamp(1.6rem,4vw,3rem)] leading-[1.5] ${textClassName}`}
-      >
-        {splitText}
-      </span>
+      {typeof children === "string" ? (
+        <span className={`inline-block leading-[1.5] ${textClassName}`}>
+          {splitText}
+        </span>
+      ) : (
+        <span className={`inline-block w-full leading-[1.5] ${textClassName}`}>
+          {children}
+        </span>
+      )}
     </h2>
   );
 };

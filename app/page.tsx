@@ -82,14 +82,14 @@ export default function Home() {
       <ProjectTimeline />
 
       {/* New Section with Stack Component */}
-      <section className="py-16 sm:py-20 bg-background relative overflow-hidden">
+      <section className="py-16 sm:py-20 bg-background dark:bg-black relative overflow-hidden">
         <Ripple mainCircleSize={800} mainCircleOpacity={0.08} numCircles={8} className="absolute inset-0" />
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-10 md:mb-16">
             <AnimatedTitle as="h2" className="text-3xl sm:text-4xl mb-3 sm:mb-4">
-              Why Choose Laxmi Developers?
+              Why Choose Us?
             </AnimatedTitle>
-            <p className="text-base sm:text-lg text-foreground/70 max-w-2xl mx-auto">
+            <p className="text-base sm:text-lg text-foreground/70 dark:text-gray-300 max-w-2xl mx-auto">
               Discover the Laxmi Developers difference through our core principles.
             </p>
           </div>
@@ -102,16 +102,16 @@ export default function Home() {
                   <AnimatedTitle
                     as="h3"
                     key={activeStackCard.id}
-                    className="text-2xl sm:text-3xl lg:text-4xl font-semibold mb-4 sm:mb-6 text-gray-900 dark:text-white break-words"
+                    className="text-2xl sm:text-3xl lg:text-4xl font-semibold mb-4 sm:mb-6 text-gray-900 dark:text-white whitespace-normal break-words w-full inline-block min-h-[40px] sm:min-h-[48px] lg:min-h-[56px]"
                   >
                     {activeStackCard.title || "Our Commitment"}
                   </AnimatedTitle>
-                  <p className="text-foreground/80 text-sm sm:text-base lg:text-lg leading-relaxed mb-4 md:mb-0">
+                  <p className="text-foreground/80 dark:text-gray-300 text-sm sm:text-base lg:text-lg leading-relaxed mb-4 md:mb-0">
                     {activeStackCard.description || "Detailed information about this aspect will appear here."}
                   </p>
                 </>
               ) : (
-                <div className="min-h-[150px] sm:min-h-[200px] flex items-center justify-center text-foreground/50">
+                <div className="min-h-[150px] sm:min-h-[200px] flex items-center justify-center text-foreground/50 dark:text-gray-400">
                   <p className="text-sm sm:text-base">Select a card to see details.</p>
                 </div>
               )}

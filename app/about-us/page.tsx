@@ -8,7 +8,6 @@ import { TestimonialCarouselDemo } from "@/components/ui/testimonial-carousel-de
 import { Award, Eye, Zap } from "lucide-react";
 import { GridPattern } from "@/components/magicui/grid-pattern";
 import Image from "next/image";
-import { AuroraButton } from "@/components/ui/aurora-button";
 import { AboutUsContent, defaultAboutUsContent } from "../cms-admin/models/aboutUs";
 
 export default function AboutUsPage() {
@@ -49,49 +48,61 @@ export default function AboutUsPage() {
       <section className="min-h-screen flex flex-col justify-center items-center relative overflow-hidden py-16 md:py-20">
         {/* Grid pattern for hero section */}
         <div className="absolute inset-0 -z-10 pointer-events-none">
-          <GridPattern width={48} height={48} strokeDasharray="2 4" className="opacity-10" />
+          <GridPattern width={48} height={48} strokeDasharray="2 4" className="opacity-10 dark:opacity-20" />
         </div>
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/80 to-primary/60 -z-20"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/80 to-primary/60 dark:from-black dark:to-black -z-20"></div>
         <div className="absolute inset-0 -z-30">
           <Image 
             src={content.heroSection.backgroundImage} 
             alt="Laxmi Developers" 
             fill 
-            className="object-cover opacity-40"
+            className="object-cover opacity-40 dark:opacity-20"
             priority
           />
         </div>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 z-10 max-w-5xl">
           <div className="text-center mb-8">
-            <div className="flex justify-center mb-4">
-              <div className="border border-accent/20 py-1 px-4 rounded-lg text-accent">{content.heroSection.tagline}</div>
-            </div>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-4 font-display">
-              {content.heroSection.title}<br/>Building <span className="text-[#000080]">{content.heroSection.titleHighlight}</span>
+              Brick by Brick <span className="text-blue-600 dark:text-blue-400">Building Excellence</span>
             </h1>
-            <p className="text-lg text-foreground/80 mt-4">
+            <p className="text-lg text-foreground/80 dark:text-gray-300 mt-4">
               {content.heroSection.description}
             </p>
-            <div className="mt-8">
-              <AuroraButton 
-                onClick={() => window.location.href = "#"}
-                className="min-w-[170px] px-6 py-3 font-medium"
-              >
-                {content.heroSection.buttonText}
-              </AuroraButton>
-            </div>
           </div>
         </div>
       </section>
 
-      {/* Company Description Section with Image */}
-      <section className="py-16 md:py-24 bg-background relative">
+      {/* Company Description Section with Image - Order reversed for mobile/desktop */}
+      <section className="py-16 md:py-24 bg-background dark:bg-black relative">
         <div className="absolute inset-0 -z-10 pointer-events-none">
-          <GridPattern width={48} height={48} strokeDasharray="2 4" className="opacity-10" />
+          <GridPattern width={48} height={48} strokeDasharray="2 4" className="opacity-10 dark:opacity-15" />
         </div>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
-            <div className="relative rounded-xl overflow-hidden shadow-xl h-[400px] md:h-[500px]">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 lg:gap-16 items-center max-w-6xl mx-auto">
+            {/* Text column first on all devices for better semantic ordering */}
+            <div className="order-2 md:order-1 py-4">
+              <div className="flex justify-start mb-4">
+                <div className="border border-accent/20 py-1 px-4 rounded-lg text-accent dark:text-blue-400 dark:border-blue-400/30">{content.companySection.tagline}</div>
+              </div>
+              <AnimatedTitle as="h2" className="mb-6 text-left">
+                {content.companySection.title}
+              </AnimatedTitle>
+              <div className="space-y-6">
+                <ScrollReveal enableBlur blurStrength={6} baseOpacity={0.2} baseRotation={1} containerClassName="mb-4">
+                  <p className="text-sm md:text-base text-foreground/80 dark:text-gray-300 leading-relaxed">
+                    {content.companySection.description1}
+                  </p>
+                </ScrollReveal>
+                <ScrollReveal enableBlur blurStrength={6} baseOpacity={0.2} baseRotation={1} containerClassName="mb-4">
+                  <p className="text-sm md:text-base text-foreground/80 dark:text-gray-300 leading-relaxed">
+                    {content.companySection.description2}
+                  </p>
+                </ScrollReveal>
+              </div>
+            </div>
+            
+            {/* Image column */}
+            <div className="relative rounded-xl overflow-hidden shadow-xl h-[350px] md:h-[450px] order-1 md:order-2">
               <Image 
                 src={content.companySection.image} 
                 alt="Laxmi Developers Team" 
@@ -103,56 +114,56 @@ export default function AboutUsPage() {
                 <p className="text-white text-xl font-semibold">Excellence in Real Estate Development</p>
               </div>
             </div>
-            <div>
-              <div className="flex justify-start mb-4">
-                <div className="border border-accent/20 py-1 px-4 rounded-lg text-accent">{content.companySection.tagline}</div>
-              </div>
-              <AnimatedTitle as="h2" className="mb-6 text-left">
-                {content.companySection.title}
-              </AnimatedTitle>
-              <div className="space-y-4">
-                <ScrollReveal enableBlur blurStrength={6} baseOpacity={0.2} baseRotation={1} containerClassName="mb-4">
-                  {content.companySection.description1}
-                </ScrollReveal>
-                <ScrollReveal enableBlur blurStrength={6} baseOpacity={0.2} baseRotation={1} containerClassName="mb-4">
-                  {content.companySection.description2}
-                </ScrollReveal>
-              </div>
-            </div>
           </div>
         </div>
       </section>
 
-      {/* Mission, Vision, Values - Full screen */}
-      <section className="py-16 md:py-24 bg-gradient-to-br from-accent/5 to-background flex flex-col justify-center relative">
-        {/* Grid pattern for mission/vision/values */}
+      {/* Mission, Vision, Values - Full screen with subtle grid background */}
+      <section className="py-16 md:py-24 bg-gradient-to-br from-accent/5 to-background dark:from-black dark:to-black flex flex-col justify-center relative overflow-hidden">
+        {/* Enhanced grid pattern for mission/vision/values */}
         <div className="absolute inset-0 -z-10 pointer-events-none">
-          <GridPattern width={48} height={48} strokeDasharray="2 4" className="opacity-10" />
+          <GridPattern 
+            width={48} 
+            height={48} 
+            strokeDasharray="2 4" 
+            className="opacity-15 dark:opacity-20" 
+          />
+        </div>
+        {/* Additional subtle dot pattern */}
+        <div className="absolute inset-0 -z-10 pointer-events-none bg-repeat opacity-5 dark:opacity-10"
+             style={{
+               backgroundImage: 'radial-gradient(circle, currentColor 1px, transparent 1px)',
+               backgroundSize: '20px 20px'
+             }}>
         </div>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10 md:mb-16">
             <div className="flex justify-center mb-4">
-              <div className="border border-accent/20 py-1 px-4 rounded-lg text-accent">{content.missionVisionValues.sectionTagline}</div>
+              <div className="border border-accent/20 py-1 px-4 rounded-lg text-accent dark:text-blue-400 dark:border-blue-400/30">{content.missionVisionValues.sectionTagline}</div>
             </div>
             <AnimatedTitle as="h2" className="mb-4">
               {content.missionVisionValues.sectionTitle}
             </AnimatedTitle>
-            <p className="text-lg text-foreground/70 max-w-2xl mx-auto">
+            <p className="text-base md:text-lg text-foreground/70 dark:text-gray-300 max-w-2xl mx-auto">
               {content.missionVisionValues.sectionDescription}
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {missionVisionValues.map((item, index) => {
               // Map the icon based on index
-              const icons = [<Zap key="zap" className="w-8 h-8 text-accent" />, <Eye key="eye" className="w-8 h-8 text-accent" />, <Award key="award" className="w-8 h-8 text-accent" />];
+              const icons = [
+                <Zap key="zap" className="w-8 h-8 text-accent dark:text-blue-400" />, 
+                <Eye key="eye" className="w-8 h-8 text-accent dark:text-blue-400" />, 
+                <Award key="award" className="w-8 h-8 text-accent dark:text-blue-400" />
+              ];
               
               return (
-                <div key={index} className="bg-card p-8 rounded-xl shadow-lg border border-accent/10 hover:border-accent/30 transition-all duration-300 group hover:transform hover:scale-105">
-                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-accent/10 mb-4 group-hover:bg-accent/20 transition-colors">
+                <div key={index} className="bg-card/80 dark:bg-[#121212]/90 backdrop-blur-sm p-8 rounded-xl shadow-lg border border-accent/10 dark:border-blue-400/20 hover:border-accent/30 dark:hover:border-blue-400/40 transition-all duration-300 group hover:transform hover:scale-105">
+                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-accent/10 dark:bg-blue-900/30 mb-4 group-hover:bg-accent/20 dark:group-hover:bg-blue-900/50 transition-colors">
                     {icons[index % icons.length]}
                   </div>
                   <h3 className="text-xl font-bold text-foreground mb-3">{item.title}</h3>
-                  <p className="text-foreground/70">{item.description}</p>
+                  <p className="text-sm md:text-base text-foreground/70 dark:text-gray-300">{item.description}</p>
                 </div>
               );
             })}
@@ -161,19 +172,19 @@ export default function AboutUsPage() {
       </section>
 
       {/* Portfolio Section with Image Grid */}
-      <section className="py-16 md:py-24 bg-background relative">
+      <section className="py-16 md:py-24 bg-background dark:bg-black relative">
         <div className="absolute inset-0 -z-10 pointer-events-none">
-          <GridPattern width={48} height={48} strokeDasharray="2 4" className="opacity-10" />
+          <GridPattern width={48} height={48} strokeDasharray="2 4" className="opacity-10 dark:opacity-15" />
         </div>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <div className="flex justify-center mb-4">
-              <div className="border border-accent/20 py-1 px-4 rounded-lg text-accent">{content.portfolioSection.tagline}</div>
+              <div className="border border-accent/20 py-1 px-4 rounded-lg text-accent dark:text-blue-400 dark:border-blue-400/30">{content.portfolioSection.tagline}</div>
             </div>
             <AnimatedTitle as="h2" className="mb-4">
               {content.portfolioSection.title}
             </AnimatedTitle>
-            <p className="text-lg text-foreground/70 max-w-2xl mx-auto">
+            <p className="text-base md:text-lg text-foreground/70 dark:text-gray-300 max-w-2xl mx-auto">
               {content.portfolioSection.description}
             </p>
           </div>
@@ -195,13 +206,12 @@ export default function AboutUsPage() {
             ))}
           </div>
           <div className="text-center mt-10">
-            <AuroraButton 
-              onClick={() => window.location.href = "#"}
-              variant="outline"
-              className="min-w-[170px] px-6 py-3 font-medium"
+            <a 
+              href="/projects"
+              className="inline-flex items-center px-6 py-3 rounded-lg bg-accent hover:bg-accent/90 text-white font-medium transition-colors shadow-md hover:shadow-lg dark:bg-blue-600 dark:hover:bg-blue-500"
             >
               {content.portfolioSection.buttonText}
-            </AuroraButton>
+            </a>
           </div>
         </div>
       </section>

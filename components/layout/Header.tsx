@@ -15,19 +15,19 @@ const navItems = [
     title: "Our Projects",
     href: "/projects",
     submenu: [
-      // { title: "Residential", href: "/residential", 
-      //   submenu: [
-      //     { title: "On-Going Projects", href: "/residential/on-going" },
-      //     { title: "Completed Projects", href: "/residential/completed" },
-      //   ] 
-      // },
-      // { title: "Commercial", href: "/commercial", 
-      //   submenu: [
-      //     { title: "On-Going Projects", href: "/commercial/on-going" },
-      //     { title: "Completed Projects", href: "/commercial/completed" },
-      //     { title: "Up-Coming Projects", href: "/commercial/upcoming" },
-      //   ] 
-      // },
+      { title: "Residential", href: "/residential", 
+        submenu: [
+          { title: "On-Going Projects", href: "/residential/on-going" },
+          { title: "Completed Projects", href: "/residential/completed" },
+        ] 
+      },
+      { title: "Commercial", href: "/commercial", 
+        submenu: [
+          { title: "On-Going Projects", href: "/commercial/on-going" },
+          { title: "Completed Projects", href: "/commercial/completed" },
+          { title: "Up-Coming Projects", href: "/commercial/upcoming" },
+        ] 
+      },
     ],
   },
   { 
@@ -138,16 +138,16 @@ export default function Header() {
                 </Link>
                 <span className="text-xs text-neutral-500 dark:text-neutral-400">▶</span>
                 
-                {/* Nested submenu with improved positioning */}
+                {/* Nested submenu with improved positioning and visibility */}
                 <div className="absolute left-full top-0 ml-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                  <div className="pt-0 pl-1 min-w-[180px]">
-                    <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm rounded-lg shadow-lg border border-black/10 dark:border-white/10 p-2">
-                      <div className="flex flex-col space-y-1">
+                  <div className="pt-0 pl-1 min-w-[220px]">
+                    <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm rounded-lg shadow-lg border border-black/10 dark:border-white/10 p-3">
+                      <div className="flex flex-col space-y-2">
                         {subItem.submenu.map((nestedItem: any) => (
                           <Link 
                             key={nestedItem.title} 
                             href={nestedItem.href}
-                            className="text-neutral-700 dark:text-neutral-200 hover:text-accent dark:hover:text-accent transition-colors px-2 py-1.5 rounded-md hover:bg-black/5 dark:hover:bg-white/10 block w-full"
+                            className="text-neutral-700 dark:text-neutral-200 hover:text-accent dark:hover:text-accent transition-colors px-3 py-2 rounded-md hover:bg-black/5 dark:hover:bg-white/10 block w-full font-medium"
                           >
                             {nestedItem.title}
                           </Link>
@@ -408,30 +408,26 @@ export default function Header() {
 
       {/* Add global CSS for navbar transparency */}
       <style jsx global>{`
+        /* Improved submenu hover handling */
         .submenu-parent:hover > div > div {
           display: block;
           opacity: 1;
           visibility: visible;
+          pointer-events: auto;
         }
         
-        /* Ensure navbar has a base background for blur to work, but can be overridden by theme */
-        header {
-          /* background: transparent !important; */ /* Removed to allow specified bg with alpha */
+        /* Add delay for smoother transitions */
+        .submenu-parent > div > div {
+          transition: opacity 0.2s, visibility 0.2s, transform 0.2s;
         }
         
-        /* Remove background on scrolled state - not needed if base header has blur */
-        /* header.scrolled {
-          background: transparent !important;
+        .submenu-parent:hover > div > div {
+          transform: translateY(0);
         }
         
-        .dark header.scrolled {
-          background: transparent !important;
-        } */
-        
-        /* Override any potential bg colors from children if necessary */
-        /* nav, .navbar-item, .menu-container {
-          background: transparent !important; 
-        } */
+        .submenu-parent > div > div {
+          transform: translateY(5px);
+        }
         
         /* Make menu items stand out on transparent navbar */
         .navbar-item a, .home-link {

@@ -28,6 +28,17 @@ export const MenuItem = ({
 }) => {
   const [isHovering, setIsHovering] = useState(false);
   
+  // Close submenu when mouse leaves
+  const handleMouseLeave = () => {
+    setIsHovering(false);
+    // Small delay to prevent immediate closing when moving to submenu
+    setTimeout(() => {
+      if (!isHovering) {
+        setActive("");
+      }
+    }, 100);
+  };
+  
   return (
     <div 
       className="relative"
@@ -35,9 +46,14 @@ export const MenuItem = ({
         setActive(item);
         setIsHovering(true);
       }}
-      onMouseLeave={() => {
-        setIsHovering(false);
-        // Don't reset active state here to allow hovering on submenu
+      onMouseLeave={handleMouseLeave}
+      onClick={() => {
+        // Toggle submenu on click
+        if (active === item) {
+          setActive("");
+        } else {
+          setActive(item);
+        }
       }}
     >
       <Link href={href || "#"} className="relative group py-1 block">
@@ -74,7 +90,8 @@ export const MenuItem = ({
           animate={{ 
             opacity: active === item ? 1 : 0,
             y: active === item ? 0 : 10,
-            visibility: active === item ? "visible" : "hidden"
+            visibility: active === item ? "visible" : "hidden",
+            pointerEvents: active === item ? "auto" : "none"
           }}
           transition={transition}
           className="absolute top-full left-1/2 transform -translate-x-1/2 z-50 pt-2 w-max"
@@ -82,15 +99,7 @@ export const MenuItem = ({
             setActive(item);
             setIsHovering(true);
           }}
-          onMouseLeave={() => {
-            setIsHovering(false);
-            // Small delay to check if we're hovering elsewhere
-            setTimeout(() => {
-              if (!isHovering) {
-                setActive("");
-              }
-            }, 50);
-          }}
+          onMouseLeave={handleMouseLeave}
         >
           <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm rounded-lg overflow-hidden border border-black/10 dark:border-white/10 shadow-xl">
             <div className="w-max h-full p-4">

@@ -65,7 +65,7 @@ export default function FeaturedProjects({
   });
 
   return (
-    <section className="py-16 sm:py-20 bg-background">
+    <section className="py-16 sm:py-20 bg-background dark:bg-black">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-10 sm:mb-12">
@@ -73,7 +73,7 @@ export default function FeaturedProjects({
             {title}
           </AnimatedTitle>
           {subtitle && (
-            <p className="text-base sm:text-lg text-foreground/70 max-w-2xl mx-auto">
+            <p className="text-base sm:text-lg text-foreground/70 dark:text-gray-300 max-w-2xl mx-auto">
               {subtitle}
             </p>
           )}
@@ -85,8 +85,8 @@ export default function FeaturedProjects({
             onClick={() => setActiveFilter("all")}
             className={`px-4 py-2 rounded-md transition-colors ${
               activeFilter === "all"
-                ? "bg-highlight text-primary"
-                : "bg-muted text-foreground hover:bg-muted/80"
+                ? "bg-highlight text-primary dark:text-white"
+                : "bg-muted text-foreground hover:bg-muted/80 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
             }`}
           >
             All Projects
@@ -95,8 +95,8 @@ export default function FeaturedProjects({
             onClick={() => setActiveFilter("residential")}
             className={`px-4 py-2 rounded-md transition-colors ${
               activeFilter === "residential"
-                ? "bg-highlight text-primary"
-                : "bg-muted text-foreground hover:bg-muted/80"
+                ? "bg-highlight text-primary dark:text-white"
+                : "bg-muted text-foreground hover:bg-muted/80 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
             }`}
           >
             Residential
@@ -105,8 +105,8 @@ export default function FeaturedProjects({
             onClick={() => setActiveFilter("commercial")}
             className={`px-4 py-2 rounded-md transition-colors ${
               activeFilter === "commercial"
-                ? "bg-highlight text-primary"
-                : "bg-muted text-foreground hover:bg-muted/80"
+                ? "bg-highlight text-primary dark:text-white"
+                : "bg-muted text-foreground hover:bg-muted/80 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
             }`}
           >
             Commercial
@@ -115,8 +115,8 @@ export default function FeaturedProjects({
             onClick={() => setActiveFilter("ongoing")}
             className={`px-4 py-2 rounded-md transition-colors ${
               activeFilter === "ongoing"
-                ? "bg-highlight text-primary"
-                : "bg-muted text-foreground hover:bg-muted/80"
+                ? "bg-highlight text-primary dark:text-white"
+                : "bg-muted text-foreground hover:bg-muted/80 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
             }`}
           >
             On-Going
@@ -125,8 +125,8 @@ export default function FeaturedProjects({
             onClick={() => setActiveFilter("completed")}
             className={`px-4 py-2 rounded-md transition-colors ${
               activeFilter === "completed"
-                ? "bg-highlight text-primary"
-                : "bg-muted text-foreground hover:bg-muted/80"
+                ? "bg-highlight text-primary dark:text-white"
+                : "bg-muted text-foreground hover:bg-muted/80 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
             }`}
           >
             Completed
@@ -138,7 +138,7 @@ export default function FeaturedProjects({
           {filteredProjects.map((project) => (
             <div
               key={project.id}
-              className="group bg-card rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow"
+              className="group bg-card dark:bg-[#121212] rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow"
             >
               <Link href={project.href} className="block">
                 <div className="relative h-64 overflow-hidden">
@@ -148,7 +148,7 @@ export default function FeaturedProjects({
                     fill
                     className="object-cover transition-transform duration-500 group-hover:scale-110"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent opacity-70"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent opacity-70 dark:from-black/80"></div>
                   <div className={cn(
                     "absolute top-4 left-4 px-3 py-1 rounded-md text-xs sm:text-sm font-medium shadow-md transition-colors duration-300",
                     getTypeColor(project.type)
@@ -163,13 +163,13 @@ export default function FeaturedProjects({
                   </div>
                 </div>
                 <div className="p-6">
-                  <h3 className="text-xl font-display mb-2 group-hover:text-highlight transition-colors">
+                  <h3 className="text-xl font-display mb-2 group-hover:text-highlight transition-colors dark:text-white">
                     {project.title}
                   </h3>
-                  <p className="text-foreground/70 mb-4 flex items-center">
+                  <p className="text-foreground/70 dark:text-gray-300 mb-4 flex items-center">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4 mr-2 text-highlight"
+                      className="h-4 w-4 mr-2 text-highlight dark:text-blue-400"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -193,7 +193,7 @@ export default function FeaturedProjects({
                     <AuroraButton
                       as="a"
                       href={project.href}
-                      className="px-4 py-1.5 text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-2 focus:ring-offset-2 focus:ring-primary/70 dark:focus:ring-offset-gray-800 rounded-md shadow-md"
+                      className="px-4 py-1.5 text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-2 focus:ring-offset-2 focus:ring-primary/70 dark:focus:ring-offset-black dark:bg-blue-600 dark:hover:bg-blue-500 rounded-md shadow-md"
                     >
                       View Details
                     </AuroraButton>
@@ -210,7 +210,7 @@ export default function FeaturedProjects({
             <AuroraButton
               as="a"
               href={viewAllHref}
-              className="px-8 py-3 font-semibold text-lg bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-2 focus:ring-offset-2 focus:ring-primary/70 dark:focus:ring-offset-gray-800 rounded-md shadow-lg"
+              className="px-8 py-3 font-semibold text-lg bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-2 focus:ring-offset-2 focus:ring-primary/70 dark:focus:ring-offset-black dark:bg-blue-600 dark:hover:bg-blue-500 rounded-md shadow-lg"
             >
               View All Projects
             </AuroraButton>

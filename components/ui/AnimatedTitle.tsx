@@ -26,12 +26,12 @@ const AnimatedTitle: React.FC<AnimatedTitleProps> = ({
 }) => {
   // Define base styling for each heading level
   const headingStyles = {
-    h1: "text-4xl md:text-5xl font-display mb-6",
-    h2: "text-3xl md:text-4xl font-display mb-4",
-    h3: "text-2xl md:text-3xl font-display mb-3",
-    h4: "text-xl md:text-2xl font-display mb-2",
-    h5: "text-lg md:text-xl font-display mb-2",
-    h6: "text-base md:text-lg font-display mb-2"
+    h1: "text-4xl md:text-5xl font-display mb-6 whitespace-normal break-words",
+    h2: "text-3xl md:text-4xl font-display mb-4 whitespace-normal break-words",
+    h3: "text-2xl md:text-3xl font-display mb-3 whitespace-normal break-words",
+    h4: "text-xl md:text-2xl font-display mb-2 whitespace-normal break-words",
+    h5: "text-lg md:text-xl font-display mb-2 whitespace-normal break-words",
+    h6: "text-base md:text-lg font-display mb-2 whitespace-normal break-words"
   };
 
   const baseStyles = headingStyles[as];

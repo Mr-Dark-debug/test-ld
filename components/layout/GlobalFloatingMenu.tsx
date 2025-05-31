@@ -3,21 +3,20 @@
 import { usePathname } from 'next/navigation';
 import FloatingActionMenu from '@/components/ui/floating-action-menu';
 import { MessageCircle, Smartphone, Bot } from 'lucide-react';
-import React from 'react';
+import React, { useState } from 'react';
+import ChatOverlay from '@/components/ui/ChatOverlay';
 
 export default function GlobalFloatingMenu() {
   const pathname = usePathname();
   const showFloatingMenu = !pathname.startsWith('/cms-admin');
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   const menuOptions = [
     {
-      label: 'Chat with AI',
+      label: 'Chat with Us',
       Icon: <Bot className="w-4 h-4" />,
       onClick: () => {
-        // Placeholder - Replace with actual chatbot integration
-        console.log('Chatbot clicked');
-        // Example: if you have a chat widget toggle function:
-        // window.MyChatWidget.toggle(); 
+        setIsChatOpen(true);
       },
     },
     {
@@ -41,5 +40,13 @@ export default function GlobalFloatingMenu() {
     return null;
   }
 
-  return <FloatingActionMenu options={menuOptions.reverse()} />; // Reverse to get specified order (Contact Us top)
+  return (
+    <>
+      <FloatingActionMenu options={menuOptions.reverse()} /> {/* Reverse to get specified order (Contact Us top) */}
+      <ChatOverlay 
+        isOpen={isChatOpen} 
+        onClose={() => setIsChatOpen(false)} 
+      />
+    </>
+  );
 } 

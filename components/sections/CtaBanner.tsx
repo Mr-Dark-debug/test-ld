@@ -33,13 +33,13 @@ export default function CtaBanner({
   };
 
   // Adjust overlay opacity based on theme - reduced further
-  const overlayOpacity = theme === "light" ? "bg-primary/20" : "bg-primary/40";
+  const overlayOpacity = theme === "light" ? "bg-primary/20" : "bg-black/70";
   const gradientBg = theme === "light" 
     ? "bg-gradient-to-r from-primary/20 via-primary/15 to-primary/20" 
-    : "bg-gradient-to-r from-primary/70 via-primary/60 to-primary/70";
+    : "bg-gradient-to-r from-black/90 via-black/80 to-black/90";
 
   return (
-    <section className="relative py-16 md:py-24 overflow-hidden">
+    <section className="relative py-16 md:py-24 overflow-hidden dark:border-t dark:border-gray-800">
       {/* Background */}
       {backgroundImageSrc ? (
         <>
@@ -64,7 +64,7 @@ export default function CtaBanner({
             {title}
           </AnimatedTitle>
           {description && (
-            <p className="text-lg md:text-xl text-foreground/80 mb-8 max-w-2xl mx-auto">
+            <p className="text-lg md:text-xl text-foreground/80 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
               {description}
             </p>
           )}
@@ -74,7 +74,7 @@ export default function CtaBanner({
                 key={index}
                 onClick={() => window.location.href = button.href}
                 variant={button.variant || (index === 0 ? "default" : "outline")}
-                className="min-w-[170px] px-6 py-3 font-medium"
+                className="min-w-[170px] px-6 py-3 font-medium dark:border-blue-500 dark:hover:border-blue-400"
               >
                 {button.text}
               </AuroraButton>
