@@ -33,7 +33,7 @@ export default function Hero() {
       {/* Mobile Layout: Carousel + Text Block (height determined by content) */}
       <div className="md:hidden flex flex-col w-full"> {/* Removed h-screen, height now from content */}
         <div className="h-[70vh] w-full">
-          <HeroImageCarousel images={carouselImages} interval={3000} />
+          <HeroImageCarousel images={carouselImages} interval={5000} />
         </div>
         <div className="flex flex-col justify-center items-center p-6 py-8 text-center bg-background dark:bg-black flex-shrink-0"> {/* Increased py-8 for a bit more breathing room for text */}
           <AnimatedContent distance={0} delay={overallTextAnimationDelay} direction="vertical"> 
@@ -45,7 +45,7 @@ export default function Hero() {
               animationFrom={{ opacity: 0, transform: 'translate3d(0,20px,0)' }}
               animationTo={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
             />
-            <div className="text-blue-700 dark:text-blue-400">
+            <div style={{ color: THEME_COLOR_HEX }}>
               <SplitText
                 text={titleLine2}
                 className="text-2xl font-serif leading-tight block mb-1"
@@ -75,7 +75,7 @@ export default function Hero() {
                 animationFrom={{ opacity: 0, transform: 'translate3d(0,30px,0)' }}
                 animationTo={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
               />
-              <div className="text-blue-700 dark:text-blue-400">
+              <div style={{ color: THEME_COLOR_HEX }}>
                 <SplitText
                   text={titleLine2}
                   className="text-3xl sm:text-4xl md:text-5xl lg:text-[58px] font-serif leading-tight block mb-2 sm:mb-3"

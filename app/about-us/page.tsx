@@ -10,6 +10,9 @@ import { GridPattern } from "@/components/magicui/grid-pattern";
 import Image from "next/image";
 import { AboutUsContent, defaultAboutUsContent } from "../cms-admin/models/aboutUs";
 
+// Define the navy blue theme color
+const THEME_COLOR_HEX = "#324189";
+
 export default function AboutUsPage() {
   const [content, setContent] = useState<AboutUsContent>(defaultAboutUsContent);
   const [isLoading, setIsLoading] = useState(true);
@@ -63,7 +66,7 @@ export default function AboutUsPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 z-10 max-w-5xl">
           <div className="text-center mb-8">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-4 font-display">
-              Brick by Brick <span className="text-blue-600 dark:text-blue-400">Building Excellence</span>
+              Brick by Brick <span style={{ color: THEME_COLOR_HEX }}>Building Excellence</span>
             </h1>
             <p className="text-lg text-foreground/80 dark:text-gray-300 mt-4">
               {content.heroSection.description}
@@ -84,9 +87,10 @@ export default function AboutUsPage() {
               <div className="flex justify-start mb-4">
                 <div className="border border-accent/20 py-1 px-4 rounded-lg text-accent dark:text-blue-400 dark:border-blue-400/30">{content.companySection.tagline}</div>
               </div>
-              <AnimatedTitle as="h2" className="mb-6 text-left">
+              {/* Replace AnimatedTitle with direct h2 element for better mobile control */}
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-display mb-6 text-left break-words hyphens-auto leading-tight">
                 {content.companySection.title}
-              </AnimatedTitle>
+              </h2>
               <div className="space-y-6">
                 <ScrollReveal enableBlur blurStrength={6} baseOpacity={0.2} baseRotation={1} containerClassName="mb-4">
                   <p className="text-sm md:text-base text-foreground/80 dark:text-gray-300 leading-relaxed">
@@ -129,11 +133,21 @@ export default function AboutUsPage() {
             className="opacity-15 dark:opacity-20" 
           />
         </div>
-        {/* Additional subtle dot pattern */}
-        <div className="absolute inset-0 -z-10 pointer-events-none bg-repeat opacity-5 dark:opacity-10"
+        {/* Enhanced dot pattern with better visibility */}
+        <div className="absolute inset-0 -z-10 pointer-events-none bg-repeat"
              style={{
                backgroundImage: 'radial-gradient(circle, currentColor 1px, transparent 1px)',
-               backgroundSize: '20px 20px'
+               backgroundSize: '24px 24px',
+               opacity: 0.03,
+             }}>
+        </div>
+        {/* Additional diagonal dot pattern for more texture */}
+        <div className="absolute inset-0 -z-10 pointer-events-none bg-repeat"
+             style={{
+               backgroundImage: 'radial-gradient(circle, currentColor 0.8px, transparent 0.8px)',
+               backgroundSize: '16px 16px',
+               opacity: 0.02,
+               transform: 'rotate(15deg)'
              }}>
         </div>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -141,9 +155,10 @@ export default function AboutUsPage() {
             <div className="flex justify-center mb-4">
               <div className="border border-accent/20 py-1 px-4 rounded-lg text-accent dark:text-blue-400 dark:border-blue-400/30">{content.missionVisionValues.sectionTagline}</div>
             </div>
-            <AnimatedTitle as="h2" className="mb-4">
+            {/* Replace AnimatedTitle with direct h2 element for better mobile control */}
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-display mb-4 text-center break-words hyphens-auto leading-tight">
               {content.missionVisionValues.sectionTitle}
-            </AnimatedTitle>
+            </h2>
             <p className="text-base md:text-lg text-foreground/70 dark:text-gray-300 max-w-2xl mx-auto">
               {content.missionVisionValues.sectionDescription}
             </p>
@@ -158,7 +173,18 @@ export default function AboutUsPage() {
               ];
               
               return (
-                <div key={index} className="bg-card/80 dark:bg-[#121212]/90 backdrop-blur-sm p-8 rounded-xl shadow-lg border border-accent/10 dark:border-blue-400/20 hover:border-accent/30 dark:hover:border-blue-400/40 transition-all duration-300 group hover:transform hover:scale-105">
+                <div 
+                  key={index} 
+                  className="bg-card/80 dark:bg-[#121212]/90 backdrop-blur-sm p-8 rounded-xl shadow-lg border border-accent/10 dark:border-blue-400/20 hover:border-accent/30 dark:hover:border-blue-400/40 transition-all duration-300 group hover:transform hover:scale-105 relative overflow-hidden"
+                >
+                  {/* Subtle dot pattern background for each card */}
+                  <div className="absolute inset-0 pointer-events-none opacity-[0.015] dark:opacity-[0.02]"
+                       style={{
+                         backgroundImage: 'radial-gradient(circle, currentColor 0.7px, transparent 0.7px)',
+                         backgroundSize: '12px 12px',
+                       }}>
+                  </div>
+                  
                   <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-accent/10 dark:bg-blue-900/30 mb-4 group-hover:bg-accent/20 dark:group-hover:bg-blue-900/50 transition-colors">
                     {icons[index % icons.length]}
                   </div>
@@ -181,9 +207,10 @@ export default function AboutUsPage() {
             <div className="flex justify-center mb-4">
               <div className="border border-accent/20 py-1 px-4 rounded-lg text-accent dark:text-blue-400 dark:border-blue-400/30">{content.portfolioSection.tagline}</div>
             </div>
-            <AnimatedTitle as="h2" className="mb-4">
+            {/* Replace AnimatedTitle with direct h2 element for better mobile control */}
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-display mb-4 text-center break-words hyphens-auto leading-tight">
               {content.portfolioSection.title}
-            </AnimatedTitle>
+            </h2>
             <p className="text-base md:text-lg text-foreground/70 dark:text-gray-300 max-w-2xl mx-auto">
               {content.portfolioSection.description}
             </p>

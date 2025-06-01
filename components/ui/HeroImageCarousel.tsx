@@ -9,30 +9,34 @@ interface HeroImageCarouselProps {
   interval?: number;
 }
 
+// Updated slide variants for smoother transitions
 const slideVariants = {
   enter: (direction: number) => {
     return {
-      x: direction > 0 ? "100%" : "-100%",
+      x: direction > 0 ? "5%" : "-5%",
       opacity: 0,
+      scale: 1.05,
     };
   },
   center: {
     zIndex: 1,
     x: 0,
     opacity: 1,
+    scale: 1,
   },
   exit: (direction: number) => {
     return {
       zIndex: 0,
-      x: direction < 0 ? "100%" : "-100%",
+      x: direction < 0 ? "-5%" : "5%",
       opacity: 0,
+      scale: 0.95,
     };
   },
 };
 
 const HeroImageCarousel: React.FC<HeroImageCarouselProps> = ({
   images,
-  interval = 3000, // Slightly increased interval for slide
+  interval = 5000, // Increased interval for smoother experience
 }) => {
   const [[page, direction], setPage] = useState([0, 0]);
 
@@ -66,8 +70,9 @@ const HeroImageCarousel: React.FC<HeroImageCarouselProps> = ({
           animate="center"
           exit="exit"
           transition={{
-            x: { type: "spring", stiffness: 300, damping: 30 },
-            opacity: { duration: 0.3 },
+            x: { type: "tween", ease: "easeInOut", duration: 1.2 },
+            opacity: { duration: 1.5 },
+            scale: { duration: 1.5, ease: "easeOut" }
           }}
           className="absolute inset-0 w-full h-full"
         >
@@ -78,6 +83,8 @@ const HeroImageCarousel: React.FC<HeroImageCarouselProps> = ({
             className="object-cover"
             priority={currentIndex === 0}
           />
+          {/* Gradient overlay for better text visibility */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-50"></div>
         </motion.div>
       </AnimatePresence>
       {images.length > 1 && (
@@ -95,7 +102,7 @@ const HeroImageCarousel: React.FC<HeroImageCarouselProps> = ({
                   setPage([index, diff]);
                 }
               }}
-              className={`w-2.5 h-2.5 rounded-full transition-all duration-300 hover:bg-white/90 ${
+              className={`w-3 h-3 rounded-full transition-all duration-300 hover:bg-white/90 ${
                 index === currentIndex ? "bg-white scale-125" : "bg-white/50"
               }`}
               aria-label={`Go to slide ${index + 1}`}
