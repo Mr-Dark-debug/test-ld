@@ -9,10 +9,10 @@ import AnimatedTitle from "@/components/ui/AnimatedTitle";
 import HomeFlowingMenu from "@/components/sections/HomeFlowingMenu";
 import { TestimonialCarouselDemo } from "@/components/ui/testimonial-carousel-demo";
 import { Ripple } from "@/components/magicui/ripple";
-import { featuredProjects } from "@/data/projects";
 import { metricsData } from "@/data/metrics";
 import Stack from "@/components/reactbits/Stack/Stack";
 import { useState, useEffect } from "react";
+import { useFeaturedProjects, transformProjectForComponent } from "@/hooks/useProjects";
 
 interface StackCardData {
   id: number;
@@ -33,6 +33,9 @@ export default function Home() {
   const [activeStackCard, setActiveStackCard] = useState<StackCardData | null>(null);
   // Default dimensions, matching the largest size (server-render estimate)
   const [stackCardDimensions, setStackCardDimensions] = useState({ width: 350, height: 350 });
+
+  // Fetch featured projects from API
+  const { projects: featuredProjectsData, loading: projectsLoading, error: projectsError } = useFeaturedProjects();
 
   useEffect(() => {
     const calculateDimensions = () => {
@@ -136,12 +139,31 @@ export default function Home() {
       </section>
 
       {/* Featured Projects */}
-      <FeaturedProjects
-        title="Our Featured Projects"
-        subtitle="Discover our exceptional portfolio of residential and commercial properties"
-        projects={featuredProjects}
-        viewAllHref="/projects"
-      />
+      {projectsLoading ? (
+        <section className="py-16 sm:py-20 bg-background dark:bg-black">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+              <p className="mt-4 text-foreground/70">Loading featured projects...</p>
+            </div>
+          </div>
+        </section>
+      ) : projectsError ? (
+        <section className="py-16 sm:py-20 bg-background dark:bg-black">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center">
+              <p className="text-red-600 dark:text-red-400">Error loading projects: {projectsError}</p>
+            </div>
+          </div>
+        </section>
+      ) : (
+        <FeaturedProjects
+          title="Our Featured Projects"
+          subtitle="Discover our exceptional portfolio of residential and commercial properties"
+          projects={featuredProjectsData.map(transformProjectForComponent)}
+          viewAllHref="/projects"
+        />
+      )}
 
       {/* Testimonials - Using the new video testimonial carousel */}
       <TestimonialCarouselDemo />

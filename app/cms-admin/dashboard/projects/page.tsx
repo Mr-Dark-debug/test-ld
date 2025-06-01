@@ -1,58 +1,137 @@
 'use client'
 
-import React, { useState } from 'react'
-import { Toaster } from 'sonner'
-import { Plus, Search, Filter, Edit, Eye, Trash2 } from 'lucide-react'
+import React, { useState, useEffect } from 'react'
+import { Toaster, toast } from 'sonner'
+import { Plus, Search, Filter, Edit, Eye, Trash2, DownloadCloud, Star } from 'lucide-react'
 import { AddEditProjectForm } from '@/app/cms-admin/components/AddEditProjectForm'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useProjects } from '@/hooks/useProjects'
+import { projectsApi } from '@/lib/api'
 
 export default function ProjectsList() {
-  const [showAddForm, setShowAddForm] = useState(false)
+  const router = useRouter();
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [editProjectId, setEditProjectId] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [confirmDelete, setConfirmDelete] = useState(null);
 
-  const projects = [
-    {
-      id: 1,
-      title: 'Skyline Towers',
-      category: 'Residential',
-      status: 'Completed',
-      rera: 'RERA123456',
-      created: '2024-01-15',
-      image:
-        'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=100&h=100&fit=crop',
-    },
-    {
-      id: 2,
-      title: 'Green Valley Apartments',
-      category: 'Residential',
-      status: 'Ongoing',
-      rera: 'RERA789012',
-      created: '2024-02-20',
-      image:
-        'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=100&h=100&fit=crop',
-    },
-    {
-      id: 3,
-      title: 'Corporate Plaza',
-      category: 'Commercial',
-      status: 'Upcoming',
-      rera: 'RERA345678',
-      created: '2024-03-10',
-      image:
-        'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=100&h=100&fit=crop',
-    },
-  ]
+  // Use the real projects API
+  const {
+    projects,
+    loading,
+    error,
+    refetch
+  } = useProjects({
+    type: categoryFilter !== 'all' ? categoryFilter as any : undefined,
+    status: statusFilter !== 'all' ? statusFilter as any : undefined,
+    search: searchTerm || undefined,
+    limit: 100 // Get all projects for admin
+  });
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'Completed':
-        return 'bg-green-100 text-green-800'
-      case 'Ongoing':
-        return 'bg-blue-100 text-blue-800'
-      case 'Upcoming':
-        return 'bg-amber-100 text-amber-800'
-      default:
-        return 'bg-gray-100 text-gray-800'
+  // Filtering is now handled by the API, so we use projects directly
+  const filteredProjects = projects;
+
+  // Handle delete confirmation
+  const handleDelete = async (id) => {
+    if (confirmDelete === id) {
+      try {
+        const response = await projectsApi.delete(id);
+        if (response.success) {
+          toast.success('Project deleted successfully');
+          refetch(); // Refresh the data
+        } else {
+          toast.error(response.error || 'Failed to delete project');
+        }
+      } catch (error) {
+        console.error('Error deleting project:', error);
+        toast.error('Failed to delete project');
+      }
+      setConfirmDelete(null);
+    } else {
+      setConfirmDelete(id);
+      setTimeout(() => setConfirmDelete(null), 3000);
     }
-  }
+  };
+
+  // Handle featured toggle
+  const handleToggleFeatured = async (id, currentFeatured) => {
+    try {
+      const response = await projectsApi.update(id, { featured: !currentFeatured });
+      if (response.success) {
+        toast.success(`Project ${!currentFeatured ? 'added to' : 'removed from'} featured`);
+        refetch(); // Refresh the data
+      } else {
+        toast.error(response.error || 'Failed to update project');
+      }
+    } catch (error) {
+      console.error('Error updating project:', error);
+      toast.error('Failed to update project');
+    }
+  };
+
+  // Handle form close/submit
+  const handleFormClose = (refreshData = false) => {
+    setShowAddForm(false);
+    setEditProjectId(null);
+
+    if (refreshData) {
+      refetch(); // Refresh the data from API
+    }
+  };
+
+  // Handle edit project
+  const handleEdit = (id) => {
+    setEditProjectId(id);
+    setShowAddForm(true);
+  };
+
+  // Format date for display
+  const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+  };
+
+  // Get status color
+  const getStatusColor = (status) => {
+    if (!status) return 'bg-gray-100 text-gray-800';
+    switch (status.toLowerCase()) {
+      case 'completed':
+        return 'bg-green-100 text-green-800';
+      case 'ongoing':
+        return 'bg-blue-100 text-blue-800';
+      case 'upcoming':
+        return 'bg-amber-100 text-amber-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  // Get category color
+  const getCategoryColor = (category) => {
+    if (!category) return 'bg-gray-100 text-gray-800';
+    switch (category.toLowerCase()) {
+      case 'residential':
+        return 'bg-purple-100 text-purple-800';
+      case 'commercial':
+        return 'bg-indigo-100 text-indigo-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  // Reset all filters
+  const resetFilters = () => {
+    setSearchTerm('');
+    setCategoryFilter('all');
+    setStatusFilter('all');
+  };
 
   return (
     <>
@@ -64,8 +143,11 @@ export default function ProjectsList() {
             <h1 className="text-2xl font-bold text-gray-900">Projects</h1>
             <p className="text-gray-600">Manage your real estate projects</p>
           </div>
-          <button 
-            onClick={() => setShowAddForm(true)} 
+          <button
+            onClick={() => {
+              setEditProjectId(null);
+              setShowAddForm(true);
+            }}
             className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             <Plus className="w-4 h-4 mr-2" />
@@ -75,9 +157,9 @@ export default function ProjectsList() {
 
         {/* Conditionally render the AddEditProjectForm or the projects list/filters */}
         {showAddForm ? (
-          <AddEditProjectForm 
-            onClose={() => setShowAddForm(false)} 
-            // projectId will be undefined, so it's in "add" mode
+          <AddEditProjectForm
+            projectId={editProjectId}
+            onClose={() => handleFormClose(true)}
           />
         ) : (
           <>
@@ -89,112 +171,207 @@ export default function ProjectsList() {
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                     <input
                       type="text"
-                      placeholder="Search projects..."
+                      placeholder="Search projects by name or RERA number..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
                       className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
                   </div>
                 </div>
-                <div className="flex gap-2">
-                  <select className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                    <option>All Categories</option>
-                    <option>Residential</option>
-                    <option>Commercial</option>
+                <div className="flex flex-wrap gap-2">
+                  <select
+                    title="Filter by category"
+                    aria-label="Filter projects by category"
+                    value={categoryFilter}
+                    onChange={(e) => setCategoryFilter(e.target.value)}
+                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="all">All Categories</option>
+                    <option value="residential">Residential</option>
+                    <option value="commercial">Commercial</option>
                   </select>
-                  <select className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                    <option>All Status</option>
-                    <option>Completed</option>
-                    <option>Ongoing</option>
-                    <option>Upcoming</option>
+                  <select
+                    title="Filter by status"
+                    aria-label="Filter projects by status"
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="all">All Status</option>
+                    <option value="completed">Completed</option>
+                    <option value="ongoing">Ongoing</option>
+                    <option value="upcoming">Upcoming</option>
                   </select>
-                  <button className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                  <button
+                    type="button"
+                    title="Reset filters"
+                    aria-label="Reset all filters"
+                    onClick={resetFilters}
+                    className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
                     <Filter className="w-4 h-4" />
                   </button>
                 </div>
               </div>
             </div>
+
             {/* Projects Table */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-gray-50 border-b border-gray-200">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Project
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Category
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Status
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        RERA
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Created
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {projects.map((project) => (
-                      <tr key={project.id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center">
-                            <img
-                              src={project.image}
-                              alt={project.title}
-                              className="w-10 h-10 rounded-lg object-cover mr-3"
-                            />
-                            <div>
-                              <div className="text-sm font-medium text-gray-900">
-                                {project.title}
+              {loading ? (
+                <div className="p-8 text-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                  <p className="text-gray-600">Loading projects...</p>
+                </div>
+              ) : error ? (
+                <div className="p-8 text-center">
+                  <p className="text-red-600 mb-4">Error loading projects: {error}</p>
+                  <button
+                    type="button"
+                    onClick={() => refetch()}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    Try Again
+                  </button>
+                </div>
+              ) : filteredProjects.length === 0 ? (
+                <div className="p-8 text-center">
+                  <p className="text-gray-600 mb-4">No projects found matching your criteria.</p>
+                  <button
+                    type="button"
+                    onClick={resetFilters}
+                    className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                  >
+                    Reset Filters
+                  </button>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-gray-50 border-b border-gray-200">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Project
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Category
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Status
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Featured
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          RERA
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Created
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Actions
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {filteredProjects.map((project) => (
+                        <tr key={project._id} className="hover:bg-gray-50">
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex items-center">
+                              <img
+                                src={project.coverImage}
+                                alt={project.title}
+                                className="w-10 h-10 rounded-lg object-cover mr-3"
+                              />
+                              <div>
+                                <div className="text-sm font-medium text-gray-900">
+                                  {project.title}
+                                </div>
+                                <div className="text-xs text-gray-500 mt-1">
+                                  {project.location?.address || 'No location specified'}
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-sm text-gray-900">
-                            {project.category}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span
-                            className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(project.status)}`}
-                          >
-                            {project.status}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-sm text-gray-900">
-                            {project.rera}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-sm text-gray-900">
-                            {project.created}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center space-x-2">
-                            <button className="p-1 text-gray-400 hover:text-blue-600 transition-colors">
-                              <Eye className="w-4 h-4" />
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span
+                              className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getCategoryColor(project.type || project.category)}`}
+                            >
+                              {(project.type || project.category || 'Unknown').charAt(0).toUpperCase() + (project.type || project.category || 'Unknown').slice(1)}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span
+                              className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(project.status)}`}
+                            >
+                              {(project.status || 'Unknown').charAt(0).toUpperCase() + (project.status || 'Unknown').slice(1)}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <button
+                              type="button"
+                              onClick={() => handleToggleFeatured(project._id, project.featured)}
+                              className={`inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full transition-colors ${
+                                project.featured
+                                  ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200'
+                                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                              }`}
+                            >
+                              <Star className={`w-3 h-3 mr-1 ${project.featured ? 'fill-current' : ''}`} />
+                              {project.featured ? 'Featured' : 'Not Featured'}
                             </button>
-                            <button className="p-1 text-gray-400 hover:text-green-600 transition-colors">
-                              <Edit className="w-4 h-4" />
-                            </button>
-                            <button className="p-1 text-gray-400 hover:text-red-600 transition-colors">
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className="text-sm text-gray-900">
+                              {project.reraNumber || 'N/A'}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className="text-sm text-gray-900">
+                              {formatDate(project.createdAt)}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex items-center space-x-2">
+                              <Link href={`/projects/${project.slug}`} target="_blank">
+                                <button type="button" className="p-1 text-gray-400 hover:text-blue-600 transition-colors" title="View Project">
+                                  <Eye className="w-4 h-4" />
+                                </button>
+                              </Link>
+                              <button
+                                type="button"
+                                onClick={() => handleEdit(project._id)}
+                                className="p-1 text-gray-400 hover:text-green-600 transition-colors"
+                                title="Edit Project"
+                              >
+                                <Edit className="w-4 h-4" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleDelete(project._id)}
+                                className={`p-1 ${confirmDelete === project._id ? 'text-red-600' : 'text-gray-400 hover:text-red-600'} transition-colors`}
+                                title="Delete Project"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                              {project.brochureUrl && (
+                                <a
+                                  href={project.brochureUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="p-1 text-gray-400 hover:text-indigo-600 transition-colors"
+                                  title="Download Brochure"
+                                >
+                                  <DownloadCloud className="w-4 h-4" />
+                                </a>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
           </>
         )}

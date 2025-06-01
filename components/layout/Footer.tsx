@@ -11,7 +11,7 @@ export default function Footer() {
 
   // Use white text for headings instead of golden
   const headingClass = "text-xl font-display text-white mb-6";
-  
+
   return (
     <footer className={`${theme === "dark" ? "bg-primary" : "bg-gray-900"} text-foreground p-8 rounded-xl mx-4 my-8 relative overflow-hidden`}>
       <div className="absolute inset-0 z-0">
@@ -22,12 +22,12 @@ export default function Footer() {
           {/* Company Logo & Address */}
           <div className="mb-8 md:mb-0">
             <div className="mb-6">
-              <Image 
-                src="/images/logo/logo.png" 
-                alt="Laxmi Developers Logo" 
-                width={160} 
-                height={45} 
-                className="h-auto w-auto" 
+              <Image
+                src="/images/logo/logo.png"
+                alt="Laxmi Developers Logo"
+                width={160}
+                height={45}
+                className="h-auto w-auto"
               />
             </div>
             <address className="not-italic text-gray-300 space-y-2">
@@ -109,15 +109,17 @@ export default function Footer() {
           <div className="md:max-w-xs">
             <h3 className={headingClass}>Subscribe</h3>
             <p className="mb-4 text-gray-300">Stay updated with our latest projects and offers.</p>
-            <form className="space-y-3">
-              <input 
-                type="email" 
-                placeholder="Your email address" 
+            <form className="space-y-3" onSubmit={(e) => e.preventDefault()}>
+              <input
+                type="email"
+                placeholder="Your email address"
                 className="w-full px-4 py-2.5 bg-gray-800/70 border border-gray-700 text-gray-300 rounded-md focus:ring-highlight focus:border-highlight placeholder-gray-500"
                 required
+                autoComplete="email"
+                suppressHydrationWarning
               />
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 className="w-full px-4 py-2.5 bg-[#2528c0] text-white font-medium rounded-md hover:bg-[#2528c0]/90 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-highlight"
               >
                 Subscribe
@@ -126,7 +128,7 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Trust Badges */} 
+        {/* Trust Badges */}
         <div className="mt-16 border-t border-gray-700/50 pt-8 flex flex-col items-center">
           <div className="flex space-x-6 mb-6">
             <div className="flex items-center justify-center border border-gray-600 rounded-full w-16 h-16 hover:border-gray-500 transition-colors duration-300">
@@ -149,4 +151,4 @@ export default function Footer() {
       </div>
     </footer>
   );
-} 
+}

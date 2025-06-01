@@ -4,64 +4,27 @@ import React, { useState } from 'react'
 import { Toaster } from 'sonner'
 import { Search, Filter, Phone, Mail, Eye, Tag, Clock, Calendar, RefreshCcw } from 'lucide-react'
 import AnimatedBackground from '@/components/ui/animated-tabs'
+import { useLeads, transformLeadForComponent } from '@/hooks/useLeads'
 
 export default function ContactLeadsList() {
-  // Sample contact form lead data
-  const leads = [
-    {
-      id: 1,
-      name: "Ravi Patel",
-      email: "ravi.patel@example.com",
-      phone: "+91 98765 43210",
-      message: "I'm interested in investing in property in Surat. Please share more details about your current projects.",
-      status: "New",
-      source: "Contact Form",
-      date: "2024-05-15",
-    },
-    {
-      id: 2,
-      name: "Ananya Sharma",
-      email: "ananya.s@example.com",
-      phone: "+91 98765 12345",
-      message: "Looking for a 3BHK apartment in the western part of Surat. Please call me to discuss options.",
-      status: "Contacted",
-      source: "Contact Form",
-      date: "2024-05-12",
-    },
-    {
-      id: 3,
-      name: "Vikram Desai",
-      email: "vikram.d@example.com",
-      phone: "+91 87654 32109",
-      message: "I need information about your upcoming projects in Vesu area.",
-      status: "Qualified",
-      source: "Contact Form",
-      date: "2024-05-10",
-    },
-    {
-      id: 4,
-      name: "Priya Mehta",
-      email: "priya.m@example.com",
-      phone: "+91 76543 21098",
-      message: "Please provide details about commercial properties in Adajan area.",
-      status: "Negotiation",
-      source: "Contact Form",
-      date: "2024-05-08",
-    },
-    {
-      id: 5,
-      name: "Amit Shah",
-      email: "amit.s@example.com",
-      phone: "+91 65432 10987",
-      message: "I'm looking for information on your villa projects. Please contact me.",
-      status: "Closed",
-      source: "Contact Form",
-      date: "2024-05-05",
-    }
-  ]
-
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [searchQuery, setSearchQuery] = useState<string>('')
+
+  // Fetch real contact leads data
+  const {
+    leads: leadsData,
+    loading,
+    error,
+    updateLeadStatus: updateStatus,
+    refetch
+  } = useLeads({
+    type: 'contact',
+    search: searchQuery || undefined,
+    status: statusFilter !== 'all' ? statusFilter.toLowerCase() as any : undefined
+  });
+
+  // Transform leads for display
+  const leads = leadsData.map(transformLeadForComponent);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -80,29 +43,17 @@ export default function ContactLeadsList() {
     }
   }
 
-  // Filter leads based on search query and status filter
-  const filteredLeads = leads.filter(lead => {
-    const matchesSearch = searchQuery === '' || 
-      lead.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      lead.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      lead.message.toLowerCase().includes(searchQuery.toLowerCase())
-    
-    const matchesStatus = statusFilter === 'all' || lead.status === statusFilter
-    
-    return matchesSearch && matchesStatus
-  })
+  // Filtering is now handled by the API
+  const filteredLeads = leads;
 
-  const updateLeadStatus = (leadId: number, newStatus: string) => {
-    // This would connect to an API in a real implementation
-    console.log(`Updating lead ${leadId} to status: ${newStatus}`)
-    
-    // For demo purposes, update the leads array locally
-    const updatedLeads = leads.map(lead => 
-      lead.id === leadId ? { ...lead, status: newStatus } : lead
-    );
-    
-    // In a real app, you would update state here after API call success
-    alert(`Lead status updated to: ${newStatus}`)
+  const updateLeadStatus = async (leadId: string, newStatus: string) => {
+    const result = await updateStatus(leadId, newStatus);
+    if (result.success) {
+      // Refresh the data
+      refetch();
+    } else {
+      alert(`Failed to update lead status: ${result.error}`);
+    }
   }
 
   return (
@@ -216,7 +167,20 @@ export default function ContactLeadsList() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {filteredLeads.map((lead) => (
+                {loading ? (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-10 text-center text-gray-500">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                      Loading contact leads...
+                    </td>
+                  </tr>
+                ) : error ? (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-10 text-center text-red-500">
+                      Error loading leads: {error}
+                    </td>
+                  </tr>
+                ) : filteredLeads.map((lead) => (
                   <tr key={lead.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">
@@ -249,7 +213,10 @@ export default function ContactLeadsList() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center space-x-2">
-                        <button 
+                        <button
+                          type="button"
+                          title={`View details for ${lead.name}`}
+                          aria-label={`View details for ${lead.name}`}
                           className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
                           onClick={() => {
                             alert(`Viewing details for: ${lead.name}`)
@@ -257,7 +224,10 @@ export default function ContactLeadsList() {
                         >
                           <Eye className="w-4 h-4" />
                         </button>
-                        <button 
+                        <button
+                          type="button"
+                          title={`Call ${lead.name}`}
+                          aria-label={`Call ${lead.name}`}
                           className="p-1 text-gray-400 hover:text-green-600 transition-colors"
                           onClick={() => {
                             window.open(`tel:${lead.phone}`, '_blank')
@@ -265,7 +235,10 @@ export default function ContactLeadsList() {
                         >
                           <Phone className="w-4 h-4" />
                         </button>
-                        <button 
+                        <button
+                          type="button"
+                          title={`Email ${lead.name}`}
+                          aria-label={`Email ${lead.name}`}
                           className="p-1 text-gray-400 hover:text-purple-600 transition-colors"
                           onClick={() => {
                             window.open(`mailto:${lead.email}`, '_blank')
@@ -274,35 +247,45 @@ export default function ContactLeadsList() {
                           <Mail className="w-4 h-4" />
                         </button>
                         <div className="relative group">
-                          <button className="p-1 text-gray-400 hover:text-amber-600 transition-colors">
+                          <button
+                            type="button"
+                            title={`Update status for ${lead.name}`}
+                            aria-label={`Update status for ${lead.name}`}
+                            className="p-1 text-gray-400 hover:text-amber-600 transition-colors"
+                          >
                             <Tag className="w-4 h-4" />
                           </button>
                           <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10 hidden group-hover:block">
-                            <button 
+                            <button
+                              type="button"
                               onClick={() => updateLeadStatus(lead.id, 'New')}
                               className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700"
                             >
                               Mark as New
                             </button>
-                            <button 
+                            <button
+                              type="button"
                               onClick={() => updateLeadStatus(lead.id, 'Contacted')}
                               className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700"
                             >
                               Mark as Contacted
                             </button>
-                            <button 
+                            <button
+                              type="button"
                               onClick={() => updateLeadStatus(lead.id, 'Qualified')}
                               className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-700"
                             >
                               Mark as Qualified
                             </button>
-                            <button 
+                            <button
+                              type="button"
                               onClick={() => updateLeadStatus(lead.id, 'Negotiation')}
                               className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-700"
                             >
                               Mark as In Negotiation
                             </button>
-                            <button 
+                            <button
+                              type="button"
                               onClick={() => updateLeadStatus(lead.id, 'Closed')}
                               className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700"
                             >
@@ -328,4 +311,4 @@ export default function ContactLeadsList() {
       </div>
     </>
   )
-} 
+}

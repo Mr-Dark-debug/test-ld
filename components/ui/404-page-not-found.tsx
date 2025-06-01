@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 
 export function NotFoundPage() {
   const router = useRouter();
-  
+
   return (
     <section className="bg-background text-foreground font-sans min-h-screen flex items-center justify-center px-4">
       <div className="container mx-auto">
@@ -29,6 +29,7 @@ export function NotFoundPage() {
               </p>
 
               <Button
+                type="button"
                 onClick={() => router.push("/")}
                 className="my-5"
               >

@@ -23,6 +23,7 @@ import {
   Filter
 } from 'lucide-react'
 import Image from 'next/image'
+import { useAuth } from '@/contexts/AuthContext'
 
 interface SidebarProps {
   isOpen: boolean
@@ -103,6 +104,7 @@ const navigation = [
 
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname() || ''
+  const { user } = useAuth()
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null)
   
   useEffect(() => {
@@ -125,6 +127,32 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const isActivePath = (itemPath: string) => {
     return pathname.startsWith(`${itemPath}/`);
   }
+  
+  // Get user initials for avatar
+  const getUserInitials = () => {
+    if (!user || !user.name) return 'U';
+    
+    const nameParts = user.name.trim().split(' ');
+    if (nameParts.length === 1) {
+      return nameParts[0].charAt(0).toUpperCase();
+    }
+    
+    return (nameParts[0].charAt(0) + nameParts[nameParts.length - 1].charAt(0)).toUpperCase();
+  };
+  
+  // Get role display name
+  const getRoleDisplayName = (role: string) => {
+    switch (role) {
+      case 'super_admin':
+        return 'Super Admin';
+      case 'admin':
+        return 'Admin';
+      case 'editor':
+        return 'Editor';
+      default:
+        return role;
+    }
+  };
   
   return (
     <>
@@ -222,12 +250,18 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         {/* User section */}
         <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200">
           <div className="flex items-center">
-            <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-              <span className="text-sm font-medium text-gray-700">AD</span>
+            <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+              <span className="text-sm font-medium text-blue-700">
+                {getUserInitials()}
+              </span>
             </div>
             <div className="ml-3">
-              <p className="text-sm font-medium text-gray-700">Admin User</p>
-              <p className="text-xs text-gray-500">Super Admin</p>
+              <p className="text-sm font-medium text-gray-700">
+                {user?.name || 'User'}
+              </p>
+              <p className="text-xs text-gray-500">
+                {user ? getRoleDisplayName(user.role) : 'Loading...'}
+              </p>
             </div>
           </div>
         </div>

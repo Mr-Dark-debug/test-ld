@@ -27,13 +27,14 @@ import {
 import Link from 'next/link'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import { blogsApi } from '@/lib/api'
 
 export default function CreateBlogPage() {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [previewTab, setPreviewTab] = useState<'write' | 'preview'>('write')
   const [formTab, setFormTab] = useState<'content' | 'settings'>('content')
-  
+
   // Blog post data
   const [title, setTitle] = useState('')
   const [slug, setSlug] = useState('')
@@ -49,7 +50,7 @@ export default function CreateBlogPage() {
   const [publishTime, setPublishTime] = useState('')
   const [metaTitle, setMetaTitle] = useState('')
   const [metaDescription, setMetaDescription] = useState('')
-  
+
   // Sample categories for the dropdown
   const categories = [
     'Architecture',
@@ -63,14 +64,14 @@ export default function CreateBlogPage() {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
-    
+
     // Preview image
     const reader = new FileReader()
     reader.onload = () => {
       setCoverImagePreview(reader.result as string)
     }
     reader.readAsDataURL(file)
-    
+
     setCoverImage(file)
   }
 
@@ -80,7 +81,7 @@ export default function CreateBlogPage() {
       .toLowerCase()
       .replace(/[^\w\s]/gi, '')
       .replace(/\s+/g, '-')
-    
+
     setSlug(generatedSlug)
   }
 
@@ -100,7 +101,7 @@ export default function CreateBlogPage() {
   // Handle publishing options
   const handlePublishStatusChange = (status: 'draft' | 'published' | 'scheduled') => {
     setPublishStatus(status)
-    
+
     // If publishing now, set the current date and time
     if (status === 'published') {
       const now = new Date()
@@ -113,7 +114,7 @@ export default function CreateBlogPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
-    
+
     try {
       // Form validation
       if (!title) {
@@ -121,31 +122,31 @@ export default function CreateBlogPage() {
         setIsSubmitting(false)
         return
       }
-      
+
       if (!content) {
         toast.error('Content is required')
         setIsSubmitting(false)
         return
       }
-      
+
       if (!slug) {
         toast.error('Slug is required')
         setIsSubmitting(false)
         return
       }
-      
+
       if (!category) {
         toast.error('Category is required')
         setIsSubmitting(false)
         return
       }
-      
+
       if (publishStatus === 'scheduled' && (!publishDate || !publishTime)) {
         toast.error('Publish date and time are required for scheduled posts')
         setIsSubmitting(false)
         return
       }
-      
+
       // Prepare data for submission
       const blogPostData = {
         title,
@@ -155,25 +156,25 @@ export default function CreateBlogPage() {
         category,
         tags,
         status: publishStatus,
-        publishDate: publishStatus === 'scheduled' ? `${publishDate}T${publishTime}:00` : 
+        publishDate: publishStatus === 'scheduled' ? `${publishDate}T${publishTime}:00` :
                     publishStatus === 'published' ? new Date().toISOString() : null,
         metaTitle: metaTitle || title,
         metaDescription: metaDescription || excerpt,
       }
-      
-      // In a real app, you would upload the cover image and submit the data to an API
-      console.log('Submitting blog post:', blogPostData)
-      console.log('Cover image:', coverImage)
-      
-      // Simulate API call
-      setTimeout(() => {
-        toast.success('Blog post created successfully!')
-        
+
+      // Submit to real API
+      const response = await blogsApi.create(blogPostData);
+
+      if (response.success) {
+        toast.success('Blog post created successfully!');
+
         // Redirect to blog list after successful creation
         setTimeout(() => {
-          router.push('/cms-admin/dashboard/blogs')
-        }, 1500)
-      }, 1500)
+          router.push('/cms-admin/dashboard/blogs');
+        }, 1000);
+      } else {
+        toast.error(response.error || 'Failed to create blog post');
+      }
     } catch (error) {
       console.error('Error creating blog post:', error)
       toast.error('Failed to create blog post')
@@ -185,22 +186,22 @@ export default function CreateBlogPage() {
   return (
     <>
       <Toaster position="top-right" expand={true} richColors />
-      
+
       <div className="container mx-auto py-6">
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center">
-            <Link 
-              href="/cms-admin/dashboard/blogs" 
+            <Link
+              href="/cms-admin/dashboard/blogs"
               className="mr-4 p-2 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-100 transition-colors"
             >
               <ChevronLeft className="h-5 w-5" />
             </Link>
             <h1 className="text-2xl font-bold">Create New Blog Post</h1>
           </div>
-          
+
           <div className="flex gap-2">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="flex items-center gap-2"
               onClick={() => setPreviewTab(previewTab === 'write' ? 'preview' : 'write')}
             >
@@ -216,8 +217,8 @@ export default function CreateBlogPage() {
                 </>
               )}
             </Button>
-            
-            <Button 
+
+            <Button
               onClick={handleSubmit}
               disabled={isSubmitting}
               className="flex items-center gap-2"
@@ -236,7 +237,7 @@ export default function CreateBlogPage() {
             </Button>
           </div>
         </div>
-        
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main editor */}
           <div className="lg:col-span-2">
@@ -252,7 +253,7 @@ export default function CreateBlogPage() {
                     SEO & Settings
                   </TabsTrigger>
                 </TabsList>
-                
+
                 <TabsContent value="content" className="space-y-4">
                   {/* Title */}
                   <div>
@@ -265,13 +266,13 @@ export default function CreateBlogPage() {
                       className="mt-1"
                     />
                   </div>
-                  
+
                   {/* Slug */}
                   <div>
                     <div className="flex justify-between">
                       <Label htmlFor="slug">Slug</Label>
-                      <button 
-                        type="button" 
+                      <button
+                        type="button"
                         onClick={generateSlug}
                         className="text-xs text-blue-600 hover:underline"
                       >
@@ -286,7 +287,7 @@ export default function CreateBlogPage() {
                       className="mt-1"
                     />
                   </div>
-                  
+
                   {/* Content */}
                   <div className="mt-4">
                     <div className="flex justify-between items-center mb-1">
@@ -295,7 +296,7 @@ export default function CreateBlogPage() {
                         {content.length} characters
                       </div>
                     </div>
-                    
+
                     {previewTab === 'write' ? (
                       <Textarea
                         id="content"
@@ -318,7 +319,7 @@ export default function CreateBlogPage() {
                       </div>
                     )}
                   </div>
-                  
+
                   {/* Excerpt */}
                   <div>
                     <div className="flex justify-between">
@@ -337,12 +338,12 @@ export default function CreateBlogPage() {
                     />
                   </div>
                 </TabsContent>
-                
+
                 <TabsContent value="settings" className="space-y-4">
                   {/* SEO Settings */}
                   <div className="space-y-4">
                     <h3 className="text-lg font-medium">SEO Settings</h3>
-                    
+
                     <div>
                       <Label htmlFor="metaTitle">Meta Title</Label>
                       <Input
@@ -356,7 +357,7 @@ export default function CreateBlogPage() {
                         {metaTitle.length} / 60 characters
                       </div>
                     </div>
-                    
+
                     <div>
                       <Label htmlFor="metaDescription">Meta Description</Label>
                       <Textarea
@@ -375,13 +376,13 @@ export default function CreateBlogPage() {
               </Tabs>
             </Card>
           </div>
-          
+
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Publish Settings */}
             <Card className="p-6">
               <h3 className="text-lg font-medium mb-4">Publish Settings</h3>
-              
+
               <div className="space-y-4">
                 {/* Publishing options */}
                 <div>
@@ -398,7 +399,7 @@ export default function CreateBlogPage() {
                       />
                       <label htmlFor="draft" className="text-sm">Save as Draft</label>
                     </div>
-                    
+
                     <div className="flex items-center">
                       <input
                         type="radio"
@@ -410,7 +411,7 @@ export default function CreateBlogPage() {
                       />
                       <label htmlFor="publish" className="text-sm">Publish Immediately</label>
                     </div>
-                    
+
                     <div className="flex items-center">
                       <input
                         type="radio"
@@ -424,7 +425,7 @@ export default function CreateBlogPage() {
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Schedule settings */}
                 {publishStatus === 'scheduled' && (
                   <div className="pl-6 border-l-2 border-blue-200 space-y-2">
@@ -441,7 +442,7 @@ export default function CreateBlogPage() {
                         />
                       </div>
                     </div>
-                    
+
                     <div>
                       <Label htmlFor="publishTime">Publish Time</Label>
                       <div className="flex items-center mt-1">
@@ -456,9 +457,9 @@ export default function CreateBlogPage() {
                     </div>
                   </div>
                 )}
-                
+
                 <div className="pt-2">
-                  <Button 
+                  <Button
                     onClick={handleSubmit}
                     disabled={isSubmitting}
                     className="w-full flex items-center justify-center gap-2"
@@ -471,7 +472,7 @@ export default function CreateBlogPage() {
                     ) : (
                       <>
                         <Save className="h-4 w-4" />
-                        {publishStatus === 'draft' ? 'Save Draft' : 
+                        {publishStatus === 'draft' ? 'Save Draft' :
                          publishStatus === 'published' ? 'Publish Now' : 'Schedule Post'}
                       </>
                     )}
@@ -479,11 +480,11 @@ export default function CreateBlogPage() {
                 </div>
               </div>
             </Card>
-            
+
             {/* Categories & Tags */}
             <Card className="p-6">
               <h3 className="text-lg font-medium mb-4">Categories & Tags</h3>
-              
+
               <div className="space-y-4">
                 {/* Category */}
                 <div>
@@ -502,7 +503,7 @@ export default function CreateBlogPage() {
                     ))}
                   </select>
                 </div>
-                
+
                 {/* Tags */}
                 <div>
                   <Label htmlFor="tags">Tags</Label>
@@ -530,7 +531,7 @@ export default function CreateBlogPage() {
                       <Plus className="h-4 w-4" />
                     </Button>
                   </div>
-                  
+
                   <div className="flex flex-wrap gap-2 mt-2">
                     {tags.map((tag) => (
                       <div
@@ -554,11 +555,11 @@ export default function CreateBlogPage() {
                 </div>
               </div>
             </Card>
-            
+
             {/* Featured Image */}
             <Card className="p-6">
               <h3 className="text-lg font-medium mb-4">Featured Image</h3>
-              
+
               <div className="space-y-4">
                 {coverImagePreview ? (
                   <div className="relative">
@@ -584,7 +585,7 @@ export default function CreateBlogPage() {
                     <p className="mt-1 text-sm text-gray-500">Upload a cover image</p>
                   </div>
                 )}
-                
+
                 <div>
                   <Label htmlFor="image" className="sr-only">
                     Upload Cover Image

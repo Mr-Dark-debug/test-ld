@@ -1,10 +1,11 @@
 'use client'
 
-import React from 'react'
-import { Toaster } from 'sonner'
+import React, { useState, useEffect } from 'react'
+import { Toaster, toast } from 'sonner'
 import { StatsCard } from '../components/StatsCard'
 import { RecentActivity } from '../components/RecentActivity'
 import { LeadChart } from '../components/LeadChart'
+import { dashboardApi } from '@/lib/api'
 import {
   Building2,
   FileText,
@@ -14,60 +15,117 @@ import {
   TrendingUp,
   AlertCircle,
   CheckCircle,
+  RefreshCw,
+  Loader2,
 } from 'lucide-react'
 
+// Icon mapping for dynamic icons
+const iconMap = {
+  Building2,
+  FileText,
+  Users,
+  MessageSquare,
+  TrendingUp,
+  UserPlus,
+};
+
 export default function DashboardOverview() {
-  const stats = [
-    {
-      title: 'Total Projects',
-      value: '24',
-      change: '+12%',
-      trend: 'up' as const,
-      icon: Building2,
-      color: 'blue' as const,
-    },
-    {
-      title: 'Published Blogs',
-      value: '156',
-      change: '+8%',
-      trend: 'up' as const,
-      icon: FileText,
-      color: 'green' as const,
-    },
-    {
-      title: 'Active Users',
-      value: '1,234',
-      change: '+23%',
-      trend: 'up' as const,
-      icon: Users,
-      color: 'purple' as const,
-    },
-    {
-      title: 'Total Testimonials',
-      value: '89',
-      change: '+5%',
-      trend: 'up' as const,
-      icon: MessageSquare,
-      color: 'amber' as const,
-    },
-    {
-      title: 'Total Leads',
-      value: '2,847',
-      change: '+18%',
-      trend: 'up' as const,
-      icon: TrendingUp,
-      color: 'indigo' as const,
-    },
-    {
-      title: 'New Leads Today',
-      value: '47',
-      change: '+32%',
-      trend: 'up' as const,
-      icon: UserPlus,
-      color: 'red' as const,
-    },
-  ]
-  
+  const [stats, setStats] = useState<any[]>([]);
+  const [analytics, setAnalytics] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<string>('');
+
+  // Fetch dashboard statistics
+  const fetchDashboardStats = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const response = await dashboardApi.getStats();
+
+      if (response.success && response.data) {
+        // Map icons to actual components
+        const statsWithIcons = response.data.stats.map((stat: any) => ({
+          ...stat,
+          icon: iconMap[stat.icon as keyof typeof iconMap] || Building2,
+        }));
+
+        setStats(statsWithIcons);
+        setAnalytics(response.data.analytics);
+        setLastUpdated(response.data.lastUpdated);
+      } else {
+        setError(response.error || 'Failed to fetch dashboard statistics');
+        // Fallback to dummy data if API fails
+        setStats([
+          {
+            title: 'Total Projects',
+            value: '0',
+            change: '+0%',
+            trend: 'up' as const,
+            icon: Building2,
+            color: 'blue' as const,
+          },
+          {
+            title: 'Published Blogs',
+            value: '0',
+            change: '+0%',
+            trend: 'up' as const,
+            icon: FileText,
+            color: 'green' as const,
+          },
+          {
+            title: 'Active Users',
+            value: '0',
+            change: '+0%',
+            trend: 'up' as const,
+            icon: Users,
+            color: 'purple' as const,
+          },
+          {
+            title: 'Total Testimonials',
+            value: '0',
+            change: '+0%',
+            trend: 'up' as const,
+            icon: MessageSquare,
+            color: 'amber' as const,
+          },
+          {
+            title: 'Total Leads',
+            value: '0',
+            change: '+0%',
+            trend: 'up' as const,
+            icon: TrendingUp,
+            color: 'indigo' as const,
+          },
+          {
+            title: 'New Leads Today',
+            value: '0',
+            change: '+0%',
+            trend: 'up' as const,
+            icon: UserPlus,
+            color: 'red' as const,
+          },
+        ]);
+      }
+    } catch (err: any) {
+      console.error('Error fetching dashboard stats:', err);
+      setError(err.message || 'Failed to fetch dashboard statistics');
+      toast.error('Failed to load dashboard statistics');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDashboardStats();
+
+    // Set up auto-refresh every 5 minutes
+    const interval = setInterval(fetchDashboardStats, 5 * 60 * 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <>
       <Toaster position="top-right" expand={true} richColors />
@@ -81,16 +139,52 @@ export default function DashboardOverview() {
             <p className="text-gray-600 mt-1">
               Welcome back! Here's what's happening with your real estate CMS.
             </p>
+            {error && (
+              <p className="text-red-500 text-sm mt-1">
+                {error} - Showing fallback data
+              </p>
+            )}
           </div>
-          <div className="text-sm text-gray-500">
-            Last updated: {new Date().toLocaleString()}
+          <div className="flex items-center space-x-3">
+            <button
+              type="button"
+              onClick={fetchDashboardStats}
+              disabled={loading}
+              className="inline-flex items-center px-3 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+            >
+              {loading ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <RefreshCw className="w-4 h-4 mr-2" />
+              )}
+              Refresh
+            </button>
+            <div className="text-sm text-gray-500">
+              Last updated: {lastUpdated ? new Date(lastUpdated).toLocaleString() : 'Never'}
+            </div>
           </div>
         </div>
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {stats.map((stat, index) => (
-            <StatsCard key={index} {...stat} />
-          ))}
+          {loading && stats.length === 0 ? (
+            // Loading skeleton
+            Array.from({ length: 6 }).map((_, index) => (
+              <div key={index} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <div className="animate-pulse">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="w-8 h-8 bg-gray-200 rounded"></div>
+                    <div className="w-16 h-4 bg-gray-200 rounded"></div>
+                  </div>
+                  <div className="w-20 h-8 bg-gray-200 rounded mb-2"></div>
+                  <div className="w-24 h-4 bg-gray-200 rounded"></div>
+                </div>
+              </div>
+            ))
+          ) : (
+            stats.map((stat, index) => (
+              <StatsCard key={index} {...stat} />
+            ))
+          )}
         </div>
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

@@ -4,66 +4,31 @@ import React, { useState } from 'react'
 import { Toaster } from 'sonner'
 import { Search, Filter, Phone, Mail, Eye, Download, Calendar, RefreshCcw, Building, Tag } from 'lucide-react'
 import AnimatedBackground from '@/components/ui/animated-tabs'
+import { useLeads, transformLeadForComponent } from '@/hooks/useLeads'
 
 export default function BrochureLeadsList() {
-  // Sample brochure request lead data
-  const leads = [
-    {
-      id: 1,
-      name: "Karan Mehra",
-      email: "karan.m@example.com",
-      phone: "+91 98765 87654",
-      project: "Skyline Towers",
-      status: "New",
-      downloadDate: "2024-05-16",
-      notes: "Looking for 3BHK options"
-    },
-    {
-      id: 2,
-      name: "Neha Desai",
-      email: "neha.d@example.com",
-      phone: "+91 87654 76543",
-      project: "Green Valley",
-      status: "Contacted",
-      downloadDate: "2024-05-14",
-      notes: "Interested in payment plans"
-    },
-    {
-      id: 3,
-      name: "Rahul Joshi",
-      email: "rahul.j@example.com",
-      phone: "+91 76543 65432",
-      project: "Skyline Towers",
-      status: "Qualified",
-      downloadDate: "2024-05-12",
-      notes: "Asked about possession date"
-    },
-    {
-      id: 4,
-      name: "Deepa Shah",
-      email: "deepa.s@example.com",
-      phone: "+91 65432 54321",
-      project: "Corporate Plaza",
-      status: "Negotiation",
-      downloadDate: "2024-05-10",
-      notes: "Looking for office space"
-    },
-    {
-      id: 5,
-      name: "Suresh Patel",
-      email: "suresh.p@example.com",
-      phone: "+91 54321 43210",
-      project: "Green Valley",
-      status: "Closed",
-      downloadDate: "2024-05-08",
-      notes: "Scheduled site visit"
-    }
-  ]
-
-  const projects = ["All Projects", "Skyline Towers", "Green Valley", "Corporate Plaza"]
   const [projectFilter, setProjectFilter] = useState<string>("All Projects")
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [searchQuery, setSearchQuery] = useState<string>('')
+
+  // Fetch real brochure leads data
+  const {
+    leads: leadsData,
+    loading,
+    error,
+    updateLeadStatus: updateStatus,
+    refetch
+  } = useLeads({
+    type: 'brochure',
+    search: searchQuery || undefined,
+    status: statusFilter !== 'all' ? statusFilter.toLowerCase() as any : undefined
+  });
+
+  // Transform leads for display
+  const leads = leadsData.map(transformLeadForComponent);
+
+  // Get unique projects from leads for filtering
+  const projects = ["All Projects", ...Array.from(new Set(leads.map(lead => lead.project).filter(Boolean)))];
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -82,31 +47,20 @@ export default function BrochureLeadsList() {
     }
   }
 
-  // Filter leads based on search query, project filter and status filter
-  const filteredLeads = leads.filter(lead => {
-    const matchesSearch = searchQuery === '' || 
-      lead.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      lead.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      lead.notes.toLowerCase().includes(searchQuery.toLowerCase())
-    
-    const matchesStatus = statusFilter === 'all' || lead.status === statusFilter
-    const matchesProject = projectFilter === "All Projects" || lead.project === projectFilter
-    
-    return matchesSearch && matchesStatus && matchesProject
-  })
+  // Filter leads based on project filter (search and status filtering handled by API)
+  const filteredLeads = projectFilter === "All Projects"
+    ? leads
+    : leads.filter(lead => lead.project === projectFilter);
 
   // Function to update lead status
-  const updateLeadStatus = (leadId: number, newStatus: string) => {
-    // This would connect to an API in a real implementation
-    console.log(`Updating lead ${leadId} to status: ${newStatus}`)
-    
-    // For demo purposes, update the leads array locally
-    const updatedLeads = leads.map(lead => 
-      lead.id === leadId ? { ...lead, status: newStatus } : lead
-    );
-    
-    // In a real app, you would update state here after API call success
-    alert(`Lead status updated to: ${newStatus}`)
+  const updateLeadStatus = async (leadId: string, newStatus: string) => {
+    const result = await updateStatus(leadId, newStatus);
+    if (result.success) {
+      // Refresh the data
+      refetch();
+    } else {
+      alert(`Failed to update lead status: ${result.error}`);
+    }
   }
 
   return (
@@ -168,7 +122,7 @@ export default function BrochureLeadsList() {
                   ))}
                 </AnimatedBackground>
               </div>
-              
+
               <div className="border rounded-lg overflow-hidden">
                 <AnimatedBackground
                   defaultValue={statusFilter}
@@ -240,7 +194,20 @@ export default function BrochureLeadsList() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {filteredLeads.map((lead) => (
+                {loading ? (
+                  <tr>
+                    <td colSpan={7} className="px-6 py-10 text-center text-gray-500">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                      Loading brochure leads...
+                    </td>
+                  </tr>
+                ) : error ? (
+                  <tr>
+                    <td colSpan={7} className="px-6 py-10 text-center text-red-500">
+                      Error loading leads: {error}
+                    </td>
+                  </tr>
+                ) : filteredLeads.map((lead) => (
                   <tr key={lead.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">
@@ -281,7 +248,10 @@ export default function BrochureLeadsList() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center space-x-2">
-                        <button 
+                        <button
+                          type="button"
+                          title={`View details for ${lead.name}`}
+                          aria-label={`View details for ${lead.name}`}
                           className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
                           onClick={() => {
                             alert(`Viewing details for: ${lead.name}`)
@@ -289,7 +259,10 @@ export default function BrochureLeadsList() {
                         >
                           <Eye className="w-4 h-4" />
                         </button>
-                        <button 
+                        <button
+                          type="button"
+                          title={`Call ${lead.name}`}
+                          aria-label={`Call ${lead.name}`}
                           className="p-1 text-gray-400 hover:text-green-600 transition-colors"
                           onClick={() => {
                             window.open(`tel:${lead.phone}`, '_blank')
@@ -297,7 +270,10 @@ export default function BrochureLeadsList() {
                         >
                           <Phone className="w-4 h-4" />
                         </button>
-                        <button 
+                        <button
+                          type="button"
+                          title={`Email ${lead.name}`}
+                          aria-label={`Email ${lead.name}`}
                           className="p-1 text-gray-400 hover:text-purple-600 transition-colors"
                           onClick={() => {
                             window.open(`mailto:${lead.email}`, '_blank')
@@ -306,35 +282,45 @@ export default function BrochureLeadsList() {
                           <Mail className="w-4 h-4" />
                         </button>
                         <div className="relative group">
-                          <button className="p-1 text-gray-400 hover:text-amber-600 transition-colors">
+                          <button
+                            type="button"
+                            title={`Update status for ${lead.name}`}
+                            aria-label={`Update status for ${lead.name}`}
+                            className="p-1 text-gray-400 hover:text-amber-600 transition-colors"
+                          >
                             <Tag className="w-4 h-4" />
                           </button>
                           <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10 hidden group-hover:block">
-                            <button 
+                            <button
+                              type="button"
                               onClick={() => updateLeadStatus(lead.id, 'New')}
                               className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700"
                             >
                               Mark as New
                             </button>
-                            <button 
+                            <button
+                              type="button"
                               onClick={() => updateLeadStatus(lead.id, 'Contacted')}
                               className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700"
                             >
                               Mark as Contacted
                             </button>
-                            <button 
+                            <button
+                              type="button"
                               onClick={() => updateLeadStatus(lead.id, 'Qualified')}
                               className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-700"
                             >
                               Mark as Qualified
                             </button>
-                            <button 
+                            <button
+                              type="button"
                               onClick={() => updateLeadStatus(lead.id, 'Negotiation')}
                               className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-700"
                             >
                               Mark as In Negotiation
                             </button>
-                            <button 
+                            <button
+                              type="button"
                               onClick={() => updateLeadStatus(lead.id, 'Closed')}
                               className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700"
                             >
@@ -360,4 +346,4 @@ export default function BrochureLeadsList() {
       </div>
     </>
   )
-} 
+}

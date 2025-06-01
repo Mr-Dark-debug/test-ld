@@ -1,448 +1,409 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { Card } from '@/components/ui/card'
-import { Button } from '@/components/ui/Button'
-import { Badge } from '@/components/ui/badge'
-import AnimatedBackground from '@/components/ui/animated-tabs'
-import { Input } from '@/components/ui/input'
-import { 
-  Loader2, 
-  Search, 
-  Plus, 
-  FileText, 
-  Edit, 
-  Trash2, 
-  Calendar, 
-  User, 
-  Eye, 
-  Share2, 
-  Tag,
-  Filter,
-  Clock,
-  CalendarClock,
-  ArrowUpRight
-} from 'lucide-react'
+import { Toaster, toast } from 'sonner'
+import { Plus, Search, Filter, Edit, Eye, Trash2, Calendar, User, Tag } from 'lucide-react'
 import Link from 'next/link'
-import { Toaster } from 'sonner'
+import { useRouter } from 'next/navigation'
+import { blogsApi } from '@/lib/api'
+import { useAuth } from '@/contexts/AuthContext'
+import { logActivity } from '@/lib/activity'
 
 interface BlogPost {
-  id: number
-  title: string
-  slug: string
-  excerpt: string
-  content: string
-  author: string
-  category: string
-  status: 'draft' | 'published' | 'scheduled'
-  publishDate: string
-  createdAt: string
-  updatedAt: string
-  imageUrl: string
-  readingTime: string
-  tags: string[]
-  metaTitle?: string
-  metaDescription?: string
+  _id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  content: string;
+  status: 'draft' | 'published' | 'scheduled';
+  category: string;
+  tags: string[];
+  publishDate?: string;
+  createdBy: {
+    _id: string;
+    name: string;
+    email: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+  readingTime?: string;
+  imageUrl?: string;
 }
 
-export default function BlogsAdminPage() {
-  const [isLoading, setIsLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState('all')
-  const [searchQuery, setSearchQuery] = useState('')
-  const [blogPosts, setBlogPosts] = useState<BlogPost[]>([])
-  const [categoryFilter, setCategoryFilter] = useState('all')
-  const [confirmDelete, setConfirmDelete] = useState<number | null>(null)
+export default function BlogsList() {
+  const router = useRouter();
+  const { user } = useAuth();
+  const [blogs, setBlogs] = useState<BlogPost[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
 
-  // Sample categories for the filter
-  const categories = [
-    'Architecture',
-    'Interior Design',
-    'Real Estate',
-    'Technology',
-    'Lifestyle'
-  ]
+  // Fetch blogs from API
+  const fetchBlogs = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const params: any = {
+        admin: 'true', // Get all blogs for admin
+        limit: 100
+      };
+
+      if (statusFilter !== 'all') {
+        params.status = statusFilter;
+      }
+
+      if (categoryFilter !== 'all') {
+        params.category = categoryFilter;
+      }
+
+      if (searchTerm) {
+        params.search = searchTerm;
+      }
+
+      const response = await blogsApi.getAll(params);
+
+      if (response.success && response.data) {
+        setBlogs(response.data);
+      } else {
+        setError(response.error || 'Failed to fetch blogs');
+      }
+    } catch (err: any) {
+      setError(err.message || 'Failed to fetch blogs');
+      console.error('Error fetching blogs:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    // Simulate loading data from API
-    setTimeout(() => {
-      setBlogPosts([
-        {
-          id: 1,
-          title: "The Future of Sustainable Architecture in Urban Development",
-          slug: "the-future-of-sustainable-architecture-in-urban-development",
-          excerpt: "Exploring innovative designs and materials that are shaping eco-friendly cityscapes...",
-          content: "## The Future of Sustainable Architecture\n\nAs cities continue to expand...",
-          author: "AI Architect",
-          category: "Architecture",
-          status: "published",
-          publishDate: "2023-10-26T10:00:00",
-          createdAt: "2023-10-20T14:30:00",
-          updatedAt: "2023-10-25T09:15:00",
-          imageUrl: "https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0",
-          readingTime: "7 min read",
-          tags: ["sustainable", "architecture", "urban", "eco-friendly"],
-          metaTitle: "Sustainable Architecture in Urban Development | Laxmi Developers",
-          metaDescription: "Explore the future of sustainable architecture in urban development with eco-friendly designs and materials for greener cities."
-        },
-        {
-          id: 2,
-          title: "Smart Homes: Integrating Technology for a Modern Lifestyle",
-          slug: "smart-homes-integrating-technology-for-a-modern-lifestyle",
-          excerpt: "A look into how IoT devices, AI, and automation are transforming residential spaces...",
-          content: "## Smart Homes: The Future is Here\n\nThe integration of IoT devices...",
-          author: "Tech Explorer",
-          category: "Technology",
-          status: "published",
-          publishDate: "2023-10-22T08:30:00",
-          createdAt: "2023-10-15T11:45:00",
-          updatedAt: "2023-10-21T16:20:00",
-          imageUrl: "https://images.unsplash.com/photo-1529400971027-cadd71752d99",
-          readingTime: "5 min read",
-          tags: ["smart home", "technology", "IoT", "automation"],
-          metaTitle: "Smart Home Technology Integration | Laxmi Developers",
-          metaDescription: "Discover how IoT devices and automation are transforming modern homes into smart living spaces."
-        },
-        {
-          id: 3,
-          title: "The Art of Interior Design: Creating Spaces That Inspire",
-          slug: "the-art-of-interior-design-creating-spaces-that-inspire",
-          excerpt: "Principles of interior design that can turn any home into a sanctuary...",
-          content: "## The Art of Interior Design\n\nInterior design is more than decoration...",
-          author: "Design Maven",
-          category: "Interior Design",
-          status: "published",
-          publishDate: "2023-10-18T09:15:00",
-          createdAt: "2023-10-10T13:20:00",
-          updatedAt: "2023-10-17T10:45:00",
-          imageUrl: "https://images.unsplash.com/photo-1600210492493-419465538468",
-          readingTime: "6 min read",
-          tags: ["interior design", "home decor", "inspiration", "spaces"],
-          metaTitle: "Interior Design Principles for Inspiring Spaces | Laxmi Developers",
-          metaDescription: "Learn the principles of interior design that transform houses into inspiring and comfortable homes."
-        },
-        {
-          id: 4,
-          title: "Upcoming Trends in Luxury Real Estate for 2024",
-          slug: "upcoming-trends-in-luxury-real-estate-for-2024",
-          excerpt: "Predicting the luxury real estate market trends for the coming year...",
-          content: "## Luxury Real Estate Trends for 2024\n\nThe luxury real estate market is constantly evolving...",
-          author: "Market Analyst",
-          category: "Real Estate",
-          status: "draft",
-          publishDate: "",
-          createdAt: "2023-11-05T16:40:00",
-          updatedAt: "2023-11-05T16:40:00",
-          imageUrl: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750",
-          readingTime: "8 min read",
-          tags: ["luxury", "real estate", "trends", "2024", "market"],
-          metaTitle: "2024 Luxury Real Estate Trends | Laxmi Developers",
-          metaDescription: "Explore our predictions for luxury real estate market trends in 2024 and beyond."
-        },
-        {
-          id: 5,
-          title: "Sustainable Landscaping for Modern Properties",
-          slug: "sustainable-landscaping-for-modern-properties",
-          excerpt: "How eco-friendly landscaping enhances property value and environmental impact...",
-          content: "## Sustainable Landscaping\n\nModern landscaping goes beyond aesthetics...",
-          author: "Eco Landscaper",
-          category: "Architecture",
-          status: "scheduled",
-          publishDate: "2023-12-10T08:00:00",
-          createdAt: "2023-11-01T10:30:00",
-          updatedAt: "2023-11-02T14:15:00",
-          imageUrl: "https://images.unsplash.com/photo-1558036117-15d82a90b9b1",
-          readingTime: "5 min read",
-          tags: ["landscaping", "sustainable", "eco-friendly", "property value"],
-          metaTitle: "Sustainable Landscaping for Modern Properties | Laxmi Developers",
-          metaDescription: "Learn how sustainable landscaping can enhance property value while minimizing environmental impact."
+    fetchBlogs();
+  }, [statusFilter, categoryFilter, searchTerm]);
+
+  // Delete blog
+  const handleDelete = async (blogId: string, title: string) => {
+    try {
+      const blog = blogs.find(b => b._id === blogId);
+      if (!blog) return;
+
+      const response = await blogsApi.delete(blog.slug);
+
+      if (response.success) {
+        toast.success('Blog post deleted successfully');
+        
+        // Log activity
+        if (user) {
+          await logActivity({
+            type: 'blog',
+            action: 'delete',
+            title: `Deleted blog post: ${title}`,
+            userId: user._id,
+            userName: user.name,
+            entityId: blogId,
+            entityType: 'blog'
+          });
         }
-      ])
-      setIsLoading(false)
-    }, 1000)
-  }, [])
 
-  // Filter blog posts based on active tab, search query, and category
-  const filteredPosts = blogPosts.filter(post => {
-    const matchesTab = 
-      activeTab === 'all' || 
-      (activeTab === 'published' && post.status === 'published') ||
-      (activeTab === 'drafts' && post.status === 'draft') ||
-      (activeTab === 'scheduled' && post.status === 'scheduled')
-    
-    const matchesSearch = 
-      searchQuery === '' || 
-      post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      post.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      post.author.toLowerCase().includes(searchQuery.toLowerCase())
-    
-    const matchesCategory = 
-      categoryFilter === 'all' || 
-      post.category === categoryFilter
-    
-    return matchesTab && matchesSearch && matchesCategory
-  })
-
-  // Handle delete confirmation
-  const handleDelete = (id: number) => {
-    if (confirmDelete === id) {
-      // In real app, call API to delete post
-      setBlogPosts(blogPosts.filter(post => post.id !== id))
-      setConfirmDelete(null)
-    } else {
-      setConfirmDelete(id)
-      // Reset confirmation after 3 seconds
-      setTimeout(() => setConfirmDelete(null), 3000)
+        // Refresh the list
+        fetchBlogs();
+      } else {
+        toast.error(response.error || 'Failed to delete blog post');
+      }
+    } catch (error: any) {
+      console.error('Error deleting blog:', error);
+      toast.error('Failed to delete blog post');
+    } finally {
+      setConfirmDelete(null);
     }
-  }
+  };
 
-  // Format date for display
-  const formatDate = (dateString: string) => {
-    if (!dateString) return 'N/A'
-    return new Date(dateString).toLocaleString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    })
-  }
-
-  // Get status badge style
+  // Get status badge color
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'published':
-        return <Badge className="bg-green-500">Published</Badge>
+        return 'bg-green-100 text-green-800';
       case 'draft':
-        return <Badge className="bg-amber-500">Draft</Badge>
+        return 'bg-gray-100 text-gray-800';
       case 'scheduled':
-        return <Badge className="bg-blue-500">Scheduled</Badge>
+        return 'bg-blue-100 text-blue-800';
       default:
-        return <Badge className="bg-gray-500">{status}</Badge>
+        return 'bg-gray-100 text-gray-800';
     }
-  }
+  };
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
-        <span className="ml-2 text-lg">Loading blog posts...</span>
-      </div>
-    )
-  }
+  // Filter blogs based on search term
+  const filteredBlogs = blogs.filter(blog =>
+    blog.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    blog.excerpt.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    blog.category.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <>
       <Toaster position="top-right" expand={true} richColors />
-      
-      <div className="container mx-auto py-6">
-        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
-          <h1 className="text-2xl font-bold">Blog Management</h1>
-          
-          <Link href="/cms-admin/dashboard/blogs/create">
-            <Button className="w-full sm:w-auto flex items-center gap-2">
-              <Plus className="h-4 w-4" />
-              Create New Post
-            </Button>
+      <div className="space-y-6">
+        {/* Page Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Blog Management</h1>
+            <p className="text-gray-600 mt-1">
+              Manage your blog posts, create new content, and track performance.
+            </p>
+          </div>
+          <Link
+            href="/cms-admin/dashboard/blogs/create"
+            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Create Blog Post
           </Link>
         </div>
 
         {/* Filters */}
-        <Card className="p-4 mb-6">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <Input
-                  type="text"
-                  placeholder="Search posts..."
-                  className="pl-10"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </div>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            {/* Search */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <input
+                type="text"
+                placeholder="Search blogs..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
             </div>
-            
-            <div className="flex flex-wrap gap-2">
-              {/* Status Filter */}
-              <div className="border rounded-lg overflow-hidden">
-                <AnimatedBackground
-                  defaultValue={activeTab}
-                  className="bg-blue-50"
-                  transition={{
-                    type: "spring",
-                    bounce: 0.2,
-                    duration: 0.3,
-                  }}
-                  onValueChange={(value) => value && setActiveTab(value)}
-                >
-                  <button
-                    data-id="all"
-                    className="py-2 px-3 text-sm font-medium text-gray-700 data-[checked=true]:text-blue-600"
-                  >
-                    All Posts
-                  </button>
-                  <button
-                    data-id="published"
-                    className="py-2 px-3 text-sm font-medium text-gray-700 data-[checked=true]:text-blue-600"
-                  >
-                    Published
-                  </button>
-                  <button
-                    data-id="drafts"
-                    className="py-2 px-3 text-sm font-medium text-gray-700 data-[checked=true]:text-blue-600"
-                  >
-                    Drafts
-                  </button>
-                  <button
-                    data-id="scheduled"
-                    className="py-2 px-3 text-sm font-medium text-gray-700 data-[checked=true]:text-blue-600"
-                  >
-                    Scheduled
-                  </button>
-                </AnimatedBackground>
-              </div>
-              
-              {/* Category Filter */}
-              <select
-                className="px-3 py-2 border rounded-lg text-sm"
-                value={categoryFilter}
-                onChange={(e) => setCategoryFilter(e.target.value)}
-              >
-                <option value="all">All Categories</option>
-                {categories.map(category => (
-                  <option key={category} value={category}>{category}</option>
-                ))}
-              </select>
-            </div>
+
+            {/* Status Filter */}
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="all">All Status</option>
+              <option value="published">Published</option>
+              <option value="draft">Draft</option>
+              <option value="scheduled">Scheduled</option>
+            </select>
+
+            {/* Category Filter */}
+            <select
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="all">All Categories</option>
+              <option value="Architecture">Architecture</option>
+              <option value="Interior Design">Interior Design</option>
+              <option value="Real Estate">Real Estate</option>
+              <option value="Technology">Technology</option>
+              <option value="Lifestyle">Lifestyle</option>
+            </select>
+
+            {/* Refresh Button */}
+            <button
+              onClick={fetchBlogs}
+              className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+            >
+              <Filter className="w-4 h-4 mr-2 inline" />
+              Refresh
+            </button>
           </div>
-        </Card>
+        </div>
 
-        {/* Blog Posts List */}
-        <div className="space-y-4">
-          {filteredPosts.length === 0 ? (
-            <Card className="p-6 text-center">
-              <p className="text-gray-500 mb-4">No blog posts found matching your filters.</p>
-              <Link href="/cms-admin/dashboard/blogs/create">
-                <Button variant="outline" className="flex items-center gap-2">
-                  <Plus className="h-4 w-4" />
-                  Create Your First Post
-                </Button>
+        {/* Blog List */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+          {loading ? (
+            <div className="p-8 text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+              <p className="text-gray-500 mt-2">Loading blogs...</p>
+            </div>
+          ) : error ? (
+            <div className="p-8 text-center">
+              <p className="text-red-500">{error}</p>
+              <button
+                onClick={fetchBlogs}
+                className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              >
+                Try Again
+              </button>
+            </div>
+          ) : filteredBlogs.length === 0 ? (
+            <div className="p-8 text-center">
+              <p className="text-gray-500">No blog posts found.</p>
+              <Link
+                href="/cms-admin/dashboard/blogs/create"
+                className="mt-2 inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Create Your First Blog Post
               </Link>
-            </Card>
+            </div>
           ) : (
-            filteredPosts.map((post) => (
-              <Card key={post.id} className="p-4 hover:shadow-md transition-shadow">
-                <div className="flex flex-col md:flex-row gap-4">
-                  {/* Post thumbnail */}
-                  <div className="md:w-48 h-32 flex-shrink-0 overflow-hidden rounded-lg">
-                    {post.imageUrl ? (
-                      <img
-                        src={post.imageUrl}
-                        alt={post.title}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                        <FileText className="h-10 w-10 text-gray-400" />
-                      </div>
-                    )}
-                  </div>
-                  
-                  {/* Post details */}
-                  <div className="flex-1">
-                    <div className="flex flex-wrap justify-between items-start gap-2">
-                      <div>
-                        <h3 className="font-medium text-lg">{post.title}</h3>
-                        <p className="text-gray-500 text-sm mt-1">{post.excerpt.substring(0, 120)}...</p>
-                      </div>
-                      <div className="flex flex-col items-end gap-1">
-                        {getStatusBadge(post.status)}
-                        <Badge variant="outline" className="mt-1">{post.category}</Badge>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 mt-3 text-sm text-gray-600">
-                      <div className="flex items-center">
-                        <User className="h-4 w-4 mr-2" />
-                        <span>{post.author}</span>
-                      </div>
-                      
-                      <div className="flex items-center">
-                        <Clock className="h-4 w-4 mr-2" />
-                        <span>{post.readingTime}</span>
-                      </div>
-                      
-                      <div className="flex items-center">
-                        {post.status === 'scheduled' ? (
-                          <>
-                            <CalendarClock className="h-4 w-4 mr-2" />
-                            <span>Scheduled for: {formatDate(post.publishDate)}</span>
-                          </>
-                        ) : (
-                          <>
-                            <Calendar className="h-4 w-4 mr-2" />
-                            <span>
-                              {post.status === 'published' 
-                                ? `Published: ${formatDate(post.publishDate)}`
-                                : `Last updated: ${formatDate(post.updatedAt)}`
-                              }
-                            </span>
-                          </>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Blog Post
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Category
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Author
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Date
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {filteredBlogs.map((blog) => (
+                    <tr key={blog._id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4">
+                        <div className="flex items-start space-x-3">
+                          {blog.imageUrl && (
+                            <img
+                              src={blog.imageUrl}
+                              alt={blog.title}
+                              className="w-12 h-12 rounded-lg object-cover"
+                            />
+                          )}
+                          <div>
+                            <h3 className="text-sm font-medium text-gray-900 line-clamp-1">
+                              {blog.title}
+                            </h3>
+                            <p className="text-sm text-gray-500 line-clamp-2 mt-1">
+                              {blog.excerpt}
+                            </p>
+                            {blog.readingTime && (
+                              <p className="text-xs text-gray-400 mt-1">
+                                {blog.readingTime}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadge(blog.status)}`}>
+                          {blog.status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="text-sm text-gray-900">{blog.category}</span>
+                        {blog.tags && blog.tags.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mt-1">
+                            {blog.tags.slice(0, 2).map((tag, index) => (
+                              <span
+                                key={index}
+                                className="inline-flex items-center px-2 py-0.5 text-xs bg-gray-100 text-gray-600 rounded"
+                              >
+                                <Tag className="w-3 h-3 mr-1" />
+                                {tag}
+                              </span>
+                            ))}
+                            {blog.tags.length > 2 && (
+                              <span className="text-xs text-gray-400">
+                                +{blog.tags.length - 2} more
+                              </span>
+                            )}
+                          </div>
                         )}
-                      </div>
-                      
-                      <div className="flex items-center flex-wrap gap-1">
-                        <Tag className="h-4 w-4 mr-1" />
-                        {post.tags.slice(0, 3).map((tag, index) => (
-                          <span key={index} className="px-2 py-0.5 bg-gray-100 rounded-full text-xs">
-                            {tag}
-                          </span>
-                        ))}
-                        {post.tags.length > 3 && (
-                          <span className="text-xs text-gray-500">+{post.tags.length - 3} more</span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center">
+                          <User className="w-4 h-4 text-gray-400 mr-2" />
+                          <span className="text-sm text-gray-900">{blog.createdBy?.name || 'Unknown'}</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="text-sm text-gray-900">
+                          <Calendar className="w-4 h-4 inline mr-1" />
+                          {new Date(blog.createdAt).toLocaleDateString()}
+                        </div>
+                        {blog.publishDate && blog.status === 'scheduled' && (
+                          <div className="text-xs text-blue-600 mt-1">
+                            Scheduled: {new Date(blog.publishDate).toLocaleDateString()}
+                          </div>
                         )}
-                      </div>
-                    </div>
-
-                    {/* Actions */}
-                    <div className="flex flex-wrap gap-2 mt-4 justify-end">
-                      {post.status === 'published' && (
-                        <a 
-                          href={`/blogs/${post.slug}`} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center px-3 py-1.5 text-sm bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
-                        >
-                          <Eye className="h-4 w-4 mr-1.5" />
-                          View Post
-                          <ArrowUpRight className="h-3 w-3 ml-1" />
-                        </a>
-                      )}
-                      
-                      <Link href={`/cms-admin/dashboard/blogs/edit/${post.id}`}>
-                        <Button variant="outline" size="sm" className="flex items-center">
-                          <Edit className="h-4 w-4 mr-1.5" />
-                          Edit
-                        </Button>
-                      </Link>
-                      
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className={`flex items-center ${confirmDelete === post.id ? 'bg-red-500 text-white hover:bg-red-600' : 'text-red-500 hover:bg-red-50'}`}
-                        onClick={() => handleDelete(post.id)}
-                      >
-                        <Trash2 className="h-4 w-4 mr-1.5" />
-                        {confirmDelete === post.id ? 'Confirm' : 'Delete'}
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            ))
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center space-x-2">
+                          <Link
+                            href={`/blogs/${blog.slug}`}
+                            target="_blank"
+                            className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
+                            title="View Blog"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </Link>
+                          <Link
+                            href={`/cms-admin/dashboard/blogs/edit/${blog._id}`}
+                            className="p-1 text-gray-400 hover:text-green-600 transition-colors"
+                            title="Edit Blog"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Link>
+                          <button
+                            onClick={() => setConfirmDelete(blog._id)}
+                            className="p-1 text-gray-400 hover:text-red-600 transition-colors"
+                            title="Delete Blog"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
+
+        {/* Delete Confirmation Modal */}
+        {confirmDelete && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                Confirm Delete
+              </h3>
+              <p className="text-gray-600 mb-4">
+                Are you sure you want to delete this blog post? This action cannot be undone.
+              </p>
+              <div className="flex justify-end space-x-3">
+                <button
+                  onClick={() => setConfirmDelete(null)}
+                  className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    const blog = blogs.find(b => b._id === confirmDelete);
+                    if (blog) {
+                      handleDelete(confirmDelete, blog.title);
+                    }
+                  }}
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </>
-  )
+  );
 }

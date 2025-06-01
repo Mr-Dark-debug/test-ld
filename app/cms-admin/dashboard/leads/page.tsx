@@ -5,99 +5,29 @@ import { Toaster } from 'sonner'
 import { Search, Filter, Phone, Mail, Eye, Tag, Clock, Calendar, Building, Download, Globe, Users } from 'lucide-react'
 import Link from 'next/link'
 import AnimatedBackground from '@/components/ui/animated-tabs'
+import { useLeads, transformLeadForComponent } from '@/hooks/useLeads'
 
 export default function LeadsList() {
-  // Combined leads data for the main leads page
-  const leads = [
-    // Contact form leads
-    {
-      id: 1,
-      name: "Ravi Patel",
-      email: "ravi.patel@example.com",
-      phone: "+91 98765 43210",
-      project: "N/A",
-      status: "New",
-      source: "Contact Form",
-      date: "2024-05-15",
-    },
-    {
-      id: 2,
-      name: "Ananya Sharma",
-      email: "ananya.s@example.com",
-      phone: "+91 98765 12345",
-      project: "N/A",
-      status: "Contacted",
-      source: "Contact Form",
-      date: "2024-05-12",
-    },
-    // Brochure download leads
-    {
-      id: 3,
-      name: "Karan Mehra",
-      email: "karan.m@example.com",
-      phone: "+91 98765 87654",
-      project: "Skyline Towers",
-      status: "New",
-      source: "Brochure Download",
-      date: "2024-05-16",
-    },
-    {
-      id: 4,
-      name: "Neha Desai",
-      email: "neha.d@example.com",
-      phone: "+91 87654 76543",
-      project: "Green Valley",
-      status: "Contacted",
-      source: "Brochure Download",
-      date: "2024-05-14",
-    },
-    {
-      id: 5,
-      name: "Rahul Joshi",
-      email: "rahul.j@example.com",
-      phone: "+91 76543 65432",
-      project: "Skyline Towers",
-      status: "Qualified",
-      source: "Brochure Download",
-      date: "2024-05-12",
-    },
-    // Other leads
-    {
-      id: 6,
-      name: "John Smith",
-      email: "john.smith@example.com",
-      phone: "+1 (555) 123-4567",
-      project: "Skyline Towers",
-      status: "New",
-      source: "Website",
-      date: "2024-03-15",
-    },
-    {
-      id: 7,
-      name: "Sarah Johnson",
-      email: "sarah.j@example.com",
-      phone: "+1 (555) 987-6543",
-      project: "Green Valley",
-      status: "Contacted",
-      source: "Property Portal",
-      date: "2024-03-12",
-    },
-    {
-      id: 8,
-      name: "Michael Brown",
-      email: "m.brown@example.com",
-      phone: "+1 (555) 456-7890",
-      project: "Corporate Plaza",
-      status: "Qualified",
-      source: "Referral",
-      date: "2024-03-10",
-    },
-  ]
-
   const [sourceFilter, setSourceFilter] = useState<string>('all')
   const [statusFilter, setStatusFilter] = useState<string>('all')
-  const [projectFilter, setProjectFilter] = useState<string>('all')
   const [searchQuery, setSearchQuery] = useState<string>('')
+
+  // Fetch real leads data
+  const {
+    leads: leadsData,
+    loading,
+    error,
+    stats,
+    updateLeadStatus: updateStatus,
+    refetch
+  } = useLeads({
+    search: searchQuery || undefined,
+    type: sourceFilter === 'Contact Form' ? 'contact' : sourceFilter === 'Brochure Download' ? 'brochure' : undefined,
+    status: statusFilter !== 'all' ? statusFilter.toLowerCase() as any : undefined
+  });
+
+  // Transform leads for display
+  const leads = leadsData.map(transformLeadForComponent);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -133,35 +63,18 @@ export default function LeadsList() {
     }
   }
 
-  // Filter leads based on filters and search query
-  const filteredLeads = leads.filter(lead => {
-    const matchesSearch = searchQuery === '' || 
-      lead.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      lead.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      lead.project.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const matchesStatus = statusFilter === 'all' || lead.status === statusFilter;
-    const matchesProject = projectFilter === 'all' || lead.project === projectFilter;
-    const matchesSource = sourceFilter === 'all' || lead.source === sourceFilter;
-    
-    return matchesSearch && matchesStatus && matchesProject && matchesSource;
-  });
+  // Filter leads based on filters and search query (filtering is now handled by the API)
+  const filteredLeads = leads;
 
-  const projects = ['Skyline Towers', 'Green Valley', 'Corporate Plaza'];
-  const sources = ['Contact Form', 'Brochure Download', 'Website', 'Property Portal', 'Referral'];
-  
-  // Function to update lead status - in real implementation, this would call an API
-  const updateLeadStatus = (leadId: number, newStatus: string) => {
-    // This would connect to an API in a real implementation
-    console.log(`Updating lead ${leadId} to status: ${newStatus}`);
-    
-    // For demo purposes, update the leads array locally
-    const updatedLeads = leads.map(lead => 
-      lead.id === leadId ? { ...lead, status: newStatus } : lead
-    );
-    
-    // In a real app, you would update state here after API call success
-    alert(`Lead status updated to: ${newStatus}`);
+  // Function to update lead status
+  const updateLeadStatus = async (leadId: string, newStatus: string) => {
+    const result = await updateStatus(leadId, newStatus);
+    if (result.success) {
+      // Refresh the data
+      refetch();
+    } else {
+      alert(`Failed to update lead status: ${result.error}`);
+    }
   }
 
   return (
@@ -191,7 +104,7 @@ export default function LeadsList() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-500">Total Leads</p>
-                <p className="text-2xl font-semibold">{leads.length}</p>
+                <p className="text-2xl font-semibold">{loading ? '...' : stats.total}</p>
               </div>
               <div className="p-3 bg-blue-100 rounded-full">
                 <Users className="w-6 h-6 text-blue-600" />
@@ -202,7 +115,7 @@ export default function LeadsList() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-500">Contact Inquiries</p>
-                <p className="text-2xl font-semibold">{leads.filter(l => l.source === 'Contact Form').length}</p>
+                <p className="text-2xl font-semibold">{loading ? '...' : stats.contactInquiries}</p>
               </div>
               <div className="p-3 bg-green-100 rounded-full">
                 <Globe className="w-6 h-6 text-green-600" />
@@ -213,7 +126,7 @@ export default function LeadsList() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-500">Brochure Requests</p>
-                <p className="text-2xl font-semibold">{leads.filter(l => l.source === 'Brochure Download').length}</p>
+                <p className="text-2xl font-semibold">{loading ? '...' : stats.brochureRequests}</p>
               </div>
               <div className="p-3 bg-purple-100 rounded-full">
                 <Download className="w-6 h-6 text-purple-600" />
@@ -224,7 +137,7 @@ export default function LeadsList() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-500">New Today</p>
-                <p className="text-2xl font-semibold">5</p>
+                <p className="text-2xl font-semibold">{loading ? '...' : stats.newToday}</p>
               </div>
               <div className="p-3 bg-amber-100 rounded-full">
                 <Clock className="w-6 h-6 text-amber-600" />
@@ -280,7 +193,7 @@ export default function LeadsList() {
                   </button>
                 </AnimatedBackground>
               </div>
-              
+
               <div className="border rounded-lg overflow-hidden">
                 <AnimatedBackground
                   defaultValue={statusFilter}
@@ -352,7 +265,20 @@ export default function LeadsList() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {filteredLeads.map((lead) => (
+                {loading ? (
+                  <tr>
+                    <td colSpan={7} className="px-6 py-10 text-center text-gray-500">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                      Loading leads...
+                    </td>
+                  </tr>
+                ) : error ? (
+                  <tr>
+                    <td colSpan={7} className="px-6 py-10 text-center text-red-500">
+                      Error loading leads: {error}
+                    </td>
+                  </tr>
+                ) : filteredLeads.map((lead) => (
                   <tr key={lead.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">
@@ -393,7 +319,10 @@ export default function LeadsList() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center space-x-2">
-                        <button 
+                        <button
+                          type="button"
+                          title={`View details for ${lead.name}`}
+                          aria-label={`View details for ${lead.name}`}
                           className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
                           onClick={() => {
                             alert(`Viewing details for: ${lead.name}`)
@@ -401,7 +330,10 @@ export default function LeadsList() {
                         >
                           <Eye className="w-4 h-4" />
                         </button>
-                        <button 
+                        <button
+                          type="button"
+                          title={`Call ${lead.name}`}
+                          aria-label={`Call ${lead.name}`}
                           className="p-1 text-gray-400 hover:text-green-600 transition-colors"
                           onClick={() => {
                             window.open(`tel:${lead.phone}`, '_blank')
@@ -409,7 +341,10 @@ export default function LeadsList() {
                         >
                           <Phone className="w-4 h-4" />
                         </button>
-                        <button 
+                        <button
+                          type="button"
+                          title={`Email ${lead.name}`}
+                          aria-label={`Email ${lead.name}`}
                           className="p-1 text-gray-400 hover:text-purple-600 transition-colors"
                           onClick={() => {
                             window.open(`mailto:${lead.email}`, '_blank')
@@ -418,35 +353,45 @@ export default function LeadsList() {
                           <Mail className="w-4 h-4" />
                         </button>
                         <div className="relative group">
-                          <button className="p-1 text-gray-400 hover:text-amber-600 transition-colors">
+                          <button
+                            type="button"
+                            title={`Update status for ${lead.name}`}
+                            aria-label={`Update status for ${lead.name}`}
+                            className="p-1 text-gray-400 hover:text-amber-600 transition-colors"
+                          >
                             <Tag className="w-4 h-4" />
                           </button>
                           <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10 hidden group-hover:block">
-                            <button 
+                            <button
+                              type="button"
                               onClick={() => updateLeadStatus(lead.id, 'New')}
                               className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700"
                             >
                               Mark as New
                             </button>
-                            <button 
+                            <button
+                              type="button"
                               onClick={() => updateLeadStatus(lead.id, 'Contacted')}
                               className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700"
                             >
                               Mark as Contacted
                             </button>
-                            <button 
+                            <button
+                              type="button"
                               onClick={() => updateLeadStatus(lead.id, 'Qualified')}
                               className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-700"
                             >
                               Mark as Qualified
                             </button>
-                            <button 
+                            <button
+                              type="button"
                               onClick={() => updateLeadStatus(lead.id, 'Negotiation')}
                               className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-700"
                             >
                               Mark as In Negotiation
                             </button>
-                            <button 
+                            <button
+                              type="button"
                               onClick={() => updateLeadStatus(lead.id, 'Closed')}
                               className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700"
                             >

@@ -1,8 +1,10 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Eye, EyeOff, Building2, Lock, Mail } from 'lucide-react'
+import { toast } from 'sonner'
+import { useAuth } from '@/contexts/AuthContext'
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
@@ -11,15 +13,42 @@ export default function LoginPage() {
   const [rememberMe, setRememberMe] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
+  const { login, isAuthenticated, loading } = useAuth()
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated && !loading) {
+      router.push('/cms-admin/dashboard')
+    }
+  }, [isAuthenticated, loading, router])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
-    // Simulate login process
-    setTimeout(() => {
+
+    try {
+      const result = await login(email, password)
+
+      if (result.success) {
+        toast.success('Login successful! Redirecting to dashboard...')
+        router.push('/cms-admin/dashboard')
+      } else {
+        toast.error(result.error || 'Login failed. Please try again.')
+      }
+    } catch (error) {
+      toast.error('An unexpected error occurred. Please try again.')
+    } finally {
       setIsLoading(false)
-      router.push('/cms-admin/dashboard')
-    }, 1500)
+    }
+  }
+
+  // Show loading spinner while checking authentication
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-amber-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      </div>
+    )
   }
 
   return (
@@ -56,7 +85,7 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                  placeholder="admin@Laxmi Developer.com"
+                  placeholder="admin@laxmidev.com"
                   required
                 />
               </div>

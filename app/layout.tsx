@@ -7,6 +7,7 @@ import { ThemeProvider } from "@/lib/theme-context";
 import GlobalFloatingMenu from "@/components/layout/GlobalFloatingMenu";
 import { Toaster } from 'sonner';
 import { LoadingProvider } from '@/components/providers/loading-provider';
+import { AuthProvider } from "@/contexts/AuthContext";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const playfair = PlayfairDisplay({
@@ -34,13 +35,15 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} ${playfair.variable} ${montserrat.variable} font-sans antialiased flex flex-col min-h-screen`}>
         <ThemeProvider>
-          <LoadingProvider>
-            <Header />
-            <main className="flex-grow">{children}</main>
-            <Footer />
-            <GlobalFloatingMenu />
-            <Toaster richColors position="top-right" />
-          </LoadingProvider>
+          <AuthProvider>
+            <LoadingProvider>
+              <Header />
+              <main className="flex-grow">{children}</main>
+              <Footer />
+              <GlobalFloatingMenu />
+              <Toaster richColors position="top-right" />
+            </LoadingProvider>
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>
