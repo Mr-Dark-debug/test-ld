@@ -10,72 +10,33 @@ import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import Head from 'next/head';
-
-// Sample blog post data (move to a separate file or API in production)
-const allBlogPosts = [
-  {
-    id: 1,
-    slug: "the-future-of-sustainable-architecture-in-urban-development",
-    title: "The Future of Sustainable Architecture in Urban Development",
-    date: "October 26, 2023",
-    readingTime: "7 min read",
-    excerpt:
-      "Exploring innovative designs and materials that are shaping eco-friendly cityscapes...",
-    author: "AI Architect",
-    category: "Architecture",
-    imageUrl:
-      "https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80",
-    content: `
-## The Future of Sustainable Architecture in Urban Development
-
-As cities continue to expand, the need for sustainable architecture has never been more urgent. Urban environments face unique challenges—ranging from resource scarcity to pollution and the heat island effect. The future of architecture lies in innovative, eco-friendly solutions that not only minimize environmental impact but also enhance the quality of urban life.
-
-### Key Trends Shaping the Future
-
-- **Green Roofs & Living Walls:**  
-  Buildings are increasingly being designed with green roofs and living walls, which help regulate temperature, improve air quality, and provide habitats for urban wildlife.
-
-- **Smart Building Technology:**  
-  The integration of IoT devices and AI-driven systems allows buildings to optimize energy use, monitor air quality, and adapt to occupants' needs in real time.
-
-- **Sustainable Materials:**  
-  Architects are turning to recycled, renewable, and locally sourced materials. Innovations like cross-laminated timber and low-carbon concrete are reducing the carbon footprint of new construction.
-
-- **Water Conservation:**  
-  Rainwater harvesting, greywater recycling, and efficient plumbing systems are becoming standard features in sustainable urban buildings.
-
-### Case Study: The Eco-Tower
-
-One of the most exciting examples of sustainable urban architecture is the Eco-Tower, a high-rise that combines solar panels, wind turbines, and a rainwater collection system. Its façade is covered in vertical gardens, and its smart systems adjust lighting and HVAC based on occupancy and weather.
-
-![Sustainable Building Design](https://images.unsplash.com/photo-1487700160041-bab79e9cb66a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80)
-
-### The Human Element
-
-Sustainable architecture is not just about technology—it's about people. Designs that maximize natural light, provide access to green spaces, and encourage community interaction contribute to healthier, happier urban populations.
-
-> "Sustainable development is the pathway to the future we want for all. It offers a framework to generate economic growth, achieve social justice, seek environmental protection and strengthen governance."  
-> — Ban Ki-moon
-
-### Looking Ahead
-
-The future of sustainable architecture in urban development is bright. As technology advances and awareness grows, cities will become greener, smarter, and more livable. By embracing these trends, architects and developers can create urban spaces that are resilient, inclusive, and inspiring for generations to come.
-    `,
-  },
-  // Add more posts as needed
-];
+import { blogsApi } from '@/lib/api';
 
 interface BlogPost {
-  id: number;
-  slug: string;
+  _id: string;
   title: string;
-  date: string;
-  readingTime: string;
+  slug: string;
   excerpt: string;
-  author: string;
-  category: string;
-  imageUrl: string;
   content: string;
+  featuredImage?: string;
+  category: string;
+  tags: string[];
+  status: 'draft' | 'published' | 'scheduled';
+  publishedAt?: string;
+  scheduledFor?: string;
+  readingTime?: string;
+  author: {
+    _id: string;
+    name: string;
+    email: string;
+  };
+  seoMeta?: {
+    title?: string;
+    description?: string;
+    keywords?: string[];
+  };
+  createdAt: string;
+  updatedAt: string;
 }
 
 export default function BlogPostPage() {
@@ -85,18 +46,28 @@ export default function BlogPostPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!slug) {
-      setError("Invalid post URL");
-      return;
-    }
+    const fetchBlogPost = async () => {
+      if (!slug) {
+        setError("Invalid post URL");
+        return;
+      }
 
-    const foundPost = allBlogPosts.find((p) => p.slug === slug);
-    if (foundPost) {
-      setPost(foundPost);
-      setError(null);
-    } else {
-      setError("Post not found");
-    }
+      try {
+        setError(null);
+        const response = await blogsApi.getBySlug(slug);
+
+        if (response.success && response.data) {
+          setPost(response.data);
+        } else {
+          setError("Post not found");
+        }
+      } catch (err: any) {
+        console.error('Error fetching blog post:', err);
+        setError("Failed to load post");
+      }
+    };
+
+    fetchBlogPost();
   }, [slug]);
 
   const handleShare = useCallback(async () => {
@@ -173,7 +144,7 @@ export default function BlogPostPage() {
         <meta name="description" content={post.excerpt} />
         <meta property="og:title" content={post.title} />
         <meta property="og:description" content={post.excerpt} />
-        <meta property="og:image" content={post.imageUrl} />
+        <meta property="og:image" content={post.featuredImage || '/images/placeholder-project.jpg'} />
         <meta property="og:type" content="article" />
         <meta name="twitter:card" content="summary_large_image" />
       </Head>
@@ -181,7 +152,7 @@ export default function BlogPostPage() {
         <header
           className="relative py-24 md:py-40 bg-cover bg-center"
           style={{
-            backgroundImage: `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url(${post.imageUrl})`,
+            backgroundImage: `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url(${post.featuredImage || '/images/placeholder-project.jpg'})`,
           }}
         >
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
@@ -193,12 +164,17 @@ export default function BlogPostPage() {
             </AnimatedTitle>
             <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-sm text-gray-300 mb-8">
               <span className="flex items-center">
-                <User size={14} className="mr-1.5" aria-hidden="true" /> {post.author}
+                <User size={14} className="mr-1.5" aria-hidden="true" /> {post.author.name}
               </span>
               <span className="hidden sm:inline">|</span>
               <span className="flex items-center">
-                <Clock size={14} className="mr-1.5" aria-hidden="true" /> {post.date} (
-                {post.readingTime})
+                <Clock size={14} className="mr-1.5" aria-hidden="true" />
+                {new Date(post.publishedAt || post.createdAt).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+                })}
+                {post.readingTime && ` (${post.readingTime})`}
               </span>
               <span className="hidden sm:inline">|</span>
               <span className="flex items-center">
@@ -223,6 +199,7 @@ export default function BlogPostPage() {
               Back to Blogs
             </Link>
             <button
+              type="button"
               onClick={handleShare}
               className={cn(
                 "flex items-center gap-2 p-2.5 rounded-lg transition-all duration-300 ease-in-out text-sm font-medium",

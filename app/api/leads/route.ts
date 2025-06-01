@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Lead from '@/models/Lead';
 import { withAuth, withErrorHandling, withCors, AuthenticatedRequest } from '@/middleware/auth';
+import { logActivity } from '@/lib/activity';
 
 // GET /api/leads - Get all leads (admin only)
 async function getLeadsHandler(req: AuthenticatedRequest) {
@@ -18,19 +19,19 @@ async function getLeadsHandler(req: AuthenticatedRequest) {
 
     // Build query
     const query: any = {};
-    
+
     if (type && ['contact', 'brochure', 'career'].includes(type)) {
       query.type = type;
     }
-    
+
     if (status && ['new', 'contacted', 'qualified', 'converted', 'closed'].includes(status)) {
       query.status = status;
     }
-    
+
     if (assignedTo) {
       query.assignedTo = assignedTo;
     }
-    
+
     if (search) {
       query.$or = [
         { name: new RegExp(search, 'i') },
@@ -88,12 +89,96 @@ async function getLeadsHandler(req: AuthenticatedRequest) {
   }
 }
 
+// POST /api/leads - Create new lead
+async function createLeadHandler(req: AuthenticatedRequest) {
+  await connectDB();
+
+  try {
+    const body = await req.json();
+    const {
+      type,
+      name,
+      email,
+      phone,
+      projectId,
+      projectInterest,
+      message,
+      jobId,
+      experience,
+      resumeUrl,
+      source,
+      assignedTo
+    } = body;
+
+    // Validate required fields
+    if (!type || !name || !email || !phone) {
+      return NextResponse.json(
+        { error: 'Type, name, email, and phone are required' },
+        { status: 400 }
+      );
+    }
+
+    // Create new lead
+    const newLead = new Lead({
+      type,
+      name,
+      email,
+      phone,
+      projectId,
+      projectInterest,
+      message,
+      jobId,
+      experience,
+      resumeUrl,
+      source: source || 'website',
+      assignedTo,
+      status: 'new'
+    });
+
+    await newLead.save();
+
+    // Populate references for response
+    await newLead.populate('assignedTo', 'name email');
+    await newLead.populate('projectId', 'title slug');
+
+    // Log activity
+    await logActivity({
+      type: 'lead',
+      action: 'create',
+      title: `New lead created: ${name}`,
+      userId: req.user._id,
+      userName: req.user.name,
+      entityId: newLead._id.toString(),
+      entityType: 'lead'
+    });
+
+    return NextResponse.json({
+      success: true,
+      data: newLead,
+      message: 'Lead created successfully'
+    }, { status: 201 });
+
+  } catch (error) {
+    console.error('Create lead error:', error);
+    return NextResponse.json(
+      { error: 'Failed to create lead' },
+      { status: 500 }
+    );
+  }
+}
+
 // Route handlers
 export const GET = withMiddleware(
   withCors,
   withAuth,
   withErrorHandling
 )(getLeadsHandler);
+
+export const POST = withMiddleware(
+  withCors,
+  withAuth,
+  withErrorHandling
+)(createLeadHandler);
 
 // Helper function to combine middlewares
 function withMiddleware(...middlewares: Array<(handler: any) => any>) {

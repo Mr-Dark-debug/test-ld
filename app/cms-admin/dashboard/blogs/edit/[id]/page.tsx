@@ -592,6 +592,8 @@ export default function EditBlogPage() {
                           accept="image/*"
                           onChange={handleImageUpload}
                           className="hidden"
+                          aria-label="Upload cover image for blog post"
+                          title="Upload cover image for blog post"
                         />
                       </div>
                     </div>
@@ -604,6 +606,8 @@ export default function EditBlogPage() {
                         value={category}
                         onChange={(e) => setCategory(e.target.value)}
                         className="w-full rounded-md border border-gray-300 p-2 text-sm focus:ring-2 focus:ring-primary"
+                        aria-label="Select blog category"
+                        title="Select blog category"
                       >
                         <option value="" disabled>
                           Select a category

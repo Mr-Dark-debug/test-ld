@@ -12,7 +12,11 @@ interface ProjectDetailPageProps {
 async function getProject(slug: string) {
   try {
     // Construct the full URL for server-side requests
-    const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000';
+    const baseUrl = process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : process.env.NODE_ENV === 'development'
+        ? 'http://localhost:3001'
+        : 'http://localhost:3000';
 
     const response = await fetch(`${baseUrl}/api/projects/${slug}`, {
       cache: 'no-store' // Always fetch fresh data

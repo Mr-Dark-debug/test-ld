@@ -5,9 +5,26 @@ export interface IUser extends Document {
   email: string;
   password: string;
   name: string;
-  role: 'super_admin' | 'admin' | 'editor';
+  role: 'super_admin' | 'admin' | 'editor' | 'user';
+  phone?: string;
+  bio?: string;
+  profileImage?: string;
+  preferences?: {
+    theme?: 'light' | 'dark' | 'system';
+    language?: string;
+    timezone?: string;
+  };
+  notifications?: {
+    email?: boolean;
+    push?: boolean;
+    marketing?: boolean;
+  };
   isActive: boolean;
   lastLogin?: Date;
+  createdBy?: string;
+  deletedAt?: Date;
+  deletedBy?: string;
+  refreshToken?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -35,9 +52,52 @@ const UserSchema = new Schema<IUser>({
   },
   role: {
     type: String,
-    enum: ['super_admin', 'admin', 'editor'],
-    default: 'editor',
+    enum: ['super_admin', 'admin', 'editor', 'user'],
+    default: 'user',
     required: true
+  },
+  phone: {
+    type: String,
+    trim: true,
+    maxlength: [20, 'Phone number cannot exceed 20 characters']
+  },
+  bio: {
+    type: String,
+    trim: true,
+    maxlength: [500, 'Bio cannot exceed 500 characters']
+  },
+  profileImage: {
+    type: String,
+    trim: true
+  },
+  preferences: {
+    theme: {
+      type: String,
+      enum: ['light', 'dark', 'system'],
+      default: 'system'
+    },
+    language: {
+      type: String,
+      default: 'en'
+    },
+    timezone: {
+      type: String,
+      default: 'UTC'
+    }
+  },
+  notifications: {
+    email: {
+      type: Boolean,
+      default: true
+    },
+    push: {
+      type: Boolean,
+      default: true
+    },
+    marketing: {
+      type: Boolean,
+      default: false
+    }
   },
   isActive: {
     type: Boolean,
@@ -45,6 +105,20 @@ const UserSchema = new Schema<IUser>({
   },
   lastLogin: {
     type: Date
+  },
+  createdBy: {
+    type: Schema.Types.ObjectId,
+    ref: 'User'
+  },
+  deletedAt: {
+    type: Date
+  },
+  deletedBy: {
+    type: Schema.Types.ObjectId,
+    ref: 'User'
+  },
+  refreshToken: {
+    type: String
   }
 }, {
   timestamps: true,

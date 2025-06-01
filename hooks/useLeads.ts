@@ -85,17 +85,30 @@ export function useLeads(options: UseLeadsOptions = {}): UseLeadsReturn {
 
   const updateLeadStatus = async (leadId: string, status: string) => {
     try {
-      // This would be implemented when we add the update lead API endpoint
-      console.log(`Updating lead ${leadId} to status: ${status}`);
+      const response = await fetch(`/api/leads/${leadId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'status',
+          value: status.toLowerCase()
+        }),
+      });
 
-      // For now, update locally and refetch
-      setLeads(prevLeads =>
-        prevLeads.map(lead =>
-          lead._id === leadId ? { ...lead, status: status as any } : lead
-        )
-      );
+      const data = await response.json();
 
-      return { success: true };
+      if (data.success) {
+        // Update local state
+        setLeads(prevLeads =>
+          prevLeads.map(lead =>
+            lead._id === leadId ? { ...lead, status: status.toLowerCase() as any } : lead
+          )
+        );
+        return { success: true };
+      } else {
+        return { success: false, error: data.error || 'Failed to update lead status' };
+      }
     } catch (err: any) {
       return { success: false, error: err.message || 'Failed to update lead status' };
     }

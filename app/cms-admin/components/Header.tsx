@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { Menu, Bell, Search, User, LogOut, Settings } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { toast } from 'sonner'
+import { UserProfile } from './UserProfile'
 
 interface HeaderProps {
   onMenuClick: () => void
@@ -12,6 +13,7 @@ interface HeaderProps {
 export function Header({ onMenuClick }: HeaderProps) {
   const { user, logout } = useAuth()
   const [showProfileMenu, setShowProfileMenu] = useState(false)
+  const [showUserProfile, setShowUserProfile] = useState(false)
 
   const handleLogout = async () => {
     try {
@@ -98,10 +100,14 @@ export function Header({ onMenuClick }: HeaderProps) {
                 </div>
                 <button
                   type="button"
+                  onClick={() => {
+                    setShowUserProfile(true);
+                    setShowProfileMenu(false);
+                  }}
                   className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
                 >
                   <Settings className="w-4 h-4" />
-                  <span>Settings</span>
+                  <span>Profile Settings</span>
                 </button>
                 <button
                   type="button"
@@ -116,6 +122,12 @@ export function Header({ onMenuClick }: HeaderProps) {
           </div>
         </div>
       </div>
+
+      {/* User Profile Modal */}
+      <UserProfile
+        isOpen={showUserProfile}
+        onClose={() => setShowUserProfile(false)}
+      />
     </header>
   )
 }

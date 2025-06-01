@@ -12,6 +12,11 @@ async function getProjectHandler(req: NextRequest, { params }: { params: Promise
   try {
     const { slug } = await params;
 
+    // Ensure Amenity model is registered
+    if (!Amenity) {
+      console.error('Amenity model not found');
+    }
+
     const project = await Project.findOne({ slug })
       .populate('amenities', 'name icon category description')
       .populate('createdBy', 'name email')

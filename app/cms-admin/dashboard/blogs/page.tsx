@@ -93,7 +93,7 @@ export default function BlogsList() {
 
       if (response.success) {
         toast.success('Blog post deleted successfully');
-        
+
         // Log activity
         if (user) {
           await logActivity({
@@ -182,6 +182,8 @@ export default function BlogsList() {
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
               className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              aria-label="Filter blogs by status"
+              title="Filter blogs by status"
             >
               <option value="all">All Status</option>
               <option value="published">Published</option>
@@ -194,6 +196,8 @@ export default function BlogsList() {
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
               className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              aria-label="Filter blogs by category"
+              title="Filter blogs by category"
             >
               <option value="all">All Categories</option>
               <option value="Architecture">Architecture</option>
