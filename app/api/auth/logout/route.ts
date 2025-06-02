@@ -34,6 +34,14 @@ async function logoutHandler(req: NextRequest) {
   }
 }
 
+function withMiddleware(...middlewares: Array<(handler: any) => any>) {
+  return (handler: any) =>
+    middlewares.reduceRight(
+      (prevHandler, middleware) => middleware(prevHandler),
+      handler
+    );
+}
+
 // Apply middlewares
 export const POST = withMiddleware(
   withCors,
