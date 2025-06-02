@@ -7,6 +7,7 @@ import { AmenitiesFeatures } from "@/components/AmenitiesFeatures";
 import { motion, AnimatePresence, useAnimation, useInView } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { ChevronLeftIcon, ChevronRightIcon, MapPin, ExternalLink, XIcon, QrCodeIcon } from "lucide-react";
+import { toast } from 'sonner';
 
 const NAVY_BLUE_BACKGROUND = "bg-[#324189]/80";
 const NAVY_BLUE_BACKGROUND_HOVER = "bg-[#324189]/90";
@@ -35,6 +36,8 @@ interface ProjectDetailsProps {
   brochureUrl?: string;
   contactPhone?: string;
   reraNumber?: string;
+  mapEmbedUrl?: string;
+  reraQrImage?: string;
 }
 
 export default function ProjectDetails({
@@ -50,6 +53,8 @@ export default function ProjectDetails({
   brochureUrl,
   contactPhone,
   reraNumber,
+  mapEmbedUrl,
+  reraQrImage,
 }: ProjectDetailsProps) {
   const [currentSlide, setCurrentSlide] = useState(0); // 0 for image, 1 for 3D view
   const [isLoading3D, setIsLoading3D] = useState(false);
@@ -261,7 +266,7 @@ export default function ProjectDetails({
                 >
                   <div className="aspect-video">
                     <iframe
-                      src={getMapEmbedUrl(location)}
+                      src={mapEmbedUrl || getMapEmbedUrl(location)}
                       width="100%"
                       height="100%"
                       style={{ border: 0 }}
@@ -285,8 +290,15 @@ export default function ProjectDetails({
 
               {reraNumber && (
                 <div className="mb-4 mt-2 text-xs sm:text-sm text-foreground/60">
-                  <button 
-                    onClick={() => setShowReraQrPopup(true)}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (!reraNumber.trim() || !reraQrImage) {
+                        toast.error('No RERA QR code available for this project');
+                        return;
+                      }
+                      setShowReraQrPopup(true);
+                    }}
                     className="bg-muted/50 dark:bg-gray-800/30 p-2.5 rounded-md inline-flex items-center hover:bg-muted dark:hover:bg-gray-800/60 transition-colors group"
                     aria-label="Show RERA QR Code"
                   >
@@ -392,13 +404,19 @@ export default function ProjectDetails({
                 <h3 className="text-lg sm:text-xl font-display mb-1 text-foreground dark:text-white">RERA Information</h3>
                 <p className="text-xs sm:text-sm text-foreground/70 dark:text-gray-300/80 mb-4">Scan the QR code or view details: <span className="font-semibold">{reraNumber}</span></p>
                 <div className="bg-white p-3 rounded-md inline-block shadow-inner">
-                  <Image
-                    src={getReraQrCodeUrl(reraNumber)}
-                    alt={`RERA QR Code for ${reraNumber}`}
-                    width={180}
-                    height={180}
-                    className="rounded"
-                  />
+                  {reraQrImage ? (
+                    <Image
+                      src={reraQrImage}
+                      alt={`RERA QR Code for ${reraNumber}`}
+                      width={180}
+                      height={180}
+                      className="rounded"
+                    />
+                  ) : (
+                    <div className="w-[180px] h-[180px] bg-gray-100 rounded flex items-center justify-center">
+                      <p className="text-gray-500 text-sm text-center">No QR Code<br />Available</p>
+                    </div>
+                  )}
                 </div>
                 {/* Optional: Add a link to official RERA website if available */}
                 {/* <a href={`YOUR_RERA_VERIFICATION_URL_PREFIX/${reraNumber}`} target="_blank" rel="noopener noreferrer" className="text-sm text-highlight hover:underline mt-4 block">Verify on RERA Portal</a> */}

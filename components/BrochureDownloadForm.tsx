@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ShimmerButton } from "@/components/magicui/shimmer-button";
+import { toast } from 'sonner';
 import {
   Card,
   CardContent,
@@ -44,6 +45,10 @@ export function BrochureDownloadForm({ projectName, brochureUrl }: BrochureDownl
   };
 
   const handleDownload = () => {
+    if (!brochureUrl || !brochureUrl.trim()) {
+      toast.error('No brochure available for this project');
+      return;
+    }
     // Open the brochure in a new tab or trigger download
     window.open(brochureUrl, "_blank");
   };

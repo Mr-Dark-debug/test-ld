@@ -32,17 +32,18 @@ export const createProjectSchema = Joi.object({
     coordinates: Joi.object({
       lat: Joi.number().min(-90).max(90).required(),
       lng: Joi.number().min(-180).max(180).required()
-    }).required()
+    }).required(),
+    mapEmbedUrl: Joi.string().uri().allow('').optional()
   }).required(),
   specifications: Joi.object({
-    totalUnits: Joi.string().required(),
-    unitTypes: Joi.string().required(),
-    unitArea: Joi.string().required(),
-    possession: Joi.string().required(),
-    structure: Joi.string().required(),
-    flooring: Joi.string().required()
+    totalUnits: Joi.string().allow('').default('0'),
+    unitTypes: Joi.string().allow('').default('N/A'),
+    unitArea: Joi.string().allow('').default('N/A'),
+    possession: Joi.string().allow('').default('TBD'),
+    structure: Joi.string().allow('').default('N/A'),
+    flooring: Joi.string().allow('').default('N/A')
   }).required(),
-  reraNumber: Joi.string().required(),
+  reraNumber: Joi.string().allow('').default(''),
   contactSales: Joi.string().required(),
   amenities: Joi.array().items(Joi.string().hex().length(24)).default([]),
   featured: Joi.boolean().default(false),
@@ -54,9 +55,40 @@ export const createProjectSchema = Joi.object({
 });
 
 export const updateProjectSchema = createProjectSchema.fork(
-  ['title', 'type', 'status', 'description', 'location', 'specifications', 'reraNumber', 'contactSales'],
+  ['title', 'type', 'status', 'description', 'location', 'specifications', 'reraNumber', 'contactSales', 'amenities', 'featured'],
   (schema) => schema.optional()
 );
+
+// Schema for partial project updates (like featured toggle)
+export const partialUpdateProjectSchema = Joi.object({
+  id: Joi.string().required(),
+  title: Joi.string().min(2).max(100).optional(),
+  type: Joi.string().valid('residential', 'commercial').optional(),
+  status: Joi.string().valid('upcoming', 'ongoing', 'completed').optional(),
+  description: Joi.string().min(10).max(1000).optional(),
+  location: Joi.object({
+    address: Joi.string().optional(),
+    city: Joi.string().optional(),
+    state: Joi.string().optional(),
+    coordinates: Joi.object({
+      lat: Joi.number().min(-90).max(90).optional(),
+      lng: Joi.number().min(-180).max(180).optional()
+    }).optional(),
+    mapEmbedUrl: Joi.string().uri().allow('').optional()
+  }).optional(),
+  specifications: Joi.object({
+    totalUnits: Joi.string().allow('').optional(),
+    unitTypes: Joi.string().allow('').optional(),
+    unitArea: Joi.string().allow('').optional(),
+    possession: Joi.string().allow('').optional(),
+    structure: Joi.string().allow('').optional(),
+    flooring: Joi.string().allow('').optional()
+  }).optional(),
+  reraNumber: Joi.string().allow('').optional(),
+  contactSales: Joi.string().optional(),
+  amenities: Joi.array().items(Joi.string()).optional(),
+  featured: Joi.boolean().optional()
+});
 
 // Amenity validation schemas
 export const createAmenitySchema = Joi.object({

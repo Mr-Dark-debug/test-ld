@@ -19,6 +19,7 @@ interface Project {
       lat: number;
       lng: number;
     };
+    mapEmbedUrl?: string;
   };
   images: {
     coverImage?: string;
@@ -82,7 +83,7 @@ export default function ProjectDetailClient({ project }: ProjectDetailClientProp
     location: `${project.location.address}, ${project.location.city}, ${project.location.state}`,
     status: project.status,
     type: project.type,
-    imageSrc: project.images.coverImage || project.images.gallery.promotional[0] || '/images/placeholder-project.jpg',
+    imageSrc: project.images.coverImage || project.images.gallery.promotional[0] || project.images.gallery.exterior[0] || project.images.gallery.interior[0] || '/images/placeholder-project.jpg',
     specifications: [
       { name: 'Total Units', value: project.specifications.totalUnits },
       { name: 'Unit Types', value: project.specifications.unitTypes },
@@ -99,6 +100,8 @@ export default function ProjectDetailClient({ project }: ProjectDetailClientProp
     brochureUrl: project.brochureUrl,
     contactPhone: project.contactSales,
     reraNumber: project.reraNumber,
+    mapEmbedUrl: project.location.mapEmbedUrl,
+    reraQrImage: project.reraQrImage,
   };
 
   // Transform images to match TabGallery format
@@ -167,6 +170,8 @@ export default function ProjectDetailClient({ project }: ProjectDetailClientProp
         brochureUrl={transformedProject.brochureUrl}
         contactPhone={transformedProject.contactPhone}
         reraNumber={transformedProject.reraNumber}
+        mapEmbedUrl={transformedProject.mapEmbedUrl}
+        reraQrImage={transformedProject.reraQrImage}
       />
 
       {/* Project Gallery with Tabs */}

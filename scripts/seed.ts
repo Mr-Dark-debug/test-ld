@@ -48,20 +48,87 @@ const defaultUsers = [
   }
 ];
 
-// Default amenities
+// Comprehensive amenities list (50+ options)
 const defaultAmenities = [
-  { name: '24/7 Security', icon: 'security', category: 'security', description: 'Round the clock security services' },
-  { name: 'Swimming Pool', icon: 'pool', category: 'recreation', description: 'Modern swimming pool facility' },
-  { name: 'Fitness Center', icon: 'fitness', category: 'recreation', description: 'Fully equipped gymnasium' },
-  { name: 'Garden Area', icon: 'garden', category: 'landscape', description: 'Beautiful landscaped gardens' },
-  { name: 'Parking Space', icon: 'parking', category: 'utilities', description: 'Dedicated parking spaces' },
-  { name: 'Children\'s Play Area', icon: 'playground', category: 'recreation', description: 'Safe play area for children' },
-  { name: 'Club House', icon: 'clubhouse', category: 'recreation', description: 'Community clubhouse facility' },
-  { name: 'Elevator', icon: 'elevator', category: 'utilities', description: 'High-speed elevators' },
-  { name: 'WiFi', icon: 'wifi', category: 'utilities', description: 'High-speed internet connectivity' },
-  { name: 'Power Backup', icon: 'power', category: 'utilities', description: '24/7 power backup' },
-  { name: 'Water Supply', icon: 'water', category: 'utilities', description: '24/7 water supply' },
-  { name: 'CCTV Surveillance', icon: 'cctv', category: 'security', description: 'Complete CCTV coverage' }
+  // Security & Safety
+  { name: '24/7 Security', icon: 'Shield', category: 'security', description: 'Round the clock security services' },
+  { name: 'CCTV Surveillance', icon: 'Camera', category: 'security', description: 'Complete CCTV monitoring system' },
+  { name: 'Intercom System', icon: 'Phone', category: 'security', description: 'Video door phone system' },
+  { name: 'Fire Safety System', icon: 'Flame', category: 'security', description: 'Advanced fire detection and safety' },
+  { name: 'Emergency Exit', icon: 'DoorOpen', category: 'security', description: 'Emergency evacuation routes' },
+  { name: 'Security Guard', icon: 'UserCheck', category: 'security', description: 'Professional security personnel' },
+
+  // Recreation & Entertainment
+  { name: 'Swimming Pool', icon: 'Waves', category: 'recreation', description: 'Modern swimming pool facility' },
+  { name: 'Fitness Center', icon: 'Dumbbell', category: 'recreation', description: 'Fully equipped gymnasium' },
+  { name: 'Children\'s Play Area', icon: 'Baby', category: 'recreation', description: 'Safe play area for children' },
+  { name: 'Club House', icon: 'Home', category: 'recreation', description: 'Community clubhouse facility' },
+  { name: 'Indoor Games Room', icon: 'Gamepad2', category: 'recreation', description: 'Indoor gaming and entertainment' },
+  { name: 'Outdoor Sports Court', icon: 'Trophy', category: 'recreation', description: 'Basketball/Tennis court' },
+  { name: 'Jogging Track', icon: 'Activity', category: 'recreation', description: 'Dedicated jogging and walking track' },
+  { name: 'Yoga/Meditation Area', icon: 'Heart', category: 'recreation', description: 'Peaceful yoga and meditation space' },
+  { name: 'Party Hall', icon: 'PartyPopper', category: 'recreation', description: 'Community party and event hall' },
+  { name: 'Library', icon: 'BookOpen', category: 'recreation', description: 'Community library and reading room' },
+
+  // Landscape & Environment
+  { name: 'Garden Area', icon: 'Trees', category: 'landscape', description: 'Beautiful landscaped gardens' },
+  { name: 'Terrace Garden', icon: 'Flower', category: 'landscape', description: 'Rooftop terrace garden' },
+  { name: 'Water Features', icon: 'Droplets', category: 'landscape', description: 'Decorative water fountains' },
+  { name: 'Outdoor Seating', icon: 'Armchair', category: 'landscape', description: 'Garden seating areas' },
+  { name: 'Walking Paths', icon: 'Route', category: 'landscape', description: 'Landscaped walking pathways' },
+
+  // Utilities & Infrastructure
+  { name: 'Parking Space', icon: 'Car', category: 'utilities', description: 'Dedicated parking spaces' },
+  { name: 'Elevator', icon: 'ArrowUpDown', category: 'utilities', description: 'High-speed elevators' },
+  { name: 'Power Backup', icon: 'Zap', category: 'utilities', description: '100% power backup facility' },
+  { name: 'Water Supply', icon: 'Droplet', category: 'utilities', description: '24/7 water supply system' },
+  { name: 'Waste Management', icon: 'Trash2', category: 'utilities', description: 'Modern waste disposal system' },
+  { name: 'Rainwater Harvesting', icon: 'CloudRain', category: 'utilities', description: 'Eco-friendly water conservation' },
+  { name: 'Solar Panels', icon: 'Sun', category: 'utilities', description: 'Solar energy system' },
+  { name: 'Maintenance Service', icon: 'Wrench', category: 'utilities', description: 'Professional maintenance services' },
+
+  // Technology & Connectivity
+  { name: 'High-Speed Internet', icon: 'Wifi', category: 'technology', description: 'High-speed WiFi connectivity' },
+  { name: 'Smart Home Features', icon: 'Smartphone', category: 'technology', description: 'IoT enabled smart home systems' },
+  { name: 'Cable TV Ready', icon: 'Tv', category: 'technology', description: 'Cable TV infrastructure' },
+  { name: 'Home Automation', icon: 'Settings', category: 'technology', description: 'Automated lighting and controls' },
+
+  // Convenience & Services
+  { name: 'Concierge Service', icon: 'Bell', category: 'convenience', description: 'Professional concierge assistance' },
+  { name: 'Housekeeping', icon: 'Sparkles', category: 'convenience', description: 'Professional cleaning services' },
+  { name: 'Laundry Service', icon: 'Shirt', category: 'convenience', description: 'On-site laundry facilities' },
+  { name: 'ATM/Banking', icon: 'CreditCard', category: 'convenience', description: 'ATM and banking services' },
+  { name: 'Shopping Center', icon: 'ShoppingBag', category: 'convenience', description: 'On-site retail shops' },
+  { name: 'Medical Center', icon: 'Cross', category: 'convenience', description: 'Medical clinic and pharmacy' },
+
+  // Dining & Food
+  { name: 'Restaurant', icon: 'UtensilsCrossed', category: 'dining', description: 'On-site restaurant facility' },
+  { name: 'Cafeteria', icon: 'Coffee', category: 'dining', description: 'Community cafeteria' },
+  { name: 'Food Court', icon: 'ChefHat', category: 'dining', description: 'Multi-cuisine food court' },
+  { name: 'Banquet Hall', icon: 'Utensils', category: 'dining', description: 'Event banquet facilities' },
+
+  // Wellness & Health
+  { name: 'Spa & Wellness', icon: 'Sparkle', category: 'wellness', description: 'Spa and wellness center' },
+  { name: 'Sauna', icon: 'Thermometer', category: 'wellness', description: 'Sauna and steam room' },
+  { name: 'Massage Room', icon: 'Hand', category: 'wellness', description: 'Professional massage services' },
+  { name: 'Pharmacy', icon: 'Pill', category: 'wellness', description: 'On-site pharmacy' },
+
+  // Business & Work
+  { name: 'Business Center', icon: 'Building', category: 'business', description: 'Professional business facilities' },
+  { name: 'Conference Room', icon: 'Users', category: 'business', description: 'Meeting and conference rooms' },
+  { name: 'Co-working Space', icon: 'Laptop', category: 'business', description: 'Shared working spaces' },
+
+  // Transportation
+  { name: 'Shuttle Service', icon: 'Bus', category: 'transportation', description: 'Complimentary shuttle service' },
+  { name: 'Valet Parking', icon: 'KeyRound', category: 'transportation', description: 'Valet parking service' },
+  { name: 'EV Charging Station', icon: 'BatteryCharging', category: 'transportation', description: 'Electric vehicle charging' },
+
+  // Additional Amenities
+  { name: 'Guest Rooms', icon: 'Bed', category: 'convenience', description: 'Guest accommodation facility' },
+  { name: 'Pet Area', icon: 'Dog', category: 'recreation', description: 'Dedicated pet play area' },
+  { name: 'Amphitheater', icon: 'Theater', category: 'recreation', description: 'Outdoor amphitheater' },
+  { name: 'Mini Theater', icon: 'Film', category: 'recreation', description: 'Private movie screening room' },
+  { name: 'Art Gallery', icon: 'Palette', category: 'recreation', description: 'Community art exhibition space' }
 ];
 
 // Default testimonials

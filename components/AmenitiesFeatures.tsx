@@ -8,6 +8,7 @@ import { useTheme } from "@/lib/theme-context";
 import { enhancedIconMap } from "@/components/ui/EnhancedAmenityIcons";
 import { BrochureDownloadForm } from "@/components/BrochureDownloadForm";
 import { HelpCircle } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface AmenityProps {
   icon: React.ReactNode;
@@ -118,7 +119,14 @@ export function AmenitiesFeatures({ amenities, projectName = "Project", brochure
                     Contact Us
                   </button>
                   <button
-                    onClick={() => setShowBrochureForm(true)}
+                    type="button"
+                    onClick={() => {
+                      if (!brochureUrl || !brochureUrl.trim()) {
+                        toast.error('No brochure available for this project');
+                        return;
+                      }
+                      setShowBrochureForm(true);
+                    }}
                     className="w-full py-3 font-medium border border-highlight hover:bg-highlight/10 text-foreground rounded-md transition-all duration-300 flex justify-center items-center hover:shadow-md"
                   >
                     Download Brochure

@@ -59,7 +59,9 @@ export default function ProjectsList() {
   // Handle featured toggle
   const handleToggleFeatured = async (id, currentFeatured) => {
     try {
-      const response = await projectsApi.update(id, { featured: !currentFeatured });
+      // Use the main projects API with PUT method and ID in body
+      const response = await projectsApi.updateFeatured(id, !currentFeatured);
+
       if (response.success) {
         toast.success(`Project ${!currentFeatured ? 'added to' : 'removed from'} featured`);
         refetch(); // Refresh the data

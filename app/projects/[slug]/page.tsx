@@ -16,7 +16,7 @@ async function getProject(slug: string) {
       ? `https://${process.env.VERCEL_URL}`
       : process.env.NODE_ENV === 'development'
         ? 'http://localhost:3000'
-        : 'http://localhost:3000';
+        : 'http://localhost:3001';
 
     const response = await fetch(`${baseUrl}/api/projects/${slug}`, {
       cache: 'no-store' // Always fetch fresh data

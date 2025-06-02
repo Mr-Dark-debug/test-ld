@@ -15,6 +15,7 @@ export interface IProject extends Document {
       lat: number;
       lng: number;
     };
+    mapEmbedUrl?: string;
   };
   images: {
     coverImage?: string;
@@ -115,6 +116,10 @@ const ProjectSchema = new Schema<IProject>({
         min: [-180, 'Longitude must be between -180 and 180'],
         max: [180, 'Longitude must be between -180 and 180']
       }
+    },
+    mapEmbedUrl: {
+      type: String,
+      trim: true
     }
   },
   images: {

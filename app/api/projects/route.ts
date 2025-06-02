@@ -4,7 +4,7 @@ import Project from '@/models/Project';
 import Amenity from '@/models/Amenity';
 import User from '@/models/User';
 import { withAuth, withErrorHandling, withCors, AuthenticatedRequest, withOptionalAuth } from '@/middleware/auth';
-import { validateRequest, createProjectSchema } from '@/lib/validation';
+import { validateRequest, createProjectSchema, partialUpdateProjectSchema } from '@/lib/validation';
 
 // GET /api/projects - Get all projects with optional filtering
 async function getProjectsHandler(req: AuthenticatedRequest) {
@@ -96,8 +96,16 @@ async function createProjectHandler(req: AuthenticatedRequest) {
       );
     }
 
+    // Ensure validation.value is not undefined before spreading
+    if (!validation.value || typeof validation.value !== 'object') {
+      return NextResponse.json(
+        { error: 'Invalid project data structure' },
+        { status: 400 }
+      );
+    }
+
     const projectData = {
-      ...validation.value,
+      ...validation.value as object,
       createdBy: req.user!.userId
     };
 
@@ -126,6 +134,80 @@ async function createProjectHandler(req: AuthenticatedRequest) {
   }
 }
 
+// PUT /api/projects - Update project (admin only)
+async function updateProjectHandler(req: AuthenticatedRequest) {
+  await connectDB();
+
+  try {
+    const body = await req.json();
+    const { id, ...updateData } = body;
+
+    if (!id) {
+      return NextResponse.json(
+        { error: 'Project ID is required' },
+        { status: 400 }
+      );
+    }
+
+    // Validate request body using partial update schema
+    const validation = validateRequest(body, partialUpdateProjectSchema);
+    if (validation.error) {
+      return NextResponse.json(
+        { error: validation.error },
+        { status: 400 }
+      );
+    }
+
+    // Ensure validation.value is not undefined before spreading
+    if (!validation.value || typeof validation.value !== 'object') {
+      return NextResponse.json(
+        { error: 'Invalid project data structure' },
+        { status: 400 }
+      );
+    }
+
+    // Extract id from validated data and use the rest for update
+    const { id: validatedId, ...updateFields } = validation.value;
+
+    const project = await Project.findByIdAndUpdate(
+      id,
+      {
+        ...updateFields,
+        updatedAt: new Date()
+      },
+      { new: true, runValidators: false } // Disable mongoose validation since we already validated
+    );
+
+    if (!project) {
+      return NextResponse.json(
+        { error: 'Project not found' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: 'Project updated successfully',
+      data: project
+    });
+
+  } catch (error) {
+    console.error('Update project error:', error);
+
+    if (error instanceof Error && error.message.includes('duplicate key')) {
+      return NextResponse.json(
+        { error: 'A project with this title already exists' },
+        { status: 409 }
+      );
+    }
+
+    return NextResponse.json(
+      { error: 'Failed to update project' },
+      { status: 500 }
+    );
+  }
+}
+
 // Route handlers
 export const GET = withMiddleware(
   withCors,
@@ -138,6 +220,12 @@ export const POST = withMiddleware(
   withAuth,
   withErrorHandling
 )(createProjectHandler);
+
+export const PUT = withMiddleware(
+  withCors,
+  withAuth,
+  withErrorHandling
+)(updateProjectHandler);
 
 // Helper function to combine middlewares
 function withMiddleware(...middlewares: Array<(handler: any) => any>) {

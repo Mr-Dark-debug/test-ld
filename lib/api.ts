@@ -163,6 +163,13 @@ export const projectsApi = {
     });
   },
 
+  updateFeatured: async (id: string, featured: boolean) => {
+    return apiRequest<any>('/projects', {
+      method: 'PUT',
+      body: JSON.stringify({ id, featured }),
+    });
+  },
+
   delete: async (id: string) => {
     return apiRequest(`/projects/${id}`, {
       method: 'DELETE',
