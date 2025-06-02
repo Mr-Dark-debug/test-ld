@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { enhancedIconMap } from "@/components/ui/EnhancedAmenityIcons";
+import { IconSelector } from './IconSelector'
 
 interface FileObject {
   id: string;
@@ -76,7 +77,8 @@ interface AddEditProjectFormProps {
 export function AddEditProjectForm({ projectId, onClose }: AddEditProjectFormProps) {
   const isEditing = Boolean(projectId);
   const [showAddAmenityModal, setShowAddAmenityModal] = useState(false);
-  const [newAmenityName, setNewAmenityName] = useState("");
+  const [newAmenityName, setNewAmenityName] = useState('');
+  const [newAmenityIcon, setNewAmenityIcon] = useState('Home');
 
   const [availableAmenities, setAvailableAmenities] = useState([
     { id: 1, title: 'Swimming Pool' },
@@ -265,11 +267,13 @@ export function AddEditProjectForm({ projectId, onClose }: AddEditProjectFormPro
     const newAmenity = {
       id: Date.now(),
       title: newAmenityName.trim(),
+      icon: newAmenityIcon
     };
     setAvailableAmenities(prev => [...prev, newAmenity]);
     toast.success(`Amenity "${newAmenity.title}" added to available list.`);
     setShowAddAmenityModal(false);
     setNewAmenityName("");
+    setNewAmenityIcon("Home");
   };
 
   const [activeFloorPlanTab, setActiveFloorPlanTab] = useState<string>('3bhk');
@@ -631,12 +635,14 @@ export function AddEditProjectForm({ projectId, onClose }: AddEditProjectFormPro
                     className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
-                {/* Placeholder for Icon Selection UI */}
+                {/* Icon Selection UI */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Icon (Placeholder)</label>
-                  <div className="mt-1 p-3 border border-gray-300 rounded-lg text-center text-gray-400">
-                    Icon selection UI will go here.
-                  </div>
+                  <label className="block text-sm font-medium text-gray-700">Icon</label>
+                  <IconSelector
+                    value={newAmenityIcon}
+                    onChange={setNewAmenityIcon}
+                    className="mt-1"
+                  />
                 </div>
               </div>
               <div className="mt-6 flex justify-end space-x-3">
@@ -663,90 +669,91 @@ export function AddEditProjectForm({ projectId, onClose }: AddEditProjectFormPro
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
           <div className="p-6">
              <h2 className="text-lg font-semibold text-gray-900 mb-4">Project Gallery & Floor Plans</h2>
-            <div className="space-y-6 mb-8">
+            <div className="space-y-6">
               <h3 className="text-base font-semibold text-gray-800 mb-1">Gallery Images</h3>
-              {[ 
-                { category: 'promotional', title: 'Promotional Images' },
-                { category: 'exterior', title: 'Exterior Images' },
-                { category: 'interior', title: 'Interior Images' },
-              ].map(galleryType => (
-                <div key={galleryType.category}>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">{galleryType.title}</label>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                    {(formData.gallery[galleryType.category as keyof FormData['gallery']] as FileObject[]).map((image) => (
-                      <div key={image.id} className="relative group aspect-square">
-                        <img src={image.url} alt={galleryType.title} className="h-full w-full object-cover rounded-lg shadow-sm"/>
-                        <button type="button" onClick={() => handleRemoveFile('gallery', image.id, galleryType.category)} className="absolute top-1.5 right-1.5 p-1 bg-red-500 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600">
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    ))}
-                    <label htmlFor={`gallery-${galleryType.category}-upload`} className="cursor-pointer aspect-square border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center text-gray-400 hover:bg-gray-50 hover:border-blue-400 transition-colors">
-                      <Plus className="w-6 h-6 mb-1" />
-                      <span className="text-xs text-center">Add Image(s)</span>
-                      <input id={`gallery-${galleryType.category}-upload`} type="file" className="sr-only" accept="image/*" multiple onChange={(e) => handleFileUpload('gallery', e.target.files, galleryType.category)} />
-                    </label>
-                  </div>
-                </div>
-              ))}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Videos</label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                   {(formData.gallery.videos as FileObject[]).map((video) => (
-                    <div key={video.id} className="relative group aspect-video bg-gray-100 rounded-lg flex flex-col items-center justify-center p-2 shadow-sm text-center">
-                      <svg className="w-8 h-8 text-gray-500 mb-1.5" fill="currentColor" viewBox="0 0 20 20"><path d="M6.5 5.5L13.5 10l-7 4.5v-9z" /></svg>
-                      <p className="text-xs font-medium text-gray-700 truncate w-full px-1">{video.name}</p>
-                      <button type="button" onClick={() => handleRemoveFile('gallery', video.id, 'videos')} className="absolute top-1.5 right-1.5 p-1 bg-red-500 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600">
-                         <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  ))}
-                  <label htmlFor="gallery-videos-upload" className="cursor-pointer aspect-video border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center text-gray-400 hover:bg-gray-50 hover:border-blue-400 transition-colors">
-                    <Plus className="w-6 h-6 mb-1" />
-                    <span className="text-xs">Add Video(s)</span>
-                    <input id="gallery-videos-upload" type="file" className="sr-only" accept="video/*" multiple onChange={(e) => handleFileUpload('gallery', e.target.files, 'videos')} />
-                  </label>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <h3 className="text-base font-semibold text-gray-800 mb-3 pt-4 border-t border-gray-200">Floor Plans</h3>
-              <div className="border-b border-gray-200 mb-4">
-                <nav className="-mb-px flex space-x-6 overflow-x-auto">
-                  {floorPlanTypes.map(type => (
-                     <button key={type} type="button" onClick={() => setActiveFloorPlanTab(type)} className={`whitespace-nowrap pb-3 px-1 border-b-2 font-medium text-sm transition-colors ${activeFloorPlanTab === type ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}>
-                      {type.toUpperCase()} Plans
-                    </button>
-                  ))}
-                </nav>
-              </div>
-
-              {floorPlanTypes.map(type => (
-                <div key={type} className={activeFloorPlanTab === type ? 'block' : 'hidden'}>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">{type.toUpperCase()} Floor Plans</label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {(formData.floorPlans[type] || []).map((plan) => (
-                      <div key={plan.id} className="relative group aspect-[4/3]">
-                        <img src={plan.url} alt={`${type.toUpperCase()} Floor Plan - ${plan.name}`} className="h-full w-full object-contain bg-gray-50 rounded-lg border border-gray-200 shadow-sm"/>
-                        <div className="absolute inset-x-0 bottom-0 bg-white/80 backdrop-blur-sm p-1.5 border-t border-gray-200 text-center">
-                          <p className="text-xs font-medium text-gray-800 truncate">{plan.name}</p>
+              <div className="flex flex-col space-y-6">
+                {[ 
+                  { category: 'promotional', title: 'Promotional Images' },
+                  { category: 'exterior', title: 'Exterior Images' },
+                  { category: 'interior', title: 'Interior Images' },
+                ].map(galleryType => (
+                  <div key={galleryType.category}>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{galleryType.title}</label>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                      {(formData.gallery[galleryType.category as keyof FormData['gallery']] as FileObject[]).map((image) => (
+                        <div key={image.id} className="relative group aspect-square">
+                          <img src={image.url} alt={galleryType.title} className="h-full w-full object-cover rounded-lg shadow-sm"/>
+                          <button type="button" onClick={() => handleRemoveFile('gallery', image.id, galleryType.category)} className="absolute top-1.5 right-1.5 p-1 bg-red-500 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600">
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
                         </div>
-                        <button type="button" onClick={() => handleRemoveFile('floorPlans', plan.id, type)} className="absolute top-1.5 right-1.5 p-1 bg-red-500 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600">
-                          <Trash2 className="w-3.5 h-3.5" />
+                      ))}
+                      <label htmlFor={`gallery-${galleryType.category}-upload`} className="cursor-pointer aspect-square border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center text-gray-400 hover:bg-gray-50 hover:border-blue-400 transition-colors">
+                        <Plus className="w-6 h-6 mb-1" />
+                        <span className="text-xs text-center">Add Image(s)</span>
+                        <input id={`gallery-${galleryType.category}-upload`} type="file" className="sr-only" accept="image/*" multiple onChange={(e) => handleFileUpload('gallery', e.target.files, galleryType.category)} />
+                      </label>
+                    </div>
+                  </div>
+                ))}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Videos</label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                     {(formData.gallery.videos as FileObject[]).map((video) => (
+                      <div key={video.id} className="relative group aspect-video bg-gray-100 rounded-lg flex flex-col items-center justify-center p-2 shadow-sm text-center">
+                        <svg className="w-8 h-8 text-gray-500 mb-1.5" fill="currentColor" viewBox="0 0 20 20"><path d="M6.5 5.5L13.5 10l-7 4.5v-9z" /></svg>
+                        <p className="text-xs font-medium text-gray-700 truncate w-full px-1">{video.name}</p>
+                        <button type="button" onClick={() => handleRemoveFile('gallery', video.id, 'videos')} className="absolute top-1.5 right-1.5 p-1 bg-red-500 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600">
+                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       </div>
                     ))}
-                    <label htmlFor={`floorPlans-${type}-upload`} className="cursor-pointer aspect-[4/3] border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center text-gray-400 hover:bg-gray-50 hover:border-blue-400 transition-colors">
+                    <label htmlFor="gallery-videos-upload" className="cursor-pointer aspect-video border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center text-gray-400 hover:bg-gray-50 hover:border-blue-400 transition-colors">
                       <Plus className="w-6 h-6 mb-1" />
-                      <span className="text-xs text-center">Add {type.toUpperCase()} Plan(s)</span>
-                      <input id={`floorPlans-${type}-upload`} type="file" className="sr-only" accept="image/*" multiple onChange={(e) => handleFileUpload('floorPlans', e.target.files, type)} />
+                      <span className="text-xs">Add Video(s)</span>
+                      <input id="gallery-videos-upload" type="file" className="sr-only" accept="video/*" multiple onChange={(e) => handleFileUpload('gallery', e.target.files, 'videos')} />
                     </label>
                   </div>
                 </div>
-              ))}
-            </div>
+              </div>
 
+              <div className="pt-6 border-t border-gray-200">
+                <h3 className="text-base font-semibold text-gray-800 mb-3">Floor Plans</h3>
+                <div className="border-b border-gray-200 mb-4">
+                  <nav className="-mb-px flex space-x-6 overflow-x-auto">
+                    {floorPlanTypes.map(type => (
+                       <button key={type} type="button" onClick={() => setActiveFloorPlanTab(type)} className={`whitespace-nowrap pb-3 px-1 border-b-2 font-medium text-sm transition-colors ${activeFloorPlanTab === type ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}>
+                        {type.toUpperCase()} Plans
+                      </button>
+                    ))}
+                  </nav>
+                </div>
+
+                {floorPlanTypes.map(type => (
+                  <div key={type} className={activeFloorPlanTab === type ? 'block' : 'hidden'}>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{type.toUpperCase()} Floor Plans</label>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                      {(formData.floorPlans[type] || []).map((plan) => (
+                        <div key={plan.id} className="relative group aspect-[4/3]">
+                          <img src={plan.url} alt={`${type.toUpperCase()} Floor Plan - ${plan.name}`} className="h-full w-full object-contain bg-gray-50 rounded-lg border border-gray-200 shadow-sm"/>
+                          <div className="absolute inset-x-0 bottom-0 bg-white/80 backdrop-blur-sm p-1.5 border-t border-gray-200 text-center">
+                            <p className="text-xs font-medium text-gray-800 truncate">{plan.name}</p>
+                          </div>
+                          <button type="button" onClick={() => handleRemoveFile('floorPlans', plan.id, type)} className="absolute top-1.5 right-1.5 p-1 bg-red-500 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600">
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      ))}
+                      <label htmlFor={`floorPlans-${type}-upload`} className="cursor-pointer aspect-[4/3] border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center text-gray-400 hover:bg-gray-50 hover:border-blue-400 transition-colors">
+                        <Plus className="w-6 h-6 mb-1" />
+                        <span className="text-xs text-center">Add {type.toUpperCase()} Plan(s)</span>
+                        <input id={`floorPlans-${type}-upload`} type="file" className="sr-only" accept="image/*" multiple onChange={(e) => handleFileUpload('floorPlans', e.target.files, type)} />
+                      </label>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
 

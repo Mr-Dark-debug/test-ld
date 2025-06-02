@@ -10,8 +10,8 @@ import { GridPattern } from "@/components/magicui/grid-pattern";
 import Image from "next/image";
 import { AboutUsContent, defaultAboutUsContent } from "../cms-admin/models/aboutUs";
 
-// Define the navy blue theme color
-const THEME_COLOR_HEX = "#324189";
+// Add a custom class to your tailwind config if needed, or use existing Tailwind color classes
+// For now, we'll use text-blue-800 which is close to the navy blue color
 
 export default function AboutUsPage() {
   const [content, setContent] = useState<AboutUsContent>(defaultAboutUsContent);
@@ -66,7 +66,7 @@ export default function AboutUsPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 z-10 max-w-5xl">
           <div className="text-center mb-8">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-4 font-display">
-              Brick by Brick <span style={{ color: THEME_COLOR_HEX }}>Building Excellence</span>
+              Brick by Brick <span className="text-blue-800 dark:text-blue-600">Building Excellence</span>
             </h1>
             <p className="text-lg text-foreground/80 dark:text-gray-300 mt-4">
               {content.heroSection.description}
@@ -134,21 +134,10 @@ export default function AboutUsPage() {
           />
         </div>
         {/* Enhanced dot pattern with better visibility */}
-        <div className="absolute inset-0 -z-10 pointer-events-none bg-repeat"
-             style={{
-               backgroundImage: 'radial-gradient(circle, currentColor 1px, transparent 1px)',
-               backgroundSize: '24px 24px',
-               opacity: 0.03,
-             }}>
+        <div className="absolute inset-0 -z-10 pointer-events-none bg-repeat bg-dot-pattern opacity-[0.03]">
         </div>
         {/* Additional diagonal dot pattern for more texture */}
-        <div className="absolute inset-0 -z-10 pointer-events-none bg-repeat"
-             style={{
-               backgroundImage: 'radial-gradient(circle, currentColor 0.8px, transparent 0.8px)',
-               backgroundSize: '16px 16px',
-               opacity: 0.02,
-               transform: 'rotate(15deg)'
-             }}>
+        <div className="absolute inset-0 -z-10 pointer-events-none bg-repeat bg-dot-pattern-diagonal opacity-[0.02] rotate-15">
         </div>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10 md:mb-16">
@@ -178,11 +167,7 @@ export default function AboutUsPage() {
                   className="bg-card/80 dark:bg-[#121212]/90 backdrop-blur-sm p-8 rounded-xl shadow-lg border border-accent/10 dark:border-blue-400/20 hover:border-accent/30 dark:hover:border-blue-400/40 transition-all duration-300 group hover:transform hover:scale-105 relative overflow-hidden"
                 >
                   {/* Subtle dot pattern background for each card */}
-                  <div className="absolute inset-0 pointer-events-none opacity-[0.015] dark:opacity-[0.02]"
-                       style={{
-                         backgroundImage: 'radial-gradient(circle, currentColor 0.7px, transparent 0.7px)',
-                         backgroundSize: '12px 12px',
-                       }}>
+                  <div className="absolute inset-0 pointer-events-none opacity-[0.015] dark:opacity-[0.02] bg-dot-pattern-small">
                   </div>
                   
                   <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-accent/10 dark:bg-blue-900/30 mb-4 group-hover:bg-accent/20 dark:group-hover:bg-blue-900/50 transition-colors">

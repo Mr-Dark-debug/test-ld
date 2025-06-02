@@ -117,13 +117,13 @@ export function LeadChart() {
     }
     
     // Filter leads by date range
-    const filteredLeads = allLeads.filter(lead => {
+    const filteredLeads = allLeads.filter((lead: any) => {
       const leadDate = new Date(lead.createdAt);
       return leadDate >= startDate && leadDate <= endDate;
     });
     
     // Count conversions (closed deals)
-    const conversions = filteredLeads.filter(lead => lead.status === 'closed').length;
+    const conversions = filteredLeads.filter((lead: any) => lead.status === 'closed').length;
     
     // Group leads by month/week depending on timeframe
     const groupedData = [];
@@ -159,13 +159,13 @@ export function LeadChart() {
       }
       
       // Filter leads for this period
-      const periodLeads = filteredLeads.filter(lead => {
+      const periodLeads = filteredLeads.filter((lead: any) => {
         const leadDate = new Date(lead.createdAt);
         return leadDate >= periodStartDate && leadDate <= periodEndDate;
       });
       
       // Count conversions for this period
-      const periodConversions = periodLeads.filter(lead => lead.status === 'closed').length;
+      const periodConversions = periodLeads.filter((lead: any) => lead.status === 'closed').length;
       
       // Format label based on period type
       let label;
@@ -197,7 +197,7 @@ export function LeadChart() {
   }, [timeframe]);
   
   const maxLeads = Math.max(...leadData.map((d) => d.leads), 1);
-  const trend = totalStats.totalLeads > 0 ? 'up' : 'neutral';
+  const trend: 'up' | 'down' | 'neutral' = totalStats.totalLeads > 0 ? 'up' : 'neutral';
   
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -249,10 +249,7 @@ export function LeadChart() {
           >
             <div className="w-full flex flex-col items-center space-y-1 relative">
               <div
-                className="w-full bg-blue-500 rounded-t-sm group-hover:bg-blue-600 transition-all duration-200"
-                style={{
-                  height: `${Math.max((data.leads / maxLeads) * 200, 2)}px`,
-                }}
+                className={`w-full bg-blue-500 rounded-t-sm group-hover:bg-blue-600 transition-all duration-200 h-[${Math.max((data.leads / maxLeads) * 200, 2)}px]`}
               >
                 {/* Tooltip */}
                 <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-gray-800 text-white text-xs rounded py-1 px-2 min-w-[80px] text-center pointer-events-none">
@@ -261,10 +258,7 @@ export function LeadChart() {
               </div>
               
               <div
-                className="w-full bg-green-500 rounded-t-sm group-hover:bg-green-600 transition-all duration-200"
-                style={{
-                  height: `${Math.max((data.conversions / maxLeads) * 200, data.conversions > 0 ? 2 : 0)}px`,
-                }}
+                className={`w-full bg-green-500 rounded-t-sm group-hover:bg-green-600 transition-all duration-200 ${data.conversions > 0 ? `h-[${Math.max((data.conversions / maxLeads) * 200, 2)}px]` : 'h-0'}`}
               >
                 {/* Tooltip */}
                 {data.conversions > 0 && (
@@ -311,9 +305,9 @@ export function LeadChart() {
                 <ChevronUp className="w-4 h-4" />
               </span>
             )}
-            {trend === 'down' && (
-              <span className="ml-1 text-red-500">
-                <ChevronDown className="w-4 h-4" />
+            {trend === 'neutral' && (
+              <span className="ml-1 text-gray-500">
+                <ChevronUp className="w-4 h-4" />
               </span>
             )}
           </div>
