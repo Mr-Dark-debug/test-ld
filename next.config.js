@@ -18,10 +18,6 @@ const nextConfig = {
       },
     ],
   },
-  // Ensure we're using the App Router only
-  experimental: {
-    appDir: true,
-  },
-}
+};
 
-module.exports = nextConfig 
+module.exports = nextConfig;
