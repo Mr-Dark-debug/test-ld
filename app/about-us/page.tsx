@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import CtaBanner from "@/components/sections/CtaBanner";
-import AnimatedTitle from "@/components/ui/AnimatedTitle";
 import ScrollReveal from "@/components/reactbits/ScrollReveal/ScrollReveal";
 import { TestimonialCarouselDemo } from "@/components/ui/testimonial-carousel-demo";
 import { Award, Eye, Zap } from "lucide-react";
