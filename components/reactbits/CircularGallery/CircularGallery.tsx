@@ -48,21 +48,44 @@ function createTextTexture(
   const context = canvas.getContext("2d");
   if (!context) throw new Error("Could not get 2d context");
 
+  // Handle multi-line text
+  const lines = text.split('\n');
   context.font = font;
-  const metrics = context.measureText(text);
-  const textWidth = Math.ceil(metrics.width);
+
+  // Calculate dimensions for all lines
+  let maxWidth = 0;
+  const lineMetrics = lines.map(line => {
+    const metrics = context.measureText(line);
+    const width = Math.ceil(metrics.width);
+    maxWidth = Math.max(maxWidth, width);
+    return { width, line };
+  });
+
   const fontSize = getFontSize(font);
-  const textHeight = Math.ceil(fontSize * 1.2);
+  const lineHeight = Math.ceil(fontSize * 1.3);
+  const totalHeight = lineHeight * lines.length;
 
-  canvas.width = textWidth + 20;
-  canvas.height = textHeight + 20;
+  canvas.width = maxWidth + 40; // More padding for better visibility
+  canvas.height = totalHeight + 40;
 
+  // Clear and set up context again (canvas resize resets context)
   context.font = font;
   context.fillStyle = color;
   context.textBaseline = "middle";
   context.textAlign = "center";
   context.clearRect(0, 0, canvas.width, canvas.height);
-  context.fillText(text, canvas.width / 2, canvas.height / 2);
+
+  // Add text shadow for better visibility
+  context.shadowColor = color === "#ffffff" ? "rgba(0,0,0,0.8)" : "rgba(255,255,255,0.8)";
+  context.shadowBlur = 3;
+  context.shadowOffsetX = 1;
+  context.shadowOffsetY = 1;
+
+  // Draw each line
+  lines.forEach((line, index) => {
+    const y = canvas.height / 2 + (index - (lines.length - 1) / 2) * lineHeight;
+    context.fillText(line, canvas.width / 2, y);
+  });
 
   const texture = new Texture(gl, { generateMipmaps: false });
   texture.image = canvas;
@@ -92,7 +115,7 @@ class Title {
     plane,
     renderer,
     text,
-    textColor = "#545050",
+    textColor = "#ffffff",
     font = "30px sans-serif",
   }: TitleProps) {
     autoBind(this);
@@ -772,7 +795,7 @@ export default function CircularGallery({
   // Fallback rendering when WebGL is not supported
   if (webGLSupported === false) {
     return (
-      <div className="w-full h-full overflow-x-auto py-8 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-900">
+      <div className="w-full h-full overflow-x-auto py-8 bg-gray-900 dark:bg-gray-900">
         <div className="flex gap-6 px-4 min-w-max">
           {galleryItems.map((item, index) => (
             <div 
@@ -809,14 +832,14 @@ export default function CircularGallery({
   // Show loading state while checking WebGL support
   if (webGLSupported === null) {
     return (
-      <div className="w-full h-full flex items-center justify-center bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-900" style={{ minHeight: "500px" }}>
+      <div className="w-full h-full flex items-center justify-center bg-gray-900 dark:bg-gray-900" style={{ minHeight: "500px" }}>
         <div className="text-lg font-medium text-gray-700 dark:text-gray-300">Loading gallery...</div>
       </div>
     );
   }
 
   return (
-    <div className="relative w-full bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-900 py-10">
+    <div className="relative w-full bg-gray-900 dark:bg-gray-900 py-10">
       <div
         className="w-full overflow-hidden cursor-grab active:cursor-grabbing"
         ref={containerRef}

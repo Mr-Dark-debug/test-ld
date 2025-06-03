@@ -361,6 +361,15 @@ export function AddEditProjectForm({ projectId, onClose }: AddEditProjectFormPro
           },
           mapEmbedUrl: formData.location.mapEmbedUrl.trim() || ''
         },
+        images: {
+          coverImage: formData.coverImage || '',
+          gallery: {
+            promotional: formData.gallery.promotional.map(item => item.url).filter(Boolean),
+            exterior: formData.gallery.exterior.map(item => item.url).filter(Boolean),
+            interior: formData.gallery.interior.map(item => item.url).filter(Boolean),
+            videos: formData.gallery.videos.map(item => item.url).filter(Boolean)
+          }
+        },
         specifications: {
           totalUnits: formData.specifications.totalUnits || '0',
           unitTypes: formData.specifications.unitTypes || 'N/A',
@@ -369,7 +378,16 @@ export function AddEditProjectForm({ projectId, onClose }: AddEditProjectFormPro
           structure: formData.specifications.structure || 'N/A',
           flooring: formData.specifications.flooring || 'N/A'
         },
+        floorPlans: {
+          '1bhk': [],
+          '2bhk': [],
+          '3bhk': formData.floorPlans['3bhk'].map(item => item.url).filter(Boolean),
+          '4bhk': formData.floorPlans['4bhk'].map(item => item.url).filter(Boolean),
+          '5bhk': formData.floorPlans['5bhk'].map(item => item.url).filter(Boolean)
+        },
         reraNumber: formData.reraNumber.trim() || '',
+        reraQrImage: formData.reraQrImage || '',
+        brochureUrl: formData.brochureUrl || '',
         contactSales: formData.contactSales.trim(),
         amenities: formData.amenities,
         featured: formData.featured

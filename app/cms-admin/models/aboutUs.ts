@@ -25,6 +25,17 @@ export interface AboutUsContent {
       description: string
     }[]
   }
+  achievementsSection: {
+    sectionTagline: string
+    sectionTitle: string
+    sectionDescription: string
+    achievements: {
+      title: string
+      description: string
+      image: string
+      year: string
+    }[]
+  }
   portfolioSection: {
     tagline: string
     title: string
@@ -83,6 +94,19 @@ export const defaultAboutUsContent: AboutUsContent = {
       {
         title: 'Our Values',
         description: 'Integrity, excellence, customer focus, innovation, sustainability, and community engagement form our foundation.'
+      }
+    ]
+  },
+  achievementsSection: {
+    sectionTagline: 'Our Recognition',
+    sectionTitle: 'Awards & Achievements',
+    sectionDescription: 'Recognition for our commitment to excellence and innovation in real estate development',
+    achievements: [
+      {
+        title: 'Best Developer Award 2023',
+        description: 'Recognized for outstanding contribution to residential development in Surat',
+        image: '/images/awards/award-1.jpg',
+        year: '2023'
       }
     ]
   },

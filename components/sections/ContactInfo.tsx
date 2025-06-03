@@ -122,8 +122,12 @@ export default function ContactInfo({
                   Your message has been sent successfully. We will get back to you shortly.
                 </p>
                 <button
+                  type="button"
                   className="mt-6 text-highlight underline"
-                  onClick={() => setFormSubmitted(false)}
+                  onClick={() => {
+                    trackButtonClick('send_another_message', 'contact_form');
+                    setFormSubmitted(false);
+                  }}
                 >
                   Send another message
                 </button>

@@ -181,6 +181,54 @@ export default function AboutUsPage() {
         </div>
       </section>
 
+      {/* Achievements Section */}
+      <section className="py-12 md:py-20 bg-muted/30 dark:bg-gray-900/50 relative overflow-hidden">
+        <div className="absolute inset-0 -z-10 pointer-events-none bg-repeat bg-dot-pattern-diagonal opacity-[0.02] rotate-15">
+        </div>
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-10 md:mb-16">
+            <div className="flex justify-center mb-4">
+              <div className="border border-accent/20 py-1 px-4 rounded-lg text-accent dark:text-blue-400 dark:border-blue-400/30">
+                {content.achievementsSection.sectionTagline}
+              </div>
+            </div>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-display mb-4 text-center break-words hyphens-auto leading-tight">
+              {content.achievementsSection.sectionTitle}
+            </h2>
+            <p className="text-base md:text-lg text-foreground/70 dark:text-gray-300 max-w-2xl mx-auto">
+              {content.achievementsSection.sectionDescription}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            {content.achievementsSection.achievements.map((achievement, index) => (
+              <ScrollReveal key={index}>
+                <div className="bg-card dark:bg-gray-800/50 rounded-lg p-6 shadow-lg hover:shadow-xl transition-all duration-300 group border border-border/50 dark:border-gray-700/50">
+                  <div className="relative mb-4 overflow-hidden rounded-lg">
+                    <Image
+                      src={achievement.image}
+                      alt={achievement.title}
+                      width={400}
+                      height={250}
+                      className="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                    <div className="absolute top-3 right-3 bg-accent/90 dark:bg-blue-600/90 text-white px-2 py-1 rounded-md text-sm font-medium">
+                      {achievement.year}
+                    </div>
+                  </div>
+                  <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-accent dark:group-hover:text-blue-400 transition-colors">
+                    {achievement.title}
+                  </h3>
+                  <p className="text-sm md:text-base text-foreground/70 dark:text-gray-300">
+                    {achievement.description}
+                  </p>
+                </div>
+              </ScrollReveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Portfolio Section with Image Grid */}
       <section className="py-16 md:py-24 bg-background dark:bg-black relative">
         <div className="absolute inset-0 -z-10 pointer-events-none">

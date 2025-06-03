@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/Button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Loader2, Save, Upload, Image as ImageIcon, Menu, ChevronLeft, ChevronRight, X } from 'lucide-react'
+import { Loader2, Save, Upload, Image as ImageIcon, Menu, ChevronLeft, ChevronRight, X, Plus, Trash2 } from 'lucide-react'
 
 interface AboutUsContent {
   heroSection: {
@@ -30,6 +30,17 @@ interface AboutUsContent {
     items: {
       title: string
       description: string
+    }[]
+  }
+  achievementsSection: {
+    sectionTagline: string
+    sectionTitle: string
+    sectionDescription: string
+    achievements: {
+      title: string
+      description: string
+      image: string
+      year: string
     }[]
   }
   portfolioSection: {
@@ -92,6 +103,19 @@ const defaultContent: AboutUsContent = {
       }
     ]
   },
+  achievementsSection: {
+    sectionTagline: 'Our Recognition',
+    sectionTitle: 'Awards & Achievements',
+    sectionDescription: 'Recognition for our commitment to excellence and innovation in real estate development',
+    achievements: [
+      {
+        title: 'Best Developer Award 2023',
+        description: 'Recognized for outstanding contribution to residential development in Surat',
+        image: '/images/awards/award-1.jpg',
+        year: '2023'
+      }
+    ]
+  },
   portfolioSection: {
     tagline: 'Our Portfolio',
     title: 'Our Landmark Projects',
@@ -140,6 +164,7 @@ export default function AboutUsPage() {
     { id: 'hero', label: 'Hero Section' },
     { id: 'company', label: 'Company Section' },
     { id: 'mission', label: 'Mission & Values' },
+    { id: 'achievements', label: 'Achievements' },
     { id: 'portfolio', label: 'Portfolio' },
     { id: 'cta', label: 'CTA Section' }
   ]
@@ -323,14 +348,20 @@ export default function AboutUsPage() {
           >
             Company Section
           </TabsTrigger>
-          <TabsTrigger 
-            value="mission" 
+          <TabsTrigger
+            value="mission"
             className="px-4 py-2 min-w-[120px] text-center rounded-t-md"
           >
             Mission & Values
           </TabsTrigger>
-          <TabsTrigger 
-            value="portfolio" 
+          <TabsTrigger
+            value="achievements"
+            className="px-4 py-2 min-w-[120px] text-center rounded-t-md"
+          >
+            Achievements
+          </TabsTrigger>
+          <TabsTrigger
+            value="portfolio"
             className="px-4 py-2 min-w-[120px] text-center rounded-t-md"
           >
             Portfolio
@@ -609,7 +640,163 @@ export default function AboutUsPage() {
             </div>
           </Card>
         </TabsContent>
-        
+
+        {/* Achievements Tab */}
+        <TabsContent value="achievements" className="space-y-4">
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold mb-4">Achievements Section</h2>
+
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Section Tagline</label>
+                  <Input
+                    value={content.achievementsSection.sectionTagline}
+                    onChange={(e) => handleInputChange('achievementsSection', 'sectionTagline', e.target.value)}
+                    placeholder="Enter section tagline"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-1">Section Title</label>
+                  <Input
+                    value={content.achievementsSection.sectionTitle}
+                    onChange={(e) => handleInputChange('achievementsSection', 'sectionTitle', e.target.value)}
+                    placeholder="Enter section title"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-1">Section Description</label>
+                  <Input
+                    value={content.achievementsSection.sectionDescription}
+                    onChange={(e) => handleInputChange('achievementsSection', 'sectionDescription', e.target.value)}
+                    placeholder="Enter section description"
+                  />
+                </div>
+              </div>
+
+              <div className="border-t pt-4">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-medium">Awards & Achievements</h3>
+                  <Button
+                    onClick={() => {
+                      const newAchievement = {
+                        title: '',
+                        description: '',
+                        image: '',
+                        year: new Date().getFullYear().toString()
+                      };
+                      setContent(prev => ({
+                        ...prev,
+                        achievementsSection: {
+                          ...prev.achievementsSection,
+                          achievements: [...prev.achievementsSection.achievements, newAchievement]
+                        }
+                      }));
+                    }}
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add Achievement
+                  </Button>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  {content.achievementsSection.achievements.map((achievement, index) => (
+                    <Card key={index} className="p-4">
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center">
+                          <h4 className="font-medium">Achievement {index + 1}</h4>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setContent(prev => ({
+                                ...prev,
+                                achievementsSection: {
+                                  ...prev.achievementsSection,
+                                  achievements: prev.achievementsSection.achievements.filter((_, i) => i !== index)
+                                }
+                              }));
+                            }}
+                            className="text-red-600 hover:text-red-700"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium mb-1">Achievement Image</label>
+                          <div className="border-2 border-dashed border-gray-300 rounded-lg p-2 h-40 flex flex-col items-center justify-center">
+                            {achievement.image ? (
+                              <div className="relative w-full h-full">
+                                <img
+                                  src={achievement.image}
+                                  alt={achievement.title}
+                                  className="w-full h-full object-cover rounded-lg"
+                                />
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="absolute bottom-2 right-2 bg-white text-xs p-1 sm:p-2"
+                                  onClick={() => handleArrayItemChange('achievementsSection', 'achievements', index, 'image', '')}
+                                >
+                                  Change
+                                </Button>
+                              </div>
+                            ) : (
+                              <div className="text-center">
+                                <ImageIcon className="w-8 h-8 mx-auto text-gray-400" />
+                                <p className="mt-1 text-xs text-gray-500">Upload award image</p>
+                                <Button variant="outline" size="sm" className="mt-2 text-xs p-1 sm:p-2 w-full sm:w-auto">
+                                  <Upload className="w-3 h-3 mr-1" />
+                                  Upload
+                                </Button>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-sm font-medium mb-1">Achievement Title</label>
+                            <Input
+                              value={achievement.title}
+                              onChange={(e) => handleArrayItemChange('achievementsSection', 'achievements', index, 'title', e.target.value)}
+                              placeholder="Enter achievement title"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-medium mb-1">Year</label>
+                            <Input
+                              value={achievement.year}
+                              onChange={(e) => handleArrayItemChange('achievementsSection', 'achievements', index, 'year', e.target.value)}
+                              placeholder="Enter year"
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium mb-1">Description</label>
+                          <textarea
+                            value={achievement.description}
+                            onChange={(e) => handleArrayItemChange('achievementsSection', 'achievements', index, 'description', e.target.value)}
+                            placeholder="Enter achievement description"
+                            className="w-full p-2 border border-gray-300 rounded-md"
+                            rows={3}
+                          />
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </Card>
+        </TabsContent>
+
         {/* Portfolio Tab */}
         <TabsContent value="portfolio" className="space-y-4">
           <Card className="p-6">
