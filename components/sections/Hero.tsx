@@ -10,11 +10,11 @@ const EXCELLENCE_COLOR_HEX = "#FFBF00"; // Amber/Gold for excellence
 
 // Property items for the TiltedCards - now 5 items
 const propertyItems = [
-  { imageSrc: "/images/hero/hero-1.jpg", alt: "Horizon, Greece", title: "Horizon, Greece" },
-  { imageSrc: "/images/projects/Aleta.jpg", alt: "Sunset Ridge Villa, USA", title: "Sunset Ridge Villa, USA" },
-  { imageSrc: "/images/projects/Millennium Park.jpg", alt: "Willowbrook Home, Oregon", title: "Willowbrook Home, Oregon" },
-  { imageSrc: "/images/projects/Laxmi Nova.jpg", alt: "Whispering Pines, Canada", title: "Whispering Pines, Canada" },
-  { imageSrc: "/images/projects/Alexa.jpg", alt: "Alexa Apartments", title: "Alexa Apartments" },
+  { imageSrc: "/images/hero/hero-1.jpg", alt: "Hero 1", title: "Hero 1" },
+  { imageSrc: "/images/projects/Aleta.jpg", alt: "Aleta", title: "Aleta" },
+  { imageSrc: "/images/projects/Millennium Park.jpg", alt: "Millennium Park", title: "Millennium Park" },
+  { imageSrc: "/images/projects/Laxmi Nova.jpg", alt: "Laxmi Nova", title: "Laxmi Nova" },
+  { imageSrc: "/images/projects/Alexa.jpg", alt: "Alexa", title: "Alexa" },
 ];
 
 // Helper function getRandomPosition is no longer needed and will be removed implicitly by not using it.
@@ -124,9 +124,6 @@ export default function Hero() {
                   showTooltip={true}
                   displayOverlayContent={false}
                 />
-                <div className="mt-3 text-center w-[230px]">
-                  <h3 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-white truncate">{item.title}</h3>
-                </div>
               </div>
             </AnimatedContent>
           ))}

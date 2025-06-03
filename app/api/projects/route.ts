@@ -8,7 +8,15 @@ import { validateRequest, createProjectSchema, partialUpdateProjectSchema } from
 
 // GET /api/projects - Get all projects with optional filtering
 async function getProjectsHandler(req: AuthenticatedRequest) {
-  await connectDB();
+  try {
+    await connectDB();
+  } catch (error) {
+    console.error('Database connection failed:', error);
+    return NextResponse.json(
+      { error: 'Database connection failed' },
+      { status: 500 }
+    );
+  }
 
   try {
     const { searchParams } = new URL(req.url);
@@ -50,12 +58,18 @@ async function getProjectsHandler(req: AuthenticatedRequest) {
     // Calculate pagination
     const skip = (page - 1) * limit;
 
+    console.log('Projects query:', query);
+    console.log('Pagination:', { page, limit, skip });
+
     // Execute query without population for now (to avoid schema registration issues)
+    const startTime = Date.now();
     const projects = await Project.find(query)
       .sort({ featured: -1, createdAt: -1 })
       .skip(skip)
       .limit(limit)
       .lean();
+
+    console.log(`Found ${projects.length} projects in ${Date.now() - startTime}ms`);
 
     // Get total count for pagination
     const total = await Project.countDocuments(query);

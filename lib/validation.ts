@@ -111,6 +111,8 @@ export const createTestimonialSchema = Joi.object({
   company: Joi.string().max(50).optional(),
   content: Joi.string().min(10).max(500).required(),
   rating: Joi.number().min(1).max(5).required(),
+  image: Joi.string().uri().optional(),
+  youtubeUrl: Joi.string().pattern(/^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)[a-zA-Z0-9_-]{11}(&.*)?$/).optional(),
   projectId: Joi.string().hex().length(24).optional(),
   isApproved: Joi.boolean().default(false),
   isFeatured: Joi.boolean().default(false)

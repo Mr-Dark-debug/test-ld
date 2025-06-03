@@ -3,7 +3,7 @@ import { Building, Home, Award } from "@/components/ui/LucideIcons";
 
 export const metricsData = [
   {
-    value: "1 Crore+",
+    value: "1 Cr+",
     label: "Construction Area",
     icon: <Building size={32} />,
   },

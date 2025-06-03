@@ -7,10 +7,19 @@ import { validateRequest, updateProjectSchema } from '@/lib/validation';
 
 // GET /api/projects/[slug] - Get single project by slug
 async function getProjectHandler(req: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
-  await connectDB();
+  try {
+    await connectDB();
+  } catch (error) {
+    console.error('Database connection failed:', error);
+    return NextResponse.json(
+      { error: 'Database connection failed' },
+      { status: 500 }
+    );
+  }
 
   try {
     const { slug } = await params;
+    console.log(`Looking for project with slug: ${slug}`);
 
     // Ensure Amenity model is registered
     if (!Amenity) {
@@ -21,6 +30,8 @@ async function getProjectHandler(req: NextRequest, { params }: { params: Promise
       .populate('amenities', 'name icon category description')
       .populate('createdBy', 'name email')
       .lean();
+
+    console.log(`Project found: ${project ? 'Yes' : 'No'}`);
 
     if (!project) {
       return NextResponse.json(

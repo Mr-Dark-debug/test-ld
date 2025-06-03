@@ -138,9 +138,42 @@ export function useProjects(options: UseProjectsOptions = {}): UseProjectsReturn
   };
 }
 
-// Hook specifically for featured projects
+// Hook specifically for featured projects with caching
 export function useFeaturedProjects(): UseProjectsReturn {
-  return useProjects({ featured: true, limit: 6 });
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [pagination, setPagination] = useState<UseProjectsReturn['pagination']>();
+
+  useEffect(() => {
+    // Only fetch if we don't have projects yet
+    if (projects.length === 0) {
+      setLoading(true);
+      projectsApi.getAll({ featured: true, limit: 6 })
+        .then(response => {
+          if (response.success && response.data) {
+            setProjects(response.data);
+            setPagination(response.pagination);
+          } else {
+            setError(response.error || 'Failed to fetch featured projects');
+          }
+        })
+        .catch(err => {
+          setError(err.message || 'Failed to fetch featured projects');
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }
+  }, [projects.length]);
+
+  return {
+    projects,
+    loading,
+    error,
+    pagination,
+    refetch: () => setProjects([])
+  };
 }
 
 // Transform API project to component format

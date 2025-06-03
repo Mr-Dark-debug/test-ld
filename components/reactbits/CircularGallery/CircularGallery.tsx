@@ -1,4 +1,4 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState, useMemo } from "react";
 import {
   Renderer,
   Camera,
@@ -8,6 +8,7 @@ import {
   Program,
   Texture,
 } from "ogl";
+import Image from "next/image";
 
 type GL = Renderer["gl"];
 
@@ -291,6 +292,9 @@ class Media {
             discard;
           }
           
+          // Apply a subtle color enhancement to make images more vibrant
+          color.rgb = color.rgb * 1.1;
+          
           gl_FragColor = vec4(color.rgb, 1.0);
         }
       `,
@@ -304,7 +308,8 @@ class Media {
       },
       transparent: true,
     });
-    const img = new Image();
+    
+    const img = new window.Image(0, 0);
     img.crossOrigin = "anonymous";
     img.src = this.image;
     img.onload = () => {
@@ -447,6 +452,7 @@ class App {
 
   isDown: boolean = false;
   start: number = 0;
+  isDestroyed: boolean = false;
 
   constructor(
     container: HTMLElement,
@@ -468,8 +474,8 @@ class App {
     this.onResize();
     this.createGeometry();
     this.createMedias(items, bend, textColor, borderRadius, font);
-    this.update();
     this.addEventListeners();
+    this.update();
   }
 
   createRenderer() {
@@ -505,52 +511,40 @@ class App {
   ) {
     const defaultItems = [
       {
-        image: `https://picsum.photos/seed/1/800/600?grayscale`,
-        text: "Bridge",
+        image: `/images/projects/Aleta.jpg`,
+        text: "Aleta",
       },
       {
-        image: `https://picsum.photos/seed/2/800/600?grayscale`,
-        text: "Desk Setup",
+        image: `/images/projects/Alexa.jpg`,
+        text: "Alexa",
       },
       {
-        image: `https://picsum.photos/seed/3/800/600?grayscale`,
-        text: "Waterfall",
+        image: `/images/projects/Millennium Business Hub.jpg`,
+        text: "Millennium Business Hub",
       },
       {
-        image: `https://picsum.photos/seed/4/800/600?grayscale`,
-        text: "Strawberries",
+        image: `/images/projects/Millennium Business Hub 2.jpg`,
+        text: "Millennium Business Hub 2",
       },
       {
-        image: `https://picsum.photos/seed/5/800/600?grayscale`,
-        text: "Deep Diving",
+        image: `/images/projects/Millennium Business Hub 3.jpg`,
+        text: "Millennium Business Hub 3",
       },
       {
-        image: `https://picsum.photos/seed/16/800/600?grayscale`,
-        text: "Train Track",
+        image: `/images/projects/Millennium City Central.jpg`,
+        text: "Millennium City Central",
       },
       {
-        image: `https://picsum.photos/seed/17/800/600?grayscale`,
-        text: "Santorini",
+        image: `/images/projects/Millennium Textile Market 3.jpg`,
+        text: "Millennium Textile Market",
       },
       {
-        image: `https://picsum.photos/seed/8/800/600?grayscale`,
-        text: "Blurry Lights",
+        image: `/images/projects/Laxmi Nova.jpg`,
+        text: "Laxmi Nova",
       },
       {
-        image: `https://picsum.photos/seed/9/800/600?grayscale`,
-        text: "New York",
-      },
-      {
-        image: `https://picsum.photos/seed/10/800/600?grayscale`,
-        text: "Good Boy",
-      },
-      {
-        image: `https://picsum.photos/seed/21/800/600?grayscale`,
-        text: "Coastline",
-      },
-      {
-        image: `https://picsum.photos/seed/12/800/600?grayscale`,
-        text: "Palm Trees",
+        image: `/images/projects/Millennium Park.jpg`,
+        text: "Millennium Park",
       },
     ];
     const galleryItems = items && items.length ? items : defaultItems;
@@ -627,6 +621,8 @@ class App {
   }
 
   update() {
+    if (this.isDestroyed) return;
+    
     this.scroll.current = lerp(
       this.scroll.current,
       this.scroll.target,
@@ -659,6 +655,7 @@ class App {
   }
 
   destroy() {
+    this.isDestroyed = true;
     window.cancelAnimationFrame(this.raf);
     window.removeEventListener("resize", this.boundOnResize);
     window.removeEventListener("mousewheel", this.boundOnWheel);
@@ -689,6 +686,17 @@ interface CircularGalleryProps {
   font?: string;
 }
 
+// Helper to check if WebGL is supported
+function isWebGLSupported() {
+  try {
+    const canvas = document.createElement('canvas');
+    return !!(window.WebGLRenderingContext && 
+      (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')));
+  } catch (e) {
+    return false;
+  }
+}
+
 export default function CircularGallery({
   items,
   bend = 3,
@@ -697,21 +705,126 @@ export default function CircularGallery({
   font = "bold 30px DM Sans",
 }: CircularGalleryProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [webGLSupported, setWebGLSupported] = useState<boolean | null>(null);
+  const appRef = useRef<App | null>(null);
+  
+  // Define default items with project images
+  const defaultItems = useMemo(() => [
+    { image: "/images/projects/Aleta.jpg", text: "Aleta" },
+    { image: "/images/projects/Alexa.jpg", text: "Alexa" },
+    { image: "/images/projects/Millennium Business Hub.jpg", text: "Millennium Business Hub" },
+    { image: "/images/projects/Millennium Business Hub 2.jpg", text: "Millennium Business Hub 2" },
+    { image: "/images/projects/Millennium Business Hub 3.jpg", text: "Millennium Business Hub 3" },
+    { image: "/images/projects/Millennium City Central.jpg", text: "Millennium City Central" },
+    { image: "/images/projects/Millennium Textile Market 3.jpg", text: "Millennium Textile Market" },
+    { image: "/images/projects/Laxmi Nova.jpg", text: "Laxmi Nova" },
+    { image: "/images/projects/Millennium Park.jpg", text: "Millennium Park" },
+  ], []);
+  
+  // Memoize the gallery items to prevent unnecessary re-renders
+  const galleryItems = useMemo(() => items || defaultItems, [items, defaultItems]);
+  
+  // Check WebGL support only once on mount
   useEffect(() => {
-    if (!containerRef.current) return;
-    const app = new App(containerRef.current, {
-      items,
-      bend,
-      textColor,
-      borderRadius,
-      font,
-    });
+    if (typeof window !== 'undefined') {
+      setWebGLSupported(isWebGLSupported());
+    }
+    
     return () => {
-      app.destroy();
+      // Clean up on unmount
+      if (appRef.current) {
+        appRef.current.destroy();
+        appRef.current = null;
+      }
     };
-  }, [items, bend, textColor, borderRadius, font]);
-  return <div
-    className="w-full h-full overflow-hidden cursor-grab active:cursor-grabbing"
-    ref={containerRef}
-  />;
+  }, []);
+  
+  // Initialize app only once when container and WebGL support are confirmed
+  useEffect(() => {
+    // Only run this effect if we have confirmed WebGL support and have a container
+    if (!containerRef.current || webGLSupported !== true || appRef.current) {
+      return;
+    }
+    
+    try {
+      // Create new app instance
+      appRef.current = new App(containerRef.current, {
+        items: galleryItems,
+        bend,
+        textColor,
+        borderRadius,
+        font,
+      });
+    } catch (error) {
+      console.error("Failed to initialize WebGL:", error);
+      setWebGLSupported(false);
+    }
+    
+    // Clean up function
+    return () => {
+      if (appRef.current) {
+        appRef.current.destroy();
+        appRef.current = null;
+      }
+    };
+  }, [webGLSupported, galleryItems, bend, textColor, borderRadius, font]);
+
+  // Fallback rendering when WebGL is not supported
+  if (webGLSupported === false) {
+    return (
+      <div className="w-full h-full overflow-x-auto py-8 bg-gradient-to-r from-blue-50 to-purple-50">
+        <div className="flex gap-6 px-4 min-w-max">
+          {galleryItems.map((item, index) => (
+            <div 
+              key={index} 
+              className="relative flex-shrink-0 w-[300px] h-[200px] rounded-lg overflow-hidden shadow-lg transform transition-all duration-300 hover:scale-105"
+              style={{
+                boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
+              }}
+            >
+              <div className="relative w-full h-full">
+                <Image 
+                  src={item.image} 
+                  alt={item.text} 
+                  fill 
+                  className="object-cover"
+                  sizes="300px"
+                />
+              </div>
+              <div 
+                className="absolute bottom-0 left-0 right-0 p-3 text-white"
+                style={{
+                  background: "linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%)"
+                }}
+              >
+                <p className="text-center font-medium">{item.text}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // Show loading state while checking WebGL support
+  if (webGLSupported === null) {
+    return (
+      <div className="w-full h-full flex items-center justify-center bg-gradient-to-r from-blue-50 to-purple-50" style={{ minHeight: "500px" }}>
+        <div className="text-lg font-medium text-gray-700">Loading gallery...</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative w-full bg-gradient-to-r from-blue-50 to-purple-50 py-10">
+      <div
+        className="w-full overflow-hidden cursor-grab active:cursor-grabbing"
+        ref={containerRef}
+        style={{ height: "500px" }}
+      />
+      <div className="absolute bottom-4 left-0 right-0 text-center text-sm text-gray-500">
+        Drag to explore more projects
+      </div>
+    </div>
+  );
 }

@@ -25,12 +25,66 @@ import {
   Eye,
   Users
 } from 'lucide-react'
-import { 
-  mockJobOpenings, 
-  mockJobApplications, 
-  JobOpening, 
-  JobApplication 
-} from '@/app/cms-admin/models/careers'
+import { toast } from 'react-hot-toast'
+
+interface JobOpening {
+  _id: string;
+  title: string;
+  slug: string;
+  department: string;
+  location: string;
+  type: 'Full-time' | 'Part-time' | 'Contract' | 'Internship';
+  experience: string;
+  salary?: {
+    min?: number;
+    max?: number;
+    currency: string;
+  };
+  description: string;
+  requirements: string[];
+  responsibilities: string[];
+  benefits?: string[];
+  skills?: string[];
+  isActive: boolean;
+  isUrgent: boolean;
+  postedDate: string;
+  applicationDeadline?: string;
+  createdBy?: {
+    name: string;
+    email: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface JobApplication {
+  _id: string;
+  jobId: string;
+  applicantInfo: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+    address?: string;
+    linkedinUrl?: string;
+    portfolioUrl?: string;
+  };
+  resume: {
+    filename: string;
+    url: string;
+    uploadedAt: string;
+  };
+  coverLetter?: string;
+  experience: string;
+  expectedSalary?: number;
+  availableFrom?: string;
+  status: 'new' | 'reviewed' | 'shortlisted' | 'interviewed' | 'rejected' | 'hired';
+  notes?: string;
+  reviewedBy?: string;
+  reviewedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export default function CareersPage() {
   const [jobOpenings, setJobOpenings] = useState<JobOpening[]>([])
@@ -44,15 +98,42 @@ export default function CareersPage() {
   const [filter, setFilter] = useState<'all' | 'new' | 'reviewed' | 'shortlisted' | 'rejected'>('all')
   const [selectedJobFilter, setSelectedJobFilter] = useState<string>('all')
   
+  // Fetch job openings from API
+  const fetchJobOpenings = async () => {
+    try {
+      const response = await fetch('/api/careers?active=true&limit=100');
+      const data = await response.json();
+
+      if (data.success) {
+        setJobOpenings(data.data);
+      } else {
+        toast.error('Failed to fetch job openings');
+      }
+    } catch (error) {
+      console.error('Error fetching job openings:', error);
+      toast.error('Failed to fetch job openings');
+    }
+  };
+
+  // Fetch job applications from API (placeholder - you'll need to create this API)
+  const fetchJobApplications = async () => {
+    try {
+      // For now, set empty array since we don't have applications API yet
+      setApplications([]);
+    } catch (error) {
+      console.error('Error fetching job applications:', error);
+    }
+  };
+
   useEffect(() => {
-    setIsLoading(true)
-    // Simulate loading data
-    setTimeout(() => {
-      setJobOpenings(mockJobOpenings)
-      setApplications(mockJobApplications)
-      setIsLoading(false)
-    }, 1000)
-  }, [])
+    setIsLoading(true);
+    Promise.all([
+      fetchJobOpenings(),
+      fetchJobApplications()
+    ]).finally(() => {
+      setIsLoading(false);
+    });
+  }, []);
   
   useEffect(() => {
     let filtered = applications;
@@ -71,46 +152,115 @@ export default function CareersPage() {
   }, [applications, filter, selectedJobFilter])
   
   // Handle creating/updating job
-  const handleJobSubmit = () => {
-    setIsSaving(true)
-    
-    setTimeout(() => {
-      if (isAddingJob && editingJob) {
+  const handleJobSubmit = async () => {
+    if (!editingJob) return;
+
+    setIsSaving(true);
+
+    try {
+      if (isAddingJob) {
         // Create new job
-        const newJob: JobOpening = {
-          ...editingJob,
-          id: `job-${Date.now()}`,
-          postedDate: new Date().toISOString(),
+        const response = await fetch('/api/careers', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(editingJob),
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          toast.success('Job opening created successfully');
+          await fetchJobOpenings(); // Refresh the list
+          setIsAddingJob(false);
+        } else {
+          toast.error(data.error || 'Failed to create job opening');
         }
-        setJobOpenings(prev => [...prev, newJob])
-        setIsAddingJob(false)
-      } else if (editingJob) {
+      } else {
         // Update existing job
-        setJobOpenings(prev => 
-          prev.map(job => job.id === editingJob.id ? editingJob : job)
-        )
+        const response = await fetch('/api/careers', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ id: editingJob._id, ...editingJob }),
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          toast.success('Job opening updated successfully');
+          await fetchJobOpenings(); // Refresh the list
+        } else {
+          toast.error(data.error || 'Failed to update job opening');
+        }
       }
-      
-      setEditingJob(null)
-      setIsSaving(false)
-    }, 1000)
-  }
+
+      setEditingJob(null);
+    } catch (error) {
+      console.error('Error saving job:', error);
+      toast.error('Failed to save job opening');
+    } finally {
+      setIsSaving(false);
+    }
+  };
   
   // Toggle job active status
-  const toggleJobStatus = (jobId: string) => {
-    setJobOpenings(prev => 
-      prev.map(job => 
-        job.id === jobId ? { ...job, isActive: !job.isActive } : job
-      )
-    )
-  }
-  
-  // Delete job
-  const deleteJob = (jobId: string) => {
-    if (confirm('Are you sure you want to delete this job posting? This action cannot be undone.')) {
-      setJobOpenings(prev => prev.filter(job => job.id !== jobId))
+  const toggleJobStatus = async (jobId: string) => {
+    try {
+      const job = jobOpenings.find(j => j._id === jobId);
+      if (!job) return;
+
+      const response = await fetch('/api/careers', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: jobId,
+          isActive: !job.isActive
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast.success(`Job ${!job.isActive ? 'activated' : 'deactivated'} successfully`);
+        await fetchJobOpenings(); // Refresh the list
+      } else {
+        toast.error(data.error || 'Failed to update job status');
+      }
+    } catch (error) {
+      console.error('Error toggling job status:', error);
+      toast.error('Failed to update job status');
     }
-  }
+  };
+
+  // Delete job
+  const deleteJob = async (jobId: string) => {
+    if (!confirm('Are you sure you want to delete this job posting? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/careers?id=${jobId}`, {
+        method: 'DELETE',
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast.success('Job opening deleted successfully');
+        await fetchJobOpenings(); // Refresh the list
+      } else {
+        toast.error(data.error || 'Failed to delete job opening');
+      }
+    } catch (error) {
+      console.error('Error deleting job:', error);
+      toast.error('Failed to delete job opening');
+    }
+  };
   
   // Update application status
   const updateApplicationStatus = (appId: string, status: 'new' | 'reviewed' | 'shortlisted' | 'rejected') => {
@@ -122,16 +272,21 @@ export default function CareersPage() {
   // Initialize new empty job
   const initializeNewJob = () => {
     setEditingJob({
-      id: '',
+      _id: '',
       title: '',
+      slug: '',
       department: '',
       location: 'Surat, Gujarat',
       type: 'Full-time',
+      experience: '',
       description: '',
       responsibilities: [''],
       requirements: [''],
       isActive: true,
-      postedDate: ''
+      isUrgent: false,
+      postedDate: '',
+      createdAt: '',
+      updatedAt: ''
     })
     setIsAddingJob(true)
   }
@@ -432,7 +587,7 @@ export default function CareersPage() {
                   </div>
                 ) : (
                   jobOpenings.map((job) => (
-                    <Card key={job.id} className="p-4 border-l-4 hover:shadow-md transition-shadow"
+                    <Card key={job._id} className="p-4 border-l-4 hover:shadow-md transition-shadow"
                       style={{ borderLeftColor: job.isActive ? '#3b82f6' : '#9ca3af' }}
                     >
                       <div className="flex justify-between items-start gap-4 flex-wrap mb-2">
@@ -443,6 +598,9 @@ export default function CareersPage() {
                               <Badge className="bg-blue-500">Active</Badge>
                             ) : (
                               <Badge className="bg-gray-500">Inactive</Badge>
+                            )}
+                            {job.isUrgent && (
+                              <Badge className="bg-red-500">Urgent</Badge>
                             )}
                           </h3>
                           <div className="flex gap-4 mt-1 text-sm text-gray-600">
@@ -456,14 +614,18 @@ export default function CareersPage() {
                             </span>
                             <span className="flex items-center gap-1">
                               <Calendar className="h-4 w-4" />
-                              {new Date(job.postedDate).toLocaleDateString()}
+                              {job.postedDate ? new Date(job.postedDate).toLocaleDateString() : 'Not set'}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Users className="h-4 w-4" />
+                              {job.type}
                             </span>
                           </div>
                         </div>
-                        
+
                         <div className="flex gap-2">
-                          <Button 
-                            variant="outline" 
+                          <Button
+                            variant="outline"
                             size="sm"
                             onClick={() => setEditingJob(job)}
                             className="text-blue-600"
@@ -471,10 +633,10 @@ export default function CareersPage() {
                             <Edit className="h-4 w-4 mr-1" />
                             Edit
                           </Button>
-                          <Button 
-                            variant="outline" 
+                          <Button
+                            variant="outline"
                             size="sm"
-                            onClick={() => toggleJobStatus(job.id)}
+                            onClick={() => toggleJobStatus(job._id)}
                             className={job.isActive ? "text-gray-600" : "text-green-600"}
                           >
                             {job.isActive ? (
@@ -489,10 +651,10 @@ export default function CareersPage() {
                               </>
                             )}
                           </Button>
-                          <Button 
-                            variant="outline" 
+                          <Button
+                            variant="outline"
                             size="sm"
-                            onClick={() => deleteJob(job.id)}
+                            onClick={() => deleteJob(job._id)}
                             className="text-red-600"
                           >
                             <Trash2 className="h-4 w-4 mr-1" />

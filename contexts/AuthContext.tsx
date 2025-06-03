@@ -45,12 +45,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (response.success && response.data?.user) {
         setUser(response.data.user);
       } else {
+        console.log('Auth check failed, removing token');
         removeAuthToken();
         setUser(null);
       }
     } catch (error) {
       console.error('Auth check failed:', error);
-      removeAuthToken();
+      // Only remove token if it's actually invalid, not just a network error
+      if (error instanceof Error && error.message.includes('401')) {
+        removeAuthToken();
+      }
       setUser(null);
     } finally {
       setLoading(false);

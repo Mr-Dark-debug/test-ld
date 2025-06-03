@@ -8,6 +8,7 @@ export interface ITestimonial extends Document {
   content: string;
   rating: number;
   image?: string;
+  youtubeUrl?: string;
   projectId?: mongoose.Types.ObjectId;
   isApproved: boolean;
   isFeatured: boolean;
@@ -49,6 +50,19 @@ const TestimonialSchema = new Schema<ITestimonial>({
   image: {
     type: String,
     trim: true
+  },
+  youtubeUrl: {
+    type: String,
+    trim: true,
+    validate: {
+      validator: function(v: string) {
+        if (!v) return true; // Optional field
+        // Validate YouTube URL format
+        const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)[a-zA-Z0-9_-]{11}(&.*)?$/;
+        return youtubeRegex.test(v);
+      },
+      message: 'Please provide a valid YouTube URL'
+    }
   },
   projectId: {
     type: Schema.Types.ObjectId,

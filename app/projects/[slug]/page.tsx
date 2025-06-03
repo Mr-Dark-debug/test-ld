@@ -1,6 +1,5 @@
 import React from 'react';
 import { notFound } from 'next/navigation';
-import { projectsApi } from '@/lib/api';
 import ProjectDetailClient from './ProjectDetailClient';
 
 interface ProjectDetailPageProps {
@@ -11,22 +10,33 @@ interface ProjectDetailPageProps {
 
 async function getProject(slug: string) {
   try {
-    // Construct the full URL for server-side requests
-    const baseUrl = process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
-      : process.env.NODE_ENV === 'development'
-        ? 'http://localhost:3000'
-        : 'http://localhost:3001';
+    // Use local development URL in development, production URL in production
+    const baseUrl = process.env.NODE_ENV === 'development'
+      ? 'http://localhost:3000'
+      : process.env.NEXT_PUBLIC_BASE_URL ||
+        (process.env.VERCEL_URL
+          ? `https://${process.env.VERCEL_URL}`
+          : 'https://laxmidev-ashy.vercel.app');
+
+    console.log(`Fetching project: ${baseUrl}/api/projects/${slug}`);
 
     const response = await fetch(`${baseUrl}/api/projects/${slug}`, {
-      cache: 'no-store' // Always fetch fresh data
+      cache: 'no-store', // Always fetch fresh data
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      next: { revalidate: 0 } // Disable caching for debugging
     });
 
+    console.log(`Response status: ${response.status}`);
+
     if (!response.ok) {
+      console.error(`Failed to fetch project: ${response.status} ${response.statusText}`);
       return null;
     }
 
     const data = await response.json();
+    console.log('Project data received:', data.success ? 'Success' : 'Failed');
     return data.success ? data.data : null;
   } catch (error) {
     console.error('Error fetching project:', error);

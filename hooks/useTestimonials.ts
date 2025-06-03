@@ -9,6 +9,7 @@ export interface Testimonial {
   content: string;
   rating: number;
   image?: string;
+  youtubeUrl?: string;
   projectId?: {
     _id: string;
     title: string;
@@ -91,9 +92,34 @@ export function useTestimonials(options: UseTestimonialsOptions = {}): UseTestim
   };
 }
 
-// Hook specifically for featured testimonials
+// Hook specifically for featured testimonials with caching
 export function useFeaturedTestimonials(): UseTestimonialsReturn {
-  return useTestimonials({ featured: true, approved: true, limit: 10 });
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Only fetch if we don't have testimonials yet
+    if (testimonials.length === 0) {
+      setLoading(true);
+      testimonialsApi.getAll({ featured: true, approved: true, limit: 4 })
+        .then(response => {
+          if (response.success && response.data) {
+            setTestimonials(response.data);
+          } else {
+            setError(response.error || 'Failed to fetch testimonials');
+          }
+        })
+        .catch(err => {
+          setError(err.message || 'Failed to fetch testimonials');
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }
+  }, [testimonials.length]);
+
+  return { testimonials, loading, error, refetch: () => setTestimonials([]) };
 }
 
 // Hook for approved testimonials (public display)

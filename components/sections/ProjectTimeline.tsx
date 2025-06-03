@@ -1,52 +1,116 @@
 "use client";
 
-import { useEffect, useRef, useState } from 'react'; // Added useState
+import { useEffect, useRef, useState } from 'react';
 import CircularGallery from "@/components/reactbits/CircularGallery/CircularGallery";
-import AnimatedTitle from "@/components/ui/AnimatedTitle"; // Import AnimatedTitle instead of SplitText
-import AnimatedContent from "@/components/reactbits/AnimatedContent/AnimatedContent"; // Import AnimatedContent
+import AnimatedTitle from "@/components/ui/AnimatedTitle";
+import AnimatedContent from "@/components/reactbits/AnimatedContent/AnimatedContent";
 
-// Project data with mockup images and descriptions
+// Project data with actual images from public/images/projects and updated completion dates
 const projects = [
   {
-    year: "2023",
-    status: "Completed",
-    title: "Sunset Apartments",
-    location: "Downtown, Cityville",
-    description: "Modern residential complex with stunning city views and luxury amenities.",
-    image: "https://picsum.photos/seed/timeline1/800/600?grayscale",
+    year: "2027",
+    status: "Upcoming",
+    title: "Millennium Park",
+    location: "Surat",
+    description: "Millennium Antara nahi aavse, park aavse",
+    image: "/images/projects/Millennium Park.jpg",
   },
   {
-    year: "2024",
-    status: "Ongoing",
-    title: "Oceanview Villas",
-    location: "Coastal Route, Seaview",
-    description: "Luxury villas offering direct beach access, private pools, and premium interior finishes.",
-    image: "https://picsum.photos/seed/timeline2/800/600?grayscale",
+    year: "2026",
+    status: "Upcoming",
+    title: "Aster",
+    location: "Surat",
+    description: "Premium residential complex with modern architecture.",
+    image: "/images/projects/Millennium Park.jpg", // Using existing image as placeholder
   },
   {
-    year: "2024",
-    status: "Completed",
-    title: "Greenwood Plaza",
-    location: "Suburbia, Townsville",
-    description: "A vibrant commercial hub featuring diverse retail spaces, modern office units, and ample parking.",
-    image: "https://picsum.photos/seed/timeline3/800/600?grayscale",
+    year: "2028",
+    status: "Upcoming",
+    title: "M3",
+    location: "Surat",
+    description: "Luxury residential development with state-of-the-art amenities.",
+    image: "/images/projects/Millennium Textile Market 3.jpg",
+  },
+  {
+    year: "2029",
+    status: "Upcoming",
+    title: "MCC",
+    location: "Surat",
+    description: "Modern commercial complex with premium office spaces.",
+    image: "/images/projects/Millennium City Central.jpg",
+  },
+  {
+    year: "2026",
+    status: "Upcoming",
+    title: "MBH 2",
+    location: "Surat",
+    description: "Expansion of the successful Millennium Business Hub with additional commercial spaces.",
+    image: "/images/projects/Millennium Business Hub 2.jpg",
+  },
+  {
+    year: "2026",
+    status: "Upcoming",
+    title: "MBH 3",
+    location: "Surat",
+    description: "The latest phase of the Millennium Business Hub development.",
+    image: "/images/projects/Millennium Business Hub 3.jpg",
+  },
+  {
+    year: "2028",
+    status: "Upcoming",
+    title: "Flora",
+    location: "Surat",
+    description: "Modern residential complex with extensive green spaces.",
+    image: "/images/projects/Millennium Park.jpg", // Using existing image as placeholder
   },
   {
     year: "2025",
     status: "Upcoming",
-    title: "Skyline Tower",
-    location: "Financial District, Metrocity",
-    description: "An iconic skyscraper set to redefine the city's skyline, offering panoramic views and state-of-the-art facilities.",
-    image: "https://picsum.photos/seed/timeline4/800/600?grayscale",
+    title: "Aleta",
+    location: "Surat",
+    description: "Luxury residential development in prime location.",
+    image: "/images/projects/Aleta.jpg",
   },
   {
-    year: "2025",
+    year: "2026",
     status: "Upcoming",
-    title: "Eco-Friendly Homes",
-    location: "Rural Greens, Countryside",
-    description: "A sustainable housing project focused on green living, energy efficiency, and community gardens.",
-    image: "https://picsum.photos/seed/timeline5/800/600?grayscale",
+    title: "Atrix",
+    location: "Surat",
+    description: "Contemporary residential project with premium amenities.",
+    image: "/images/projects/Alexa.jpg", // Using similar image as placeholder
   },
+  {
+    year: "2028",
+    status: "Upcoming",
+    title: "Azzaro",
+    location: "Surat",
+    description: "Exclusive residential development with modern design.",
+    image: "/images/projects/Laxmi Nova.jpg", // Using existing image as placeholder
+  },
+  {
+    year: "2028",
+    status: "Upcoming",
+    title: "Millennium Textile Market 3",
+    location: "Surat",
+    description: "The third phase of the successful Millennium Textile Market development.",
+    image: "/images/projects/Millennium Textile Market 3.jpg",
+  },
+  {
+    year: "2024",
+    status: "Completed",
+    title: "Millennium Textile Market 4",
+    location: "Surat",
+    description: "The fourth phase of the Millennium Textile Market, completed in 2024.",
+    image: "/images/projects/Millennium Textile Market 3.jpg", // Using similar image as placeholder
+  },
+  {
+    year: "2024",
+    status: "Completed",
+    title: "Millennium Business Hub 1",
+    location: "Surat",
+    description: "First phase of the Millennium Business Hub, completed in June 2024.",
+    image: "/images/projects/Millennium Business Hub.jpg",
+  }
 ];
 
 const ProjectTimeline = () => {
@@ -55,14 +119,14 @@ const ProjectTimeline = () => {
   const galleryItems = projects.map(project => ({
     image: project.image,
     text: `${project.title} (${project.year})`,
-    fullDescription: project.description, // Pass full description for hover
+    fullDescription: project.description,
   }));
 
-  const titleText = "Our Journey";
-  const descriptionText = "Explore our timeline of exceptional developments that have shaped communities and redefined living experiences";
+  const titleText = "Our Projects";
+  const descriptionText = "Explore our portfolio of exceptional developments that have shaped communities and redefined living experiences";
 
   return (
-    <section className="py-16 md:py-20 lg:py-24 bg-white dark:bg-gray-900 overflow-hidden"> {/* Added overflow-hidden for fades */}
+    <section className="py-16 md:py-20 lg:py-24 bg-white dark:bg-gray-900 overflow-hidden">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12 md:mb-16 lg:mb-20 relative z-10">
           <AnimatedTitle as="h2" className="mb-6">
@@ -74,7 +138,7 @@ const ProjectTimeline = () => {
         </div>
 
         <div className="relative w-full">
-          {/* Left fade overlay - shorter width */}
+          {/* Left fade overlay */}
           <div
             className="absolute left-0 top-0 bottom-0 z-10 w-12 sm:w-16 md:w-20 pointer-events-none
                        bg-gradient-to-r from-white via-white/50 to-transparent
@@ -82,23 +146,17 @@ const ProjectTimeline = () => {
             style={{ backdropFilter: 'blur(2px)' }}
           ></div>
 
-          <div className="w-full mx-auto relative h-[400px] sm:h-[500px] md:h-[600px]"> {/* Responsive height for better mobile experience */}
+          <div className="w-full mx-auto relative h-[400px] sm:h-[500px] md:h-[600px]">
             <CircularGallery
               items={galleryItems}
               bend={2}
-              textColor="#1f2937" // Darker gray for better visibility
+              textColor="#1f2937"
               borderRadius={0.08}
               font={typeof window !== 'undefined' && window.innerWidth < 768 ? "bold 24px DM Sans" : "bold 30px DM Sans"}
             />
-            {/* Removed the black box description display */}
-            {/* {hoveredItemDescription && (
-              <div className="absolute bottom-5 left-1/2 -translate-x-1/2 bg-black/70 text-white p-3 rounded-md text-sm z-20 max-w-md">
-                {hoveredItemDescription}
-              </div>
-            )} */}
           </div>
 
-          {/* Right fade overlay - shorter width */}
+          {/* Right fade overlay */}
           <div
             className="absolute right-0 top-0 bottom-0 z-10 w-12 sm:w-16 md:w-20 pointer-events-none
                        bg-gradient-to-l from-white via-white/50 to-transparent

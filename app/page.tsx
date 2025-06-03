@@ -23,10 +23,10 @@ interface StackCardData {
 }
 
 const stackCardsData: StackCardData[] = [
-  { id: 1, img: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=400&auto=format&fit=crop", title: "Innovative Designs", description: "We craft spaces that are not only aesthetically pleasing but also highly functional, incorporating the latest architectural trends and innovations." },
-  { id: 2, img: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=400&auto=format&fit=crop", title: "Quality Construction", description: "Our commitment to quality is unwavering. We use premium materials and employ stringent quality control measures throughout the construction process." },
-  { id: 3, img: "https://images.unsplash.com/photo-1448630360428-65456885c650?q=80&w=400&auto=format&fit=crop", title: "Customer Satisfaction", description: "Client satisfaction is at the heart of everything we do. We strive to exceed expectations and build lasting relationships with our customers." },
-  { id: 4, img: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=400&auto=format&fit=crop", title: "Prime Locations", description: "Our projects are strategically located in prime areas, offering excellent connectivity, convenience, and potential for appreciation." }
+  { id: 1, img: "/images/projects/Millennium Business Hub.jpg", title: "Innovative Designs", description: "We craft spaces that are not only aesthetically pleasing but also highly functional, incorporating the latest architectural trends and innovations." },
+  { id: 2, img: "/images/projects/Millennium City Central.jpg", title: "Quality Construction", description: "Our commitment to quality is unwavering. We use premium materials and employ stringent quality control measures throughout the construction process." },
+  { id: 3, img: "/images/projects/Laxmi Nova.jpg", title: "Customer Satisfaction", description: "Client satisfaction is at the heart of everything we do. We strive to exceed expectations and build lasting relationships with our customers." },
+  { id: 4, img: "/images/projects/Millennium Park.jpg", title: "Prime Locations", description: "Our projects are strategically located in prime areas, offering excellent connectivity, convenience, and potential for appreciation." }
 ];
 
 export default function Home() {
@@ -97,9 +97,9 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center md:items-start gap-8 md:gap-12 lg:gap-16">
+          <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-center md:items-start gap-8 md:gap-4 lg:gap-6">
             {/* Left Column: Dynamic Text */}
-            <div className="w-full md:w-1/2 lg:w-5/12 text-center md:text-left flex flex-col justify-center min-h-[240px] sm:min-h-[300px] md:min-h-[400px]">
+            <div className="w-full md:w-5/12 lg:w-5/12 text-center md:text-right flex flex-col justify-center min-h-[240px] sm:min-h-[300px] md:min-h-[400px] md:pr-3 lg:pr-6">
               {activeStackCard ? (
                 <>
                   <AnimatedTitle
@@ -114,15 +114,15 @@ export default function Home() {
                   </p>
                 </>
               ) : (
-                <div className="min-h-[150px] sm:min-h-[200px] flex items-center justify-center text-foreground/50 dark:text-gray-400">
+                <div className="min-h-[150px] sm:min-h-[200px] flex items-center justify-center md:justify-end text-foreground/50 dark:text-gray-400">
                   <p className="text-sm sm:text-base">Select a card to see details.</p>
                 </div>
               )}
             </div>
 
             {/* Right Column: Stack Component */}
-            <div className="w-full md:w-1/2 lg:w-7/12 flex justify-center md:justify-start items-center">
-              <div className="w-full max-w-[250px] sm:max-w-[300px] md:max-w-[350px] lg:max-w-[400px] mx-auto md:mx-0">
+            <div className="w-full md:w-7/12 lg:w-7/12 flex justify-center md:justify-start items-center md:pl-3 lg:pl-6">
+              <div className="w-full max-w-[250px] sm:max-w-[300px] md:max-w-[350px] lg:max-w-[400px] mx-auto md:ml-0 md:mr-auto">
                 <Stack
                   cardsData={stackCardsData}
                   onActiveCardChange={setActiveStackCard}

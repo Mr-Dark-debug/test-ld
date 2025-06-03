@@ -1,6 +1,9 @@
 // API utility functions for frontend
 
+import { apiCache } from './performance';
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || (typeof window !== 'undefined' ? window.location.origin : 'https://laxmidev-ashy.vercel.app');
 
 interface ApiResponse<T = any> {
   success: boolean;
@@ -51,13 +54,24 @@ function removeAuthToken(): void {
   localStorage.removeItem('auth-token');
 }
 
-// Generic API request function
+// Generic API request function with caching
 async function apiRequest<T = any>(
   endpoint: string,
-  options: RequestInit = {}
+  options: RequestInit = {},
+  useCache: boolean = true,
+  cacheTTL: number = 2 * 60 * 1000 // 2 minutes for faster updates
 ): Promise<ApiResponse<T>> {
   const url = `${API_BASE_URL}${endpoint}`;
   const token = getAuthToken();
+  const cacheKey = `${url}_${JSON.stringify(options)}`;
+
+  // Check cache for GET requests
+  if (useCache && (!options.method || options.method === 'GET')) {
+    const cachedData = apiCache.get(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
+  }
 
   const config: RequestInit = {
     headers: {
@@ -74,6 +88,11 @@ async function apiRequest<T = any>(
 
     if (!response.ok) {
       throw new ApiError(data.error || 'Request failed', response.status);
+    }
+
+    // Cache successful GET responses
+    if (useCache && data.success && (!options.method || options.method === 'GET')) {
+      apiCache.set(cacheKey, data, cacheTTL);
     }
 
     return data;
