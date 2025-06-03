@@ -59,6 +59,21 @@ export default function SettingsPage() {
     isActive: true
   });
 
+  // State for Why Laxmi page achievements
+  const [achievements, setAchievements] = useState([
+    { id: 1, title: '500+', description: 'Happy Families', isActive: true },
+    { id: 2, title: '50+', description: 'Projects Completed', isActive: true },
+    { id: 3, title: '15+', description: 'Years of Excellence', isActive: true },
+    { id: 4, title: '1000+', description: 'Units Delivered', isActive: true },
+  ]);
+  const [editingAchievement, setEditingAchievement] = useState<any>(null);
+  const [isAddingAchievement, setIsAddingAchievement] = useState(false);
+  const [newAchievement, setNewAchievement] = useState({
+    title: '',
+    description: '',
+    isActive: true
+  });
+
   // Fetch users from API
   const fetchUsers = async () => {
     try {
@@ -216,6 +231,47 @@ export default function SettingsPage() {
     }
   };
 
+  // Achievement management functions
+  const handleCreateAchievement = () => {
+    if (!newAchievement.title || !newAchievement.description) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
+
+    const newId = Math.max(...achievements.map(a => a.id)) + 1;
+    const achievement = { ...newAchievement, id: newId };
+    setAchievements([...achievements, achievement]);
+    setIsAddingAchievement(false);
+    setNewAchievement({ title: '', description: '', isActive: true });
+    toast.success('Achievement added successfully');
+  };
+
+  const handleUpdateAchievement = () => {
+    if (!editingAchievement) return;
+
+    setAchievements(achievements.map(a =>
+      a.id === editingAchievement.id ? editingAchievement : a
+    ));
+    setEditingAchievement(null);
+    toast.success('Achievement updated successfully');
+  };
+
+  const deleteAchievement = (achievementId: number) => {
+    if (!confirm('Are you sure you want to delete this achievement?')) {
+      return;
+    }
+
+    setAchievements(achievements.filter(a => a.id !== achievementId));
+    toast.success('Achievement deleted successfully');
+  };
+
+  const toggleAchievementStatus = (achievementId: number) => {
+    setAchievements(achievements.map(a =>
+      a.id === achievementId ? { ...a, isActive: !a.isActive } : a
+    ));
+    toast.success('Achievement status updated');
+  };
+
   // Get role badge color
   const getRoleBadge = (role: string) => {
     switch (role) {
@@ -254,6 +310,15 @@ export default function SettingsPage() {
             Add New User
           </Button>
         )}
+        {activeTab === 'pages' && !editingAchievement && !isAddingAchievement && (
+          <Button
+            onClick={() => setIsAddingAchievement(true)}
+            className="w-full sm:w-auto flex items-center justify-center gap-2"
+          >
+            <Plus className="w-4 h-4" />
+            Add Achievement
+          </Button>
+        )}
         {(editingUser || isAddingUser) && (
           <div className="flex gap-2 w-full sm:w-auto">
             <Button
@@ -276,6 +341,28 @@ export default function SettingsPage() {
                   role: 'user',
                   isActive: true
                 });
+              }}
+              className="flex-1"
+            >
+              Cancel
+            </Button>
+          </div>
+        )}
+        {(editingAchievement || isAddingAchievement) && (
+          <div className="flex gap-2 w-full sm:w-auto">
+            <Button
+              onClick={editingAchievement ? handleUpdateAchievement : handleCreateAchievement}
+              className="flex-1 flex items-center justify-center gap-2"
+            >
+              <Save className="w-4 h-4" />
+              {editingAchievement ? 'Update Achievement' : 'Create Achievement'}
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setEditingAchievement(null);
+                setIsAddingAchievement(false);
+                setNewAchievement({ title: '', description: '', isActive: true });
               }}
               className="flex-1"
             >
@@ -311,6 +398,13 @@ export default function SettingsPage() {
               className="py-2 px-6 font-medium text-gray-700 data-[checked=true]:text-blue-600 dark:text-gray-300 dark:data-[checked=true]:text-blue-400"
             >
               Role Permissions
+            </button>
+            <button
+              type="button"
+              data-id="pages"
+              className="py-2 px-6 font-medium text-gray-700 data-[checked=true]:text-blue-600 dark:text-gray-300 dark:data-[checked=true]:text-blue-400"
+            >
+              Pages
             </button>
             <button
               type="button"
@@ -566,6 +660,146 @@ export default function SettingsPage() {
               </div>
             </div>
           </Card>
+        )}
+
+        {/* Pages Tab */}
+        {activeTab === "pages" && (
+          <>
+            {(isAddingAchievement || editingAchievement) ? (
+              // Achievement Form
+              <Card className="p-6">
+                <h2 className="text-xl font-semibold mb-4">
+                  {isAddingAchievement ? 'Add New Achievement' : 'Edit Achievement'}
+                </h2>
+
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Title/Number</label>
+                    <Input
+                      value={isAddingAchievement ? newAchievement.title : editingAchievement?.title || ''}
+                      onChange={(e) => {
+                        if (isAddingAchievement) {
+                          setNewAchievement({...newAchievement, title: e.target.value});
+                        } else if (editingAchievement) {
+                          setEditingAchievement({...editingAchievement, title: e.target.value});
+                        }
+                      }}
+                      placeholder="e.g., 500+ or 15+"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Description</label>
+                    <Input
+                      value={isAddingAchievement ? newAchievement.description : editingAchievement?.description || ''}
+                      onChange={(e) => {
+                        if (isAddingAchievement) {
+                          setNewAchievement({...newAchievement, description: e.target.value});
+                        } else if (editingAchievement) {
+                          setEditingAchievement({...editingAchievement, description: e.target.value});
+                        }
+                      }}
+                      placeholder="e.g., Happy Families"
+                    />
+                  </div>
+
+                  <div className="flex items-center">
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={isAddingAchievement ? newAchievement.isActive : editingAchievement?.isActive || false}
+                        onChange={() => {
+                          if (isAddingAchievement) {
+                            setNewAchievement({...newAchievement, isActive: !newAchievement.isActive});
+                          } else if (editingAchievement) {
+                            setEditingAchievement({...editingAchievement, isActive: !editingAchievement.isActive});
+                          }
+                        }}
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                      <span className="ml-3 text-sm font-medium">
+                        {(isAddingAchievement ? newAchievement.isActive : editingAchievement?.isActive) ? 'Active' : 'Inactive'}
+                      </span>
+                    </label>
+                  </div>
+                </div>
+              </Card>
+            ) : (
+              // Achievements List
+              <Card className="p-6">
+                <h2 className="text-xl font-semibold mb-4">Why Laxmi Page - Achievements</h2>
+                <p className="text-gray-600 mb-6">Manage the achievements section displayed on the Why Laxmi page.</p>
+
+                <div className="space-y-4">
+                  {achievements.length === 0 ? (
+                    <div className="text-center py-8 text-gray-500">
+                      No achievements found. Create your first achievement.
+                    </div>
+                  ) : (
+                    achievements.map((achievement) => (
+                      <Card key={achievement.id} className="p-4 border-l-4 hover:shadow-md transition-shadow"
+                        style={{ borderLeftColor: achievement.isActive ? '#3b82f6' : '#9ca3af' }}
+                      >
+                        <div className="flex justify-between items-start gap-4 flex-wrap">
+                          <div className="flex-1">
+                            <h3 className="font-medium text-lg flex items-center gap-2">
+                              <span className="text-2xl font-bold text-blue-600">{achievement.title}</span>
+                              <span className="text-gray-600">{achievement.description}</span>
+                              {achievement.isActive ? (
+                                <Badge className="bg-green-500">Active</Badge>
+                              ) : (
+                                <Badge className="bg-gray-500">Inactive</Badge>
+                              )}
+                            </h3>
+                          </div>
+
+                          <div className="flex gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setEditingAchievement(achievement)}
+                              className="text-blue-600"
+                            >
+                              <Edit className="h-4 w-4 mr-1" />
+                              Edit
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => toggleAchievementStatus(achievement.id)}
+                              className={achievement.isActive ? "text-gray-600" : "text-green-600"}
+                            >
+                              {achievement.isActive ? (
+                                <>
+                                  <XCircle className="h-4 w-4 mr-1" />
+                                  Deactivate
+                                </>
+                              ) : (
+                                <>
+                                  <CheckCircle className="h-4 w-4 mr-1" />
+                                  Activate
+                                </>
+                              )}
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => deleteAchievement(achievement.id)}
+                              className="text-red-600"
+                            >
+                              <Trash2 className="h-4 w-4 mr-1" />
+                              Delete
+                            </Button>
+                          </div>
+                        </div>
+                      </Card>
+                    ))
+                  )}
+                </div>
+              </Card>
+            )}
+          </>
         )}
 
         {/* System Settings Tab */}

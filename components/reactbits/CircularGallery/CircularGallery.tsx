@@ -9,6 +9,7 @@ import {
   Texture,
 } from "ogl";
 import Image from "next/image";
+import { useTheme } from "next-themes";
 
 type GL = Renderer["gl"];
 
@@ -723,13 +724,17 @@ function isWebGLSupported() {
 export default function CircularGallery({
   items,
   bend = 3,
-  textColor = "#ffffff",
+  textColor,
   borderRadius = 0.05,
   font = "bold 30px DM Sans",
 }: CircularGalleryProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [webGLSupported, setWebGLSupported] = useState<boolean | null>(null);
   const appRef = useRef<App | null>(null);
+  const { theme } = useTheme();
+
+  // Dynamic text color based on theme
+  const dynamicTextColor = textColor || (theme === 'dark' ? '#ffffff' : '#000000');
   
   // Define default items with project images
   const defaultItems = useMemo(() => [
@@ -774,7 +779,7 @@ export default function CircularGallery({
       appRef.current = new App(containerRef.current, {
         items: galleryItems,
         bend,
-        textColor,
+        textColor: dynamicTextColor,
         borderRadius,
         font,
       });
@@ -790,12 +795,12 @@ export default function CircularGallery({
         appRef.current = null;
       }
     };
-  }, [webGLSupported, galleryItems, bend, textColor, borderRadius, font]);
+  }, [webGLSupported, galleryItems, bend, dynamicTextColor, borderRadius, font]);
 
   // Fallback rendering when WebGL is not supported
   if (webGLSupported === false) {
     return (
-      <div className="w-full h-full overflow-x-auto py-8 bg-gray-900 dark:bg-gray-900">
+      <div className="w-full h-full overflow-x-auto py-8 bg-white dark:bg-gray-900">
         <div className="flex gap-6 px-4 min-w-max">
           {galleryItems.map((item, index) => (
             <div 
@@ -820,7 +825,7 @@ export default function CircularGallery({
                   background: "linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%)"
                 }}
               >
-                <p className="text-center font-medium text-sm leading-tight whitespace-pre-line">{item.text}</p>
+                <p className="text-center font-medium text-sm leading-tight whitespace-pre-line text-white">{item.text}</p>
               </div>
             </div>
           ))}
@@ -832,14 +837,14 @@ export default function CircularGallery({
   // Show loading state while checking WebGL support
   if (webGLSupported === null) {
     return (
-      <div className="w-full h-full flex items-center justify-center bg-gray-900 dark:bg-gray-900" style={{ minHeight: "500px" }}>
+      <div className="w-full h-full flex items-center justify-center bg-white dark:bg-gray-900" style={{ minHeight: "500px" }}>
         <div className="text-lg font-medium text-gray-700 dark:text-gray-300">Loading gallery...</div>
       </div>
     );
   }
 
   return (
-    <div className="relative w-full bg-gray-900 dark:bg-gray-900 py-10">
+    <div className="relative w-full bg-white dark:bg-gray-900 py-10">
       <div
         className="w-full overflow-hidden cursor-grab active:cursor-grabbing"
         ref={containerRef}
