@@ -772,7 +772,7 @@ export default function CircularGallery({
   // Fallback rendering when WebGL is not supported
   if (webGLSupported === false) {
     return (
-      <div className="w-full h-full overflow-x-auto py-8 bg-gradient-to-r from-blue-50 to-purple-50">
+      <div className="w-full h-full overflow-x-auto py-8 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-900">
         <div className="flex gap-6 px-4 min-w-max">
           {galleryItems.map((item, index) => (
             <div 
@@ -791,13 +791,13 @@ export default function CircularGallery({
                   sizes="300px"
                 />
               </div>
-              <div 
+              <div
                 className="absolute bottom-0 left-0 right-0 p-3 text-white"
                 style={{
                   background: "linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%)"
                 }}
               >
-                <p className="text-center font-medium">{item.text}</p>
+                <p className="text-center font-medium text-sm leading-tight whitespace-pre-line">{item.text}</p>
               </div>
             </div>
           ))}
@@ -809,20 +809,20 @@ export default function CircularGallery({
   // Show loading state while checking WebGL support
   if (webGLSupported === null) {
     return (
-      <div className="w-full h-full flex items-center justify-center bg-gradient-to-r from-blue-50 to-purple-50" style={{ minHeight: "500px" }}>
-        <div className="text-lg font-medium text-gray-700">Loading gallery...</div>
+      <div className="w-full h-full flex items-center justify-center bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-900" style={{ minHeight: "500px" }}>
+        <div className="text-lg font-medium text-gray-700 dark:text-gray-300">Loading gallery...</div>
       </div>
     );
   }
 
   return (
-    <div className="relative w-full bg-gradient-to-r from-blue-50 to-purple-50 py-10">
+    <div className="relative w-full bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-900 py-10">
       <div
         className="w-full overflow-hidden cursor-grab active:cursor-grabbing"
         ref={containerRef}
         style={{ height: "500px" }}
       />
-      <div className="absolute bottom-4 left-0 right-0 text-center text-sm text-gray-500">
+      <div className="absolute bottom-4 left-0 right-0 text-center text-sm text-gray-500 dark:text-gray-400">
         Drag to explore more projects
       </div>
     </div>

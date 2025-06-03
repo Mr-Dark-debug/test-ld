@@ -2,7 +2,7 @@
 const mongoose = require('mongoose');
 
 // MongoDB connection
-const MONGODB_URI = "mongodb+srv://laxmidev:Ldtest@ldtest.kcc4dlq.mongodb.net/realestate_cms?retryWrites=true&w=majority&appName=Ldtest";
+const MONGODB_URI = process.env.MONGODB_URI;
 
 // Testimonial schema (simplified)
 const TestimonialSchema = new mongoose.Schema({

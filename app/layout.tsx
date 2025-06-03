@@ -8,6 +8,7 @@ import GlobalFloatingMenu from "@/components/layout/GlobalFloatingMenu";
 import { Toaster } from 'sonner';
 import { LoadingProvider } from '@/components/providers/loading-provider';
 import { AuthProvider } from "@/contexts/AuthContext";
+import Analytics from "@/components/analytics/Analytics";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const playfair = PlayfairDisplay({
@@ -42,6 +43,7 @@ export default function RootLayout({
               <Footer />
               <GlobalFloatingMenu />
               <Toaster richColors position="top-right" />
+              <Analytics />
             </LoadingProvider>
           </AuthProvider>
         </ThemeProvider>

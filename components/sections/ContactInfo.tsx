@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { ShimmerButton } from "@/components/magicui/shimmer-button";
+import useAnalytics from "@/hooks/useAnalytics";
 
 interface ContactInfoProps {
   title?: string;
@@ -30,6 +31,7 @@ export default function ContactInfo({
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState(false);
+  const { trackContactForm, trackButtonClick } = useAnalytics();
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -42,23 +44,41 @@ export default function ContactInfo({
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulating form submission
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    try {
+      // Track form submission attempt
+      trackContactForm('contact_page');
 
-    // Here you would typically send the data to your server
-    console.log("Form submitted:", formData);
-    
-    setIsSubmitting(false);
-    setFormSubmitted(true);
-    
-    // Reset form
-    setFormData({
-      name: "",
-      email: "",
-      mobile: "",
-      project: "",
-      message: "",
-    });
+      // Send data to API
+      const response = await fetch('/api/leads/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setFormSubmitted(true);
+        // Reset form
+        setFormData({
+          name: "",
+          email: "",
+          mobile: "",
+          project: "",
+          message: "",
+        });
+      } else {
+        console.error('Form submission failed:', result.error);
+        alert('Failed to send message. Please try again.');
+      }
+    } catch (error) {
+      console.error('Form submission error:', error);
+      alert('Failed to send message. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (

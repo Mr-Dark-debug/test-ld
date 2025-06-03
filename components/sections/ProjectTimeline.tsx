@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from 'react';
+import { useTheme } from 'next-themes';
 import CircularGallery from "@/components/reactbits/CircularGallery/CircularGallery";
 import AnimatedTitle from "@/components/ui/AnimatedTitle";
 import AnimatedContent from "@/components/reactbits/AnimatedContent/AnimatedContent";
@@ -115,15 +116,46 @@ const projects = [
 
 const ProjectTimeline = () => {
   const [hoveredItemDescription, setHoveredItemDescription] = useState<string | null>(null);
+  const { theme, resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  // Ensure component is mounted before accessing theme
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Function to break long text into multiple lines
+  const formatProjectText = (title: string, year: string) => {
+    const fullText = `${title} (${year})`;
+    // If text is longer than 25 characters, try to break it
+    if (fullText.length > 25) {
+      // Try to break at a natural point
+      const words = title.split(' ');
+      if (words.length > 2) {
+        const midPoint = Math.ceil(words.length / 2);
+        const firstLine = words.slice(0, midPoint).join(' ');
+        const secondLine = words.slice(midPoint).join(' ');
+        return `${firstLine}\n${secondLine} (${year})`;
+      }
+    }
+    return fullText;
+  };
 
   const galleryItems = projects.map(project => ({
     image: project.image,
-    text: `${project.title} (${project.year})`,
+    text: formatProjectText(project.title, project.year),
     fullDescription: project.description,
   }));
 
   const titleText = "Our Projects";
   const descriptionText = "Explore our portfolio of exceptional developments that have shaped communities and redefined living experiences";
+
+  // Determine text color based on theme
+  const getTextColor = () => {
+    if (!mounted) return "#1f2937"; // Default dark color during SSR
+    const isDark = resolvedTheme === 'dark' || theme === 'dark';
+    return isDark ? "#ffffff" : "#1f2937";
+  };
 
   return (
     <section className="py-16 md:py-20 lg:py-24 bg-white dark:bg-gray-900 overflow-hidden">
@@ -150,9 +182,9 @@ const ProjectTimeline = () => {
             <CircularGallery
               items={galleryItems}
               bend={2}
-              textColor="#1f2937"
+              textColor={getTextColor()}
               borderRadius={0.08}
-              font={typeof window !== 'undefined' && window.innerWidth < 768 ? "bold 24px DM Sans" : "bold 30px DM Sans"}
+              font={typeof window !== 'undefined' && window.innerWidth < 768 ? "bold 20px DM Sans" : "bold 26px DM Sans"}
             />
           </div>
 
