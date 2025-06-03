@@ -5,6 +5,7 @@ import FlowingMenu from "@/components/reactbits/FlowingMenu/FlowingMenu";
 import { Button } from "@/components/ui/Button";
 import ScrollingFeatureCards from "@/components/ui/ScrollingFeatureCards";
 import { TestimonialCarouselDemo } from "@/components/ui/testimonial-carousel-demo";
+import AwardsSection from "@/components/sections/AwardsSection";
 
 export const metadata: Metadata = {
   title: "Why Choose Laxmi Developers | Laxmi Developers",
@@ -258,6 +259,9 @@ export default function WhyLaxmiPage() {
           </div>
         </div>
       </section>
+
+      {/* Awards & Recognition */}
+      <AwardsSection />
 
       {/* Testimonials */}
       <TestimonialCarouselDemo />

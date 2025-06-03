@@ -35,27 +35,31 @@ export default function DashboardOverview() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<string>('');
+  const [alerts, setAlerts] = useState<any[]>([]);
 
-  // Fetch dashboard statistics
+  // Fetch dashboard statistics and alerts
   const fetchDashboardStats = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      const response = await dashboardApi.getStats();
+      const [statsResponse, alertsResponse] = await Promise.all([
+        dashboardApi.getStats(),
+        fetch('/api/alerts')
+      ]);
 
-      if (response.success && response.data) {
+      if (statsResponse.success && statsResponse.data) {
         // Map icons to actual components
-        const statsWithIcons = response.data.stats.map((stat: any) => ({
+        const statsWithIcons = statsResponse.data.stats.map((stat: any) => ({
           ...stat,
           icon: iconMap[stat.icon as keyof typeof iconMap] || Building2,
         }));
 
         setStats(statsWithIcons);
-        setAnalytics(response.data.analytics);
-        setLastUpdated(response.data.lastUpdated);
+        setAnalytics(statsResponse.data.analytics);
+        setLastUpdated(statsResponse.data.lastUpdated);
       } else {
-        setError(response.error || 'Failed to fetch dashboard statistics');
+        setError(statsResponse.error || 'Failed to fetch dashboard statistics');
         // Fallback to dummy data if API fails
         setStats([
           {
@@ -106,6 +110,39 @@ export default function DashboardOverview() {
             icon: UserPlus,
             color: 'red' as const,
           },
+        ]);
+      }
+
+      // Fetch alerts
+      if (alertsResponse.ok) {
+        const alertsData = await alertsResponse.json();
+        if (alertsData.success && alertsData.data) {
+          setAlerts(alertsData.data);
+        }
+      } else {
+        // Fallback alerts
+        setAlerts([
+          {
+            type: 'warning',
+            title: 'Pending blog approvals',
+            description: 'Review and publish',
+            count: 3,
+            link: '/cms-admin/dashboard/blogs'
+          },
+          {
+            type: 'error',
+            title: 'High priority leads',
+            description: 'Need follow-up',
+            count: 12,
+            link: '/cms-admin/dashboard/leads'
+          },
+          {
+            type: 'success',
+            title: 'System status',
+            description: 'All systems operational',
+            count: 0,
+            link: null
+          }
         ]);
       }
     } catch (err: any) {
@@ -205,22 +242,22 @@ export default function DashboardOverview() {
               Quick Actions
             </h3>
             <div className="grid grid-cols-2 gap-4">
-              <button className="flex items-center justify-center p-4 border-2 border-dashed border-blue-300 rounded-lg text-blue-600 hover:bg-blue-50 transition-colors">
+              <a href="/cms-admin/projects/add" className="flex items-center justify-center p-4 border-2 border-dashed border-blue-300 rounded-lg text-blue-600 hover:bg-blue-50 transition-colors">
                 <Building2 className="w-5 h-5 mr-2" />
                 Add Project
-              </button>
-              <button className="flex items-center justify-center p-4 border-2 border-dashed border-green-300 rounded-lg text-green-600 hover:bg-green-50 transition-colors">
+              </a>
+              <a href="/cms-admin/dashboard/blogs/create" className="flex items-center justify-center p-4 border-2 border-dashed border-green-300 rounded-lg text-green-600 hover:bg-green-50 transition-colors">
                 <FileText className="w-5 h-5 mr-2" />
                 Write Blog
-              </button>
-              <button className="flex items-center justify-center p-4 border-2 border-dashed border-purple-300 rounded-lg text-purple-600 hover:bg-purple-50 transition-colors">
+              </a>
+              <a href="/cms-admin/dashboard/leads" className="flex items-center justify-center p-4 border-2 border-dashed border-purple-300 rounded-lg text-purple-600 hover:bg-purple-50 transition-colors">
                 <Users className="w-5 h-5 mr-2" />
                 View Leads
-              </button>
-              <button className="flex items-center justify-center p-4 border-2 border-dashed border-amber-300 rounded-lg text-amber-600 hover:bg-amber-50 transition-colors">
+              </a>
+              <a href="/cms-admin/dashboard/testimonials" className="flex items-center justify-center p-4 border-2 border-dashed border-amber-300 rounded-lg text-amber-600 hover:bg-amber-50 transition-colors">
                 <MessageSquare className="w-5 h-5 mr-2" />
                 Add Testimonial
-              </button>
+              </a>
             </div>
           </div>
           {/* Pending Approvals & Alerts */}
@@ -229,33 +266,54 @@ export default function DashboardOverview() {
               Alerts & Approvals
             </h3>
             <div className="space-y-3">
-              <div className="flex items-center p-3 bg-amber-50 rounded-lg border border-amber-200">
-                <AlertCircle className="w-5 h-5 text-amber-600 mr-3" />
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-amber-800">
-                    3 blogs pending approval
-                  </p>
-                  <p className="text-xs text-amber-600">Review and publish</p>
+              {alerts.length === 0 ? (
+                <div className="text-center py-4 text-gray-500">
+                  No alerts at this time
                 </div>
-              </div>
-              <div className="flex items-center p-3 bg-red-50 rounded-lg border border-red-200">
-                <AlertCircle className="w-5 h-5 text-red-600 mr-3" />
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-red-800">
-                    12 leads need follow-up
-                  </p>
-                  <p className="text-xs text-red-600">High priority contacts</p>
-                </div>
-              </div>
-              <div className="flex items-center p-3 bg-green-50 rounded-lg border border-green-200">
-                <CheckCircle className="w-5 h-5 text-green-600 mr-3" />
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-green-800">
-                    All systems operational
-                  </p>
-                  <p className="text-xs text-green-600">No issues detected</p>
-                </div>
-              </div>
+              ) : (
+                alerts.map((alert, index) => {
+                  const alertStyles = {
+                    warning: {
+                      bg: 'bg-amber-50',
+                      border: 'border-amber-200',
+                      icon: 'text-amber-600',
+                      title: 'text-amber-800',
+                      desc: 'text-amber-600'
+                    },
+                    error: {
+                      bg: 'bg-red-50',
+                      border: 'border-red-200',
+                      icon: 'text-red-600',
+                      title: 'text-red-800',
+                      desc: 'text-red-600'
+                    },
+                    success: {
+                      bg: 'bg-green-50',
+                      border: 'border-green-200',
+                      icon: 'text-green-600',
+                      title: 'text-green-800',
+                      desc: 'text-green-600'
+                    }
+                  };
+
+                  const style = alertStyles[alert.type as keyof typeof alertStyles] || alertStyles.warning;
+                  const IconComponent = alert.type === 'success' ? CheckCircle : AlertCircle;
+
+                  return (
+                    <div key={index} className={`flex items-center p-3 ${style.bg} rounded-lg border ${style.border} ${alert.link ? 'cursor-pointer hover:shadow-md transition-shadow' : ''}`}
+                      onClick={() => alert.link && (window.location.href = alert.link)}
+                    >
+                      <IconComponent className={`w-5 h-5 ${style.icon} mr-3`} />
+                      <div className="flex-1">
+                        <p className={`text-sm font-medium ${style.title}`}>
+                          {alert.count > 0 ? `${alert.count} ${alert.title}` : alert.title}
+                        </p>
+                        <p className={`text-xs ${style.desc}`}>{alert.description}</p>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
             </div>
           </div>
         </div>

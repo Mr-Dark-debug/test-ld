@@ -20,7 +20,8 @@ import {
   Info,
   Globe,
   Download,
-  Filter
+  Filter,
+  Award
 } from 'lucide-react'
 import Image from 'next/image'
 import { useAuth } from '@/contexts/AuthContext'
@@ -92,6 +93,11 @@ const navigation = [
         name: 'Careers',
         href: '/cms-admin/dashboard/pages/careers',
         icon: Users,
+      },
+      {
+        name: 'Awards',
+        href: '/cms-admin/dashboard/pages/awards',
+        icon: Award,
       },
     ],
   },
