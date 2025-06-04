@@ -1,80 +1,30 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { TrendingUp, Users, Target, Calendar, ChevronDown, ChevronUp, ArrowRight } from 'lucide-react'
+import { TrendingUp, Users, Target, Calendar, ChevronDown, ChevronUp, ArrowRight, Loader2 } from 'lucide-react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { useAuth } from '@/contexts/AuthContext'
 
-// Lead data service to get leads from localStorage
+// Lead data service to fetch real data from API
 const LeadService = {
-  getAllLeads: () => {
-    if (typeof window === 'undefined') return [];
-    const leads = localStorage.getItem('leadData');
-    return leads ? JSON.parse(leads) : [];
-  },
-  
-  // Initialize with sample data if no leads exist
-  initSampleData: () => {
-    if (typeof window === 'undefined') return;
-    const leads = LeadService.getAllLeads();
-    
-    if (leads.length === 0) {
-      // Generate realistic data for the past 6 months
-      const today = new Date();
-      const sampleLeads = [];
-      
-      // Generate random leads with a realistic growth trend
-      for (let i = 0; i < 250; i++) {
-        // Random date within past 6 months
-        const randomMonthOffset = Math.floor(Math.random() * 6);
-        const randomDayOffset = Math.floor(Math.random() * 30);
-        const leadDate = new Date();
-        leadDate.setMonth(today.getMonth() - randomMonthOffset);
-        leadDate.setDate(today.getDate() - randomDayOffset);
-        
-        // Increase chances of newer leads to show growth trend
-        const chanceOfNewerLead = (6 - randomMonthOffset) * 5;
-        if (Math.random() * 100 > chanceOfNewerLead) continue;
-        
-        // Generate lead data
-        const propertyTypes = ['residential', 'commercial', 'luxury', 'affordable'];
-        const sources = ['website', 'social media', 'referral', 'direct', 'phone'];
-        const statuses = ['new', 'contacted', 'qualified', 'proposal', 'closed', 'lost'];
-        
-        // Higher conversion rates for older leads
-        const leadAgeInDays = randomMonthOffset * 30 + randomDayOffset;
-        let status;
-        if (leadAgeInDays > 60) {
-          // Old leads are mostly closed or lost
-          status = Math.random() > 0.3 ? 'closed' : 'lost';
-        } else if (leadAgeInDays > 30) {
-          // Medium-age leads are in progress
-          const statusIndex = Math.min(Math.floor(Math.random() * 4) + 2, 5);
-          status = statuses[statusIndex];
-        } else {
-          // Newer leads are mostly new or contacted
-          const statusIndex = Math.min(Math.floor(Math.random() * 3), 2);
-          status = statuses[statusIndex];
-        }
-        
-        sampleLeads.push({
-          id: `lead-${i}`,
-          name: `Lead ${i}`,
-          email: `lead${i}@example.com`,
-          phone: `+1${Math.floor(1000000000 + Math.random() * 9000000000)}`,
-          propertyType: propertyTypes[Math.floor(Math.random() * propertyTypes.length)],
-          source: sources[Math.floor(Math.random() * sources.length)],
-          status,
-          createdAt: leadDate.toISOString(),
-          updatedAt: new Date(leadDate.getTime() + Math.random() * 1000 * 60 * 60 * 24 * 15).toISOString()
-        });
+  getAllLeads: async () => {
+    try {
+      const response = await fetch('/api/leads?limit=1000');
+      const data = await response.json();
+
+      if (data.success && data.data) {
+        return data.data;
       }
-      
-      localStorage.setItem('leadData', JSON.stringify(sampleLeads));
+      return [];
+    } catch (error) {
+      console.error('Error fetching leads:', error);
+      return [];
     }
   }
 };
 
 export function LeadChart() {
+  const { user } = useAuth();
   const [timeframe, setTimeframe] = useState<'7d' | '30d' | '90d' | '6m' | '1y'>('6m');
   const [leadData, setLeadData] = useState<{
     month: string;
@@ -86,119 +36,170 @@ export function LeadChart() {
     conversions: 0,
     conversionRate: 0
   });
-  
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   useEffect(() => {
-    // Initialize sample data if needed
-    LeadService.initSampleData();
+    const fetchAndProcessLeads = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // Get all leads from API
+        const allLeads = await LeadService.getAllLeads();
     
-    // Get all leads from localStorage
-    const allLeads = LeadService.getAllLeads();
-    
-    // Calculate date range based on selected timeframe
-    const endDate = new Date();
-    let startDate = new Date();
-    
-    switch (timeframe) {
-      case '7d':
-        startDate.setDate(endDate.getDate() - 7);
-        break;
-      case '30d':
-        startDate.setDate(endDate.getDate() - 30);
-        break;
-      case '90d':
-        startDate.setDate(endDate.getDate() - 90);
-        break;
-      case '6m':
-        startDate.setMonth(endDate.getMonth() - 6);
-        break;
-      case '1y':
-        startDate.setFullYear(endDate.getFullYear() - 1);
-        break;
-    }
-    
-    // Filter leads by date range
-    const filteredLeads = allLeads.filter((lead: any) => {
-      const leadDate = new Date(lead.createdAt);
-      return leadDate >= startDate && leadDate <= endDate;
-    });
-    
-    // Count conversions (closed deals)
-    const conversions = filteredLeads.filter((lead: any) => lead.status === 'closed').length;
-    
-    // Group leads by month/week depending on timeframe
-    const groupedData = [];
-    let format: 'month' | 'week' | 'day' = 'month';
-    let numGroups = 6;
-    
-    if (timeframe === '7d') {
-      format = 'day';
-      numGroups = 7;
-    } else if (timeframe === '30d') {
-      format = 'week';
-      numGroups = 4;
-    } else if (timeframe === '90d') {
-      format = 'week';
-      numGroups = 12;
-    }
-    
-    // Create time periods
-    for (let i = 0; i < numGroups; i++) {
-      const periodEndDate = new Date(endDate);
-      const periodStartDate = new Date(endDate);
-      
-      if (format === 'month') {
-        periodEndDate.setMonth(endDate.getMonth() - i);
-        periodStartDate.setMonth(endDate.getMonth() - i - 1);
-        periodStartDate.setDate(periodStartDate.getDate() + 1);
-      } else if (format === 'week') {
-        periodEndDate.setDate(endDate.getDate() - (i * 7));
-        periodStartDate.setDate(endDate.getDate() - ((i + 1) * 7) + 1);
-      } else {
-        periodEndDate.setDate(endDate.getDate() - i);
-        periodStartDate.setDate(endDate.getDate() - i);
+        // Calculate date range based on selected timeframe
+        const endDate = new Date();
+        let startDate = new Date();
+
+        switch (timeframe) {
+          case '7d':
+            startDate.setDate(endDate.getDate() - 7);
+            break;
+          case '30d':
+            startDate.setDate(endDate.getDate() - 30);
+            break;
+          case '90d':
+            startDate.setDate(endDate.getDate() - 90);
+            break;
+          case '6m':
+            startDate.setMonth(endDate.getMonth() - 6);
+            break;
+          case '1y':
+            startDate.setFullYear(endDate.getFullYear() - 1);
+            break;
+        }
+
+        // Filter leads by date range
+        const filteredLeads = allLeads.filter((lead: any) => {
+          const leadDate = new Date(lead.createdAt);
+          return leadDate >= startDate && leadDate <= endDate;
+        });
+
+        // Count conversions (closed deals)
+        const conversions = filteredLeads.filter((lead: any) => lead.status === 'closed').length;
+
+        // Group leads by month/week depending on timeframe
+        const groupedData = [];
+        let format: 'month' | 'week' | 'day' = 'month';
+        let numGroups = 6;
+
+        if (timeframe === '7d') {
+          format = 'day';
+          numGroups = 7;
+        } else if (timeframe === '30d') {
+          format = 'week';
+          numGroups = 4;
+        } else if (timeframe === '90d') {
+          format = 'week';
+          numGroups = 12;
+        }
+
+        // Create time periods
+        for (let i = 0; i < numGroups; i++) {
+          const periodEndDate = new Date(endDate);
+          const periodStartDate = new Date(endDate);
+
+          if (format === 'month') {
+            periodEndDate.setMonth(endDate.getMonth() - i);
+            periodStartDate.setMonth(endDate.getMonth() - i - 1);
+            periodStartDate.setDate(periodStartDate.getDate() + 1);
+          } else if (format === 'week') {
+            periodEndDate.setDate(endDate.getDate() - (i * 7));
+            periodStartDate.setDate(endDate.getDate() - ((i + 1) * 7) + 1);
+          } else {
+            periodEndDate.setDate(endDate.getDate() - i);
+            periodStartDate.setDate(endDate.getDate() - i);
+          }
+
+          // Filter leads for this period
+          const periodLeads = filteredLeads.filter((lead: any) => {
+            const leadDate = new Date(lead.createdAt);
+            return leadDate >= periodStartDate && leadDate <= periodEndDate;
+          });
+
+          // Count conversions for this period
+          const periodConversions = periodLeads.filter((lead: any) => lead.status === 'closed').length;
+
+          // Format label based on period type
+          let label;
+          if (format === 'month') {
+            label = periodEndDate.toLocaleString('en-US', { month: 'short' });
+          } else if (format === 'week') {
+            label = `W${numGroups - i}`;
+          } else {
+            label = periodEndDate.toLocaleString('en-US', { day: '2-digit' });
+          }
+
+          groupedData.push({
+            month: label,
+            leads: periodLeads.length,
+            conversions: periodConversions
+          });
+        }
+
+        // Reverse to show chronological order
+        groupedData.reverse();
+
+        // Update state
+        setLeadData(groupedData);
+        setTotalStats({
+          totalLeads: filteredLeads.length,
+          conversions,
+          conversionRate: filteredLeads.length > 0 ? Math.round((conversions / filteredLeads.length) * 100) : 0
+        });
+      } catch (err: any) {
+        console.error('Error processing leads data:', err);
+        setError('Failed to load analytics data');
+        // Set empty data on error
+        setLeadData([]);
+        setTotalStats({
+          totalLeads: 0,
+          conversions: 0,
+          conversionRate: 0
+        });
+      } finally {
+        setLoading(false);
       }
-      
-      // Filter leads for this period
-      const periodLeads = filteredLeads.filter((lead: any) => {
-        const leadDate = new Date(lead.createdAt);
-        return leadDate >= periodStartDate && leadDate <= periodEndDate;
-      });
-      
-      // Count conversions for this period
-      const periodConversions = periodLeads.filter((lead: any) => lead.status === 'closed').length;
-      
-      // Format label based on period type
-      let label;
-      if (format === 'month') {
-        label = periodEndDate.toLocaleString('en-US', { month: 'short' });
-      } else if (format === 'week') {
-        label = `W${numGroups - i}`;
-      } else {
-        label = periodEndDate.toLocaleString('en-US', { day: '2-digit' });
-      }
-      
-      groupedData.push({
-        month: label,
-        leads: periodLeads.length,
-        conversions: periodConversions
-      });
-    }
-    
-    // Reverse to show chronological order
-    groupedData.reverse();
-    
-    // Update state
-    setLeadData(groupedData);
-    setTotalStats({
-      totalLeads: filteredLeads.length,
-      conversions,
-      conversionRate: filteredLeads.length > 0 ? Math.round((conversions / filteredLeads.length) * 100) : 0
-    });
+    };
+
+    fetchAndProcessLeads();
   }, [timeframe]);
   
   const maxLeads = Math.max(...leadData.map((d) => d.leads), 1);
   const trend: 'up' | 'down' | 'neutral' = totalStats.totalLeads > 0 ? 'up' : 'neutral';
   
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-4" />
+            <p className="text-gray-600">Loading analytics data...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-red-600 text-sm">!</span>
+            </div>
+            <p className="text-gray-600">{error}</p>
+            <p className="text-sm text-gray-500 mt-2">Please check if you have access to leads data</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
       <div className="flex items-center justify-between mb-6">
@@ -208,6 +209,7 @@ export function LeadChart() {
           </h3>
           <p className="text-sm text-gray-600">
             {timeframe === '7d' ? 'Daily' : timeframe === '30d' || timeframe === '90d' ? 'Weekly' : 'Monthly'} lead generation and conversion trends
+            {totalStats.totalLeads === 0 && <span className="text-amber-600"> (No data available)</span>}
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -315,13 +317,15 @@ export function LeadChart() {
         </div>
       </div>
       
-      {/* View All Link */}
-      <div className="mt-4 pt-4 border-t border-gray-200 text-center">
-        <a href="/cms-admin/dashboard/leads" className="inline-flex items-center text-sm text-blue-600 hover:text-blue-800 font-medium">
-          View All Leads
-          <ArrowRight className="ml-1 w-4 h-4" />
-        </a>
-      </div>
+      {/* View All Link - only for admins and super admins */}
+      {(user?.role === 'admin' || user?.role === 'super_admin') && (
+        <div className="mt-4 pt-4 border-t border-gray-200 text-center">
+          <a href="/cms-admin/dashboard/leads" className="inline-flex items-center text-sm text-blue-600 hover:text-blue-800 font-medium">
+            View All Leads
+            <ArrowRight className="ml-1 w-4 h-4" />
+          </a>
+        </div>
+      )}
     </div>
   )
 }

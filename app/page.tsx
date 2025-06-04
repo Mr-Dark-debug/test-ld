@@ -170,7 +170,7 @@ export default function Home() {
 
       {/* CTA Banner */}
       <CtaBanner
-        title="Find Your Perfect Property"
+        title={<>Find Your<br className="sm:hidden" /> Perfect Property</>}
         description="Explore our ongoing and upcoming projects or get in touch with our sales team for personalized assistance."
         buttons={[
           {

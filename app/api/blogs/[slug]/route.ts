@@ -36,9 +36,15 @@ async function getBlogHandler(req: NextRequest, { params }: { params: Promise<{ 
       );
     }
 
+    // Transform data to include featuredImage for frontend compatibility
+    const transformedBlog = {
+      ...blog,
+      featuredImage: blog.coverImage
+    };
+
     return NextResponse.json({
       success: true,
-      data: blog
+      data: transformedBlog
     });
 
   } catch (error) {

@@ -254,34 +254,71 @@ async function patchLeadHandler(req: AuthenticatedRequest, { params }: { params:
   }
 }
 
-// Helper function to combine middlewares
-function withMiddleware(...middlewares: Array<(handler: any) => any>) {
-  return function(handler: (req: AuthenticatedRequest) => Promise<NextResponse>) {
-    return middlewares.reduceRight((acc, middleware) => middleware(acc), handler);
-  };
+// Export the handlers directly
+export async function GET(req: NextRequest, context: { params: Promise<{ id: string }> }) {
+  try {
+    // Apply authentication middleware
+    const authResult = await withAuth(async (authReq: AuthenticatedRequest) => {
+      return getLeadHandler(authReq, context);
+    })(req as AuthenticatedRequest);
+
+    return authResult;
+  } catch (error) {
+    console.error('GET lead error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
 }
 
-// Export the handlers with middleware
-export const GET = withMiddleware(
-  withCors,
-  withAuth,
-  withErrorHandling
-)(getLeadHandler);
+export async function PUT(req: NextRequest, context: { params: Promise<{ id: string }> }) {
+  try {
+    // Apply authentication middleware
+    const authResult = await withAuth(async (authReq: AuthenticatedRequest) => {
+      return updateLeadHandler(authReq, context);
+    })(req as AuthenticatedRequest);
 
-export const PUT = withMiddleware(
-  withCors,
-  withAuth,
-  withErrorHandling
-)(updateLeadHandler);
+    return authResult;
+  } catch (error) {
+    console.error('PUT lead error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
 
-export const DELETE = withMiddleware(
-  withCors,
-  withAuth,
-  withErrorHandling
-)(deleteLeadHandler);
+export async function DELETE(req: NextRequest, context: { params: Promise<{ id: string }> }) {
+  try {
+    // Apply authentication middleware
+    const authResult = await withAuth(async (authReq: AuthenticatedRequest) => {
+      return deleteLeadHandler(authReq, context);
+    })(req as AuthenticatedRequest);
 
-export const PATCH = withMiddleware(
-  withCors,
-  withAuth,
-  withErrorHandling
-)(patchLeadHandler);
+    return authResult;
+  } catch (error) {
+    console.error('DELETE lead error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PATCH(req: NextRequest, context: { params: Promise<{ id: string }> }) {
+  try {
+    // Apply authentication middleware
+    const authResult = await withAuth(async (authReq: AuthenticatedRequest) => {
+      return patchLeadHandler(authReq, context);
+    })(req as AuthenticatedRequest);
+
+    return authResult;
+  } catch (error) {
+    console.error('PATCH lead error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}

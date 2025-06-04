@@ -36,7 +36,12 @@ export async function comparePassword(password: string, hash: string): Promise<b
  * Generate a JWT token
  */
 export function generateToken(payload: Omit<JWTPayload, 'iat' | 'exp'>): string {
-  return jwt.sign(payload, JWT_SECRET!, { expiresIn: JWT_EXPIRES_IN });
+  if (!JWT_SECRET) {
+    throw new Error('JWT_SECRET is not defined');
+  }
+  // Type assertion to fix TypeScript error
+  const secretKey = JWT_SECRET as string;
+  return jwt.sign(payload, secretKey, { expiresIn: JWT_EXPIRES_IN });
 }
 
 /**
@@ -105,4 +110,17 @@ export function generateRandomPassword(length: number = 12): string {
     password += charset.charAt(Math.floor(Math.random() * charset.length));
   }
   return password;
+}
+
+/**
+ * Verify authentication from request
+ */
+export async function verifyAuth(request: NextRequest) {
+  const user = getUserFromRequest(request);
+  
+  if (!user) {
+    return { success: false, error: 'Authentication required' };
+  }
+  
+  return { success: true, user };
 }

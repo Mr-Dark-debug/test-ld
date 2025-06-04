@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import BlogPost from '@/models/BlogPost';
 import { validateRequest, createBlogSchema } from '@/lib/validation';
+import { withAuth, withErrorHandling, withCors, AuthenticatedRequest } from '@/middleware/auth';
 
 // GET /api/blogs - Get all blog posts
 async function getBlogsHandler(req: NextRequest) {
@@ -54,12 +55,18 @@ async function getBlogsHandler(req: NextRequest) {
       .limit(limit)
       .lean();
 
+    // Transform data to include featuredImage for frontend compatibility
+    const transformedBlogs = blogs.map(blog => ({
+      ...blog,
+      featuredImage: blog.coverImage // Add featuredImage field for frontend compatibility
+    }));
+
     // Get total count for pagination
     const total = await BlogPost.countDocuments(query);
 
     return NextResponse.json({
       success: true,
-      data: blogs,
+      data: transformedBlogs,
       pagination: {
         page,
         limit,
@@ -78,7 +85,7 @@ async function getBlogsHandler(req: NextRequest) {
 }
 
 // POST /api/blogs - Create new blog post (admin only)
-async function createBlogHandler(req: NextRequest) {
+async function createBlogHandler(req: AuthenticatedRequest) {
   await connectDB();
 
   try {
@@ -93,12 +100,23 @@ async function createBlogHandler(req: NextRequest) {
       );
     }
 
-    // For now, we'll use a default user ID - in real implementation, get from auth
-    const defaultUserId = '507f1f77bcf86cd799439011'; // This should come from authenticated user
+    // Get user ID from authenticated request
+    const userId = req.user.userId;
+
+    // Generate slug from title
+    const generateSlug = (title: string) => {
+      return title
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-')
+        .trim();
+    };
 
     const blogData = {
       ...validation.value,
-      createdBy: defaultUserId
+      slug: generateSlug(validation.value.title),
+      createdBy: userId
     };
 
     const blog = await BlogPost.create(blogData);
@@ -129,11 +147,20 @@ async function createBlogHandler(req: NextRequest) {
   }
 }
 
+// Helper function to combine middlewares
+function withMiddleware(...middlewares: Array<(handler: any) => any>) {
+  return function(handler: (req: AuthenticatedRequest) => Promise<NextResponse>) {
+    return middlewares.reduceRight((acc, middleware) => middleware(acc), handler);
+  };
+}
+
 // Export the handlers
 export async function GET(req: NextRequest) {
   return getBlogsHandler(req);
 }
 
-export async function POST(req: NextRequest) {
-  return createBlogHandler(req);
-}
+export const POST = withMiddleware(
+  withCors,
+  withAuth,
+  withErrorHandling
+)(createBlogHandler);

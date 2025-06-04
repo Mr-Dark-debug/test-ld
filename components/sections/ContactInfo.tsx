@@ -3,6 +3,8 @@
 import React, { useState } from "react";
 import { ShimmerButton } from "@/components/magicui/shimmer-button";
 import useAnalytics from "@/hooks/useAnalytics";
+import { getApiUrl } from "@/lib/config";
+import PhoneInput from "@/components/ui/phone-input";
 
 interface ContactInfoProps {
   title?: string;
@@ -24,13 +26,14 @@ export default function ContactInfo({
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    mobile: "",
-    project: "",
+    phone: "",
+    projectInterest: "",
     message: "",
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const { trackContactForm, trackButtonClick } = useAnalytics();
 
   const handleChange = (
@@ -40,42 +43,69 @@ export default function ContactInfo({
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handlePhoneChange = (value: string) => {
+    setFormData((prev) => ({ ...prev, phone: value }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setSubmitError(null);
 
     try {
+      // Validate phone number
+      if (!formData.phone || formData.phone.trim().length < 8) {
+        setSubmitError('Please enter a valid phone number');
+        return;
+      }
+
       // Track form submission attempt
       trackContactForm('contact_page');
 
       // Send data to API
-      const response = await fetch('/api/leads/contact', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
+      const apiUrl = getApiUrl('leads/contact');
+      console.log('Submitting to:', apiUrl);
+      console.log('Form data:', formData);
+
+      // Create a timeout promise
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Request timeout')), 30000) // 30 second timeout
+      );
+
+      // Race between fetch and timeout
+      const response = await Promise.race([
+        fetch(apiUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData),
+        }),
+        timeoutPromise
+      ]) as Response;
 
       const result = await response.json();
+      console.log('API Response:', result);
 
-      if (result.success) {
+      if (response.ok && result.success) {
         setFormSubmitted(true);
+        setSubmitError(null);
         // Reset form
         setFormData({
           name: "",
           email: "",
-          mobile: "",
-          project: "",
+          phone: "",
+          projectInterest: "",
           message: "",
         });
       } else {
-        console.error('Form submission failed:', result.error);
-        alert('Failed to send message. Please try again.');
+        const errorMessage = result.error || `Server error: ${response.status}`;
+        console.error('Form submission failed:', errorMessage);
+        setSubmitError(errorMessage);
       }
     } catch (error) {
       console.error('Form submission error:', error);
-      alert('Failed to send message. Please try again.');
+      setSubmitError('Network error. Please check your connection and try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -134,6 +164,28 @@ export default function ContactInfo({
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Error Message */}
+                {submitError && (
+                  <div className="bg-red-50 border border-red-200 rounded-md p-4">
+                    <div className="flex">
+                      <svg
+                        className="h-5 w-5 text-red-400"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      <div className="ml-3">
+                        <p className="text-sm text-red-800">{submitError}</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium mb-2">
                     Full Name *
@@ -165,29 +217,29 @@ export default function ContactInfo({
                     />
                   </div>
                   <div>
-                    <label htmlFor="mobile" className="block text-sm font-medium mb-2">
+                    <label htmlFor="phone" className="block text-sm font-medium mb-2">
                       Mobile Number *
                     </label>
-                    <input
-                      id="mobile"
-                      name="mobile"
-                      type="tel"
+                    <PhoneInput
+                      id="phone"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handlePhoneChange}
+                      placeholder="Enter number"
                       required
-                      value={formData.mobile}
-                      onChange={handleChange}
-                      className="w-full px-4 py-2 bg-muted border border-border rounded-md focus:ring-highlight focus:border-highlight"
+                      className="w-full"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label htmlFor="project" className="block text-sm font-medium mb-2">
+                  <label htmlFor="projectInterest" className="block text-sm font-medium mb-2">
                     Project of Interest
                   </label>
                   <select
-                    id="project"
-                    name="project"
-                    value={formData.project}
+                    id="projectInterest"
+                    name="projectInterest"
+                    value={formData.projectInterest}
                     onChange={handleChange}
                     className="w-full px-4 py-2 bg-muted border border-border rounded-md focus:ring-highlight focus:border-highlight"
                   >

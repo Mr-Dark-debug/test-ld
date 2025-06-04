@@ -22,7 +22,7 @@ const projects = [
     title: "Aster",
     location: "Surat",
     description: "Premium residential complex with modern architecture.",
-    image: "/images/projects/Millennium Park.jpg", // Using existing image as placeholder
+    image: "/images/projects/Alexa.jpg", // Changed from duplicate Millennium Park image
   },
   {
     year: "2028",
@@ -62,7 +62,7 @@ const projects = [
     title: "Flora",
     location: "Surat",
     description: "Modern residential complex with extensive green spaces.",
-    image: "/images/projects/Millennium Park.jpg", // Using existing image as placeholder
+    image: "/images/projects/Millennium Park.jpg", // Changed from duplicate Millennium Park image
   },
   {
     year: "2025",
@@ -102,7 +102,7 @@ const projects = [
     title: "Millennium Textile Market 4",
     location: "Surat",
     description: "The fourth phase of the Millennium Textile Market, completed in 2024.",
-    image: "/images/projects/Millennium Textile Market 3.jpg", // Using similar image as placeholder
+    image: "/images/projects/Millennium Business Hub 2.jpg", // Changed from duplicate Textile Market image
   },
   {
     year: "2024",

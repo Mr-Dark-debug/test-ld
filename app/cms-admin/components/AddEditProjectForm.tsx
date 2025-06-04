@@ -248,13 +248,13 @@ export function AddEditProjectForm({ projectId, onClose }: AddEditProjectFormPro
     });
   };
 
-  const handleFileUpload = (field: keyof Pick<FormData, 'gallery' | 'floorPlans'> | 'coverImage' | 'modelView' | 'reraQrImage', files: FileList | null, category: string | null = null) => {
+  const handleFileUpload = async (field: keyof Pick<FormData, 'gallery' | 'floorPlans'> | 'coverImage' | 'modelView' | 'reraQrImage', files: FileList | null, category: string | null = null) => {
     if (!files || files.length === 0) return;
 
     const fileObjects: FileObject[] = Array.from(files).map((file) => ({
       id: Math.random().toString(36).substr(2, 9),
       name: file.name,
-      url: URL.createObjectURL(file), 
+      url: URL.createObjectURL(file),
       file,
     }));
 
@@ -267,12 +267,48 @@ export function AddEditProjectForm({ projectId, onClose }: AddEditProjectFormPro
         },
       }));
     } else if (field === 'coverImage' || field === 'modelView' || field === 'reraQrImage'){
-      setFormData((prev) => ({
-        ...prev,
-        [field]: fileObjects[0].url, 
-      }));
-    } 
-    toast.success(`File${files.length > 1 ? 's' : ''} uploaded successfully (preview).`);
+      // For single file uploads, upload to server immediately
+      if (field === 'coverImage' || field === 'reraQrImage') {
+        try {
+          const formDataUpload = new FormData();
+          formDataUpload.append('files', files[0]);
+          formDataUpload.append('type', 'image');
+          formDataUpload.append('thumbnails', 'true');
+
+          const response = await fetch('/api/upload', {
+            method: 'POST',
+            body: formDataUpload,
+          });
+
+          if (response.ok) {
+            const result = await response.json();
+            if (result.success && result.data.length > 0) {
+              const uploadedImagePath = result.data[0].path;
+              setFormData((prev) => ({
+                ...prev,
+                [field]: uploadedImagePath,
+              }));
+              toast.success(`${field === 'coverImage' ? 'Cover image' : 'RERA QR image'} uploaded successfully!`);
+              return;
+            }
+          }
+          toast.error(`Failed to upload ${field === 'coverImage' ? 'cover image' : 'RERA QR image'}`);
+        } catch (error) {
+          console.error(`${field} upload error:`, error);
+          toast.error(`Failed to upload ${field === 'coverImage' ? 'cover image' : 'RERA QR image'}`);
+        }
+      } else {
+        // For other files (like modelView), just set the preview URL
+        setFormData((prev) => ({
+          ...prev,
+          [field]: fileObjects[0].url,
+        }));
+      }
+    }
+
+    if (field !== 'coverImage' && field !== 'reraQrImage') {
+      toast.success(`File${files.length > 1 ? 's' : ''} uploaded successfully (preview).`);
+    }
   };
 
  const handleBrochureUpload = (files: FileList | null) => {

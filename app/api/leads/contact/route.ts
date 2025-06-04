@@ -3,6 +3,7 @@ import connectDB from '@/lib/mongodb';
 import Lead from '@/models/Lead';
 import { withErrorHandling, withCors, withRateLimit } from '@/middleware/auth';
 import { validateRequest, contactLeadSchema } from '@/lib/validation';
+import { API_CONFIG } from '@/lib/config';
 
 // POST /api/leads/contact - Submit contact form
 async function contactHandler(req: NextRequest) {
@@ -13,14 +14,17 @@ async function contactHandler(req: NextRequest) {
     );
   }
 
-  await connectDB();
-
   try {
+    // Ensure database connection
+    await connectDB();
+
     const body = await req.json();
-    
+    console.log('Received contact form data:', body);
+
     // Validate request body
     const validation = validateRequest(body, contactLeadSchema);
     if (validation.error) {
+      console.error('Validation error:', validation.error);
       return NextResponse.json(
         { error: validation.error },
         { status: 400 }
@@ -33,7 +37,9 @@ async function contactHandler(req: NextRequest) {
       source: 'website'
     };
 
+    console.log('Creating lead with data:', leadData);
     const lead = await Lead.create(leadData);
+    console.log('Lead created successfully:', lead._id);
 
     // TODO: Send notification email to admin
     // TODO: Send confirmation email to user
@@ -60,7 +66,10 @@ async function contactHandler(req: NextRequest) {
 // Apply middlewares
 export const POST = withMiddleware(
   withCors,
-  withRateLimit(5, 15 * 60 * 1000), // 5 requests per 15 minutes
+  withRateLimit(
+    API_CONFIG.RATE_LIMIT.CONTACT_FORM.MAX_REQUESTS,
+    API_CONFIG.RATE_LIMIT.CONTACT_FORM.WINDOW_MS
+  ),
   withErrorHandling
 )(contactHandler);
 

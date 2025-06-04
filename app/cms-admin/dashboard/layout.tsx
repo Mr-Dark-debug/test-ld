@@ -8,5 +8,5 @@ function Layout({ children }: { children: React.ReactNode }) {
   return <DashboardLayout>{children}</DashboardLayout>
 }
 
-// Protect the dashboard with authentication (admin and super_admin only)
-export default withAuth(Layout, ['super_admin', 'admin', 'editor'])
+// Protect the dashboard with authentication (allow all authenticated users)
+export default withAuth(Layout, ['super_admin', 'admin', 'editor', 'user'])

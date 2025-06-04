@@ -105,8 +105,8 @@ export default function EditBlogPage() {
         setSlug(blogPost.slug);
         setContent(blogPost.content);
         setExcerpt(blogPost.excerpt || '');
-        setImageUrl(blogPost.imageUrl || '');
-        setCoverImagePreview(blogPost.imageUrl || '');
+        setImageUrl(blogPost.coverImage || '');
+        setCoverImagePreview(blogPost.coverImage || '');
         setCategory(blogPost.category);
         setTags(blogPost.tags || []);
         setPublishStatus(blogPost.status);
@@ -114,8 +114,8 @@ export default function EditBlogPage() {
         setAuthorId(blogPost.createdBy?._id || '');
         setReadingTime(blogPost.readingTime || '');
         setCreatedAt(blogPost.createdAt);
-        setMetaTitle(blogPost.metaTitle || '');
-        setMetaDescription(blogPost.metaDescription || '');
+        setMetaTitle(blogPost.seoMeta?.title || '');
+        setMetaDescription(blogPost.seoMeta?.description || '');
 
         // Parse publish date and time if available
         if (blogPost.publishDate) {
@@ -137,7 +137,7 @@ export default function EditBlogPage() {
   }, [params.id, router]);
 
   // Handle image upload
-  const handleImageUpload = (e) => {
+  const handleImageUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -149,6 +149,35 @@ export default function EditBlogPage() {
     reader.readAsDataURL(file);
 
     setCoverImage(file);
+
+    // Upload image to server
+    try {
+      const formData = new FormData();
+      formData.append('files', file);
+      formData.append('type', 'image');
+      formData.append('thumbnails', 'true');
+
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success && result.data.length > 0) {
+          // Store the uploaded image path
+          const uploadedImagePath = result.data[0].path;
+          setCoverImagePreview(uploadedImagePath);
+          setImageUrl(uploadedImagePath);
+          toast.success('Image uploaded successfully!');
+        }
+      } else {
+        toast.error('Failed to upload image');
+      }
+    } catch (error) {
+      console.error('Image upload error:', error);
+      toast.error('Failed to upload image');
+    }
   };
 
   // Generate slug from title
@@ -245,10 +274,16 @@ export default function EditBlogPage() {
         status: publishStatus,
         publishDate: publishStatus === 'scheduled' ? `${publishDate}T${publishTime}:00` :
                     publishStatus === 'published' ? new Date().toISOString() : null,
-        metaTitle: metaTitle || title,
-        metaDescription: metaDescription || excerpt,
-        readingTime: updatedReadingTime,
-        imageUrl: coverImage ? coverImagePreview : imageUrl // If new image uploaded, use preview; otherwise use original URL
+        coverImage: coverImage ? coverImagePreview : imageUrl, // If new image uploaded, use preview; otherwise use original URL
+        author: {
+          name: author || "Admin User",
+          avatar: ""
+        },
+        seoMeta: {
+          title: metaTitle || title,
+          description: metaDescription || excerpt,
+          keywords: tags
+        }
       };
 
       // Update blog post via API

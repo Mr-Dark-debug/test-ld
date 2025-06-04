@@ -6,11 +6,11 @@ import { validateRequest, updateTestimonialSchema } from '@/lib/validation';
 import mongoose from 'mongoose';
 
 // GET /api/testimonials/[id] - Get single testimonial
-async function getTestimonialHandler(req: AuthenticatedRequest, { params }: { params: { id: string } }) {
+async function getTestimonialHandler(req: AuthenticatedRequest, { params }: { params: Promise<{ id: string }> }) {
   await connectDB();
 
   try {
-    const { id } = params;
+    const { id } = await params;
 
     // Validate ObjectId
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -20,9 +20,7 @@ async function getTestimonialHandler(req: AuthenticatedRequest, { params }: { pa
       );
     }
 
-    const testimonial = await Testimonial.findById(id)
-      .populate('projectId', 'title type status')
-      .lean();
+    const testimonial = await Testimonial.findById(id).lean();
 
     if (!testimonial) {
       return NextResponse.json(
@@ -46,11 +44,11 @@ async function getTestimonialHandler(req: AuthenticatedRequest, { params }: { pa
 }
 
 // PUT /api/testimonials/[id] - Update testimonial (admin only)
-async function updateTestimonialHandler(req: AuthenticatedRequest, { params }: { params: { id: string } }) {
+async function updateTestimonialHandler(req: AuthenticatedRequest, { params }: { params: Promise<{ id: string }> }) {
   await connectDB();
 
   try {
-    const { id } = params;
+    const { id } = await params;
 
     // Validate ObjectId
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -61,7 +59,7 @@ async function updateTestimonialHandler(req: AuthenticatedRequest, { params }: {
     }
 
     const body = await req.json();
-    
+
     // Validate request body
     const validation = validateRequest(body, updateTestimonialSchema);
     if (validation.error) {
@@ -75,7 +73,7 @@ async function updateTestimonialHandler(req: AuthenticatedRequest, { params }: {
       id,
       validation.value,
       { new: true, runValidators: true }
-    ).populate('projectId', 'title type status');
+    );
 
     if (!testimonial) {
       return NextResponse.json(
@@ -100,11 +98,11 @@ async function updateTestimonialHandler(req: AuthenticatedRequest, { params }: {
 }
 
 // DELETE /api/testimonials/[id] - Delete testimonial (admin only)
-async function deleteTestimonialHandler(req: AuthenticatedRequest, { params }: { params: { id: string } }) {
+async function deleteTestimonialHandler(req: AuthenticatedRequest, { params }: { params: Promise<{ id: string }> }) {
   await connectDB();
 
   try {
-    const { id } = params;
+    const { id } = await params;
 
     // Validate ObjectId
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -138,11 +136,11 @@ async function deleteTestimonialHandler(req: AuthenticatedRequest, { params }: {
 }
 
 // PATCH /api/testimonials/[id] - Approve/reject testimonial (admin only)
-async function patchTestimonialHandler(req: AuthenticatedRequest, { params }: { params: { id: string } }) {
+async function patchTestimonialHandler(req: AuthenticatedRequest, { params }: { params: Promise<{ id: string }> }) {
   await connectDB();
 
   try {
-    const { id } = params;
+    const { id } = await params;
     const body = await req.json();
     const { action } = body;
 
@@ -182,7 +180,7 @@ async function patchTestimonialHandler(req: AuthenticatedRequest, { params }: { 
       id,
       updateData,
       { new: true, runValidators: true }
-    ).populate('projectId', 'title type status');
+    );
 
     if (!testimonial) {
       return NextResponse.json(
@@ -206,34 +204,71 @@ async function patchTestimonialHandler(req: AuthenticatedRequest, { params }: { 
   }
 }
 
-// Route handlers
-export const GET = withMiddleware(
-  withCors,
-  withAuth,
-  withErrorHandling
-)(getTestimonialHandler);
+// Export the handlers with middleware
+export async function GET(req: NextRequest, context: { params: Promise<{ id: string }> }) {
+  try {
+    // Apply authentication middleware
+    const authResult = await withAuth(async (authReq: AuthenticatedRequest) => {
+      return getTestimonialHandler(authReq, context);
+    })(req as AuthenticatedRequest);
 
-export const PUT = withMiddleware(
-  withCors,
-  withAuth,
-  withErrorHandling
-)(updateTestimonialHandler);
+    return authResult;
+  } catch (error) {
+    console.error('GET testimonial error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
 
-export const DELETE = withMiddleware(
-  withCors,
-  withAuth,
-  withErrorHandling
-)(deleteTestimonialHandler);
+export async function PUT(req: NextRequest, context: { params: Promise<{ id: string }> }) {
+  try {
+    // Apply authentication middleware
+    const authResult = await withAuth(async (authReq: AuthenticatedRequest) => {
+      return updateTestimonialHandler(authReq, context);
+    })(req as AuthenticatedRequest);
 
-export const PATCH = withMiddleware(
-  withCors,
-  withAuth,
-  withErrorHandling
-)(patchTestimonialHandler);
+    return authResult;
+  } catch (error) {
+    console.error('PUT testimonial error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
 
-// Helper function to combine middlewares
-function withMiddleware(...middlewares: Array<(handler: any) => any>) {
-  return function(handler: (req: AuthenticatedRequest, context: any) => Promise<NextResponse>) {
-    return middlewares.reduceRight((acc, middleware) => middleware(acc), handler);
-  };
+export async function DELETE(req: NextRequest, context: { params: Promise<{ id: string }> }) {
+  try {
+    // Apply authentication middleware
+    const authResult = await withAuth(async (authReq: AuthenticatedRequest) => {
+      return deleteTestimonialHandler(authReq, context);
+    })(req as AuthenticatedRequest);
+
+    return authResult;
+  } catch (error) {
+    console.error('DELETE testimonial error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PATCH(req: NextRequest, context: { params: Promise<{ id: string }> }) {
+  try {
+    // Apply authentication middleware
+    const authResult = await withAuth(async (authReq: AuthenticatedRequest) => {
+      return patchTestimonialHandler(authReq, context);
+    })(req as AuthenticatedRequest);
+
+    return authResult;
+  } catch (error) {
+    console.error('PATCH testimonial error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
 }

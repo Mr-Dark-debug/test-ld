@@ -83,7 +83,7 @@ async function createUserHandler(req: AuthenticatedRequest) {
   await connectDB();
 
   try {
-    // Check if user is admin
+    // Check if user is admin or super admin (both can create users)
     if (req.user.role !== 'admin' && req.user.role !== 'super_admin') {
       return NextResponse.json(
         { error: 'Access denied. Admin privileges required.' },
@@ -107,6 +107,33 @@ async function createUserHandler(req: AuthenticatedRequest) {
       return NextResponse.json(
         { error: 'Name, email, and password are required' },
         { status: 400 }
+      );
+    }
+
+    // Role hierarchy validation
+    const roleHierarchy = {
+      'super_admin': 4,
+      'admin': 3,
+      'editor': 2,
+      'user': 1
+    };
+
+    const currentUserLevel = roleHierarchy[req.user.role as keyof typeof roleHierarchy] || 0;
+    const targetRoleLevel = roleHierarchy[(role || 'user') as keyof typeof roleHierarchy] || 0;
+
+    // Admins cannot create super admins
+    if (req.user.role === 'admin' && role === 'super_admin') {
+      return NextResponse.json(
+        { error: 'Access denied. Admins cannot create super admin users.' },
+        { status: 403 }
+      );
+    }
+
+    // Users can only create roles lower than their own level (except super admin can create anyone)
+    if (req.user.role !== 'super_admin' && targetRoleLevel >= currentUserLevel) {
+      return NextResponse.json(
+        { error: 'Access denied. You can only create users with roles lower than your own.' },
+        { status: 403 }
       );
     }
 
@@ -167,22 +194,37 @@ async function createUserHandler(req: AuthenticatedRequest) {
   }
 }
 
-// Helper function to combine middlewares
-function withMiddleware(...middlewares: Array<(handler: any) => any>) {
-  return function(handler: (req: AuthenticatedRequest) => Promise<NextResponse>) {
-    return middlewares.reduceRight((acc, middleware) => middleware(acc), handler);
-  };
+// Export the handlers directly
+export async function GET(req: NextRequest) {
+  try {
+    // Apply authentication middleware
+    const authResult = await withAuth(async (authReq: AuthenticatedRequest) => {
+      return getUsersHandler(authReq);
+    })(req as AuthenticatedRequest);
+
+    return authResult;
+  } catch (error) {
+    console.error('GET users error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
 }
 
-// Export the handlers with middleware
-export const GET = withMiddleware(
-  withCors,
-  withAuth,
-  withErrorHandling
-)(getUsersHandler);
+export async function POST(req: NextRequest) {
+  try {
+    // Apply authentication middleware
+    const authResult = await withAuth(async (authReq: AuthenticatedRequest) => {
+      return createUserHandler(authReq);
+    })(req as AuthenticatedRequest);
 
-export const POST = withMiddleware(
-  withCors,
-  withAuth,
-  withErrorHandling
-)(createUserHandler);
+    return authResult;
+  } catch (error) {
+    console.error('POST users error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}

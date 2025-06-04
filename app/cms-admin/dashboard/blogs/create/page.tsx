@@ -28,9 +28,11 @@ import Link from 'next/link'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { blogsApi } from '@/lib/api'
+import { useAuth } from '@/contexts/AuthContext'
 
 export default function CreateBlogPage() {
   const router = useRouter()
+  const { user } = useAuth()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [previewTab, setPreviewTab] = useState<'write' | 'preview'>('write')
   const [formTab, setFormTab] = useState<'content' | 'settings'>('content')
@@ -61,7 +63,7 @@ export default function CreateBlogPage() {
   ]
 
   // Handle image upload
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
 
@@ -73,6 +75,34 @@ export default function CreateBlogPage() {
     reader.readAsDataURL(file)
 
     setCoverImage(file)
+
+    // Upload image to server
+    try {
+      const formData = new FormData()
+      formData.append('files', file)
+      formData.append('type', 'image')
+      formData.append('thumbnails', 'true')
+
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (response.ok) {
+        const result = await response.json()
+        if (result.success && result.data.length > 0) {
+          // Store the uploaded image path
+          const uploadedImagePath = result.data[0].path
+          setCoverImagePreview(uploadedImagePath)
+          toast.success('Image uploaded successfully!')
+        }
+      } else {
+        toast.error('Failed to upload image')
+      }
+    } catch (error) {
+      console.error('Image upload error:', error)
+      toast.error('Failed to upload image')
+    }
   }
 
   // Generate slug from title
@@ -116,20 +146,38 @@ export default function CreateBlogPage() {
     setIsSubmitting(true)
 
     try {
-      // Form validation
-      if (!title) {
+      // Form validation with detailed checks
+      if (!title.trim()) {
         toast.error('Title is required')
         setIsSubmitting(false)
         return
       }
 
-      if (!content) {
+      if (!content.trim()) {
         toast.error('Content is required')
         setIsSubmitting(false)
         return
       }
 
-      if (!slug) {
+      if (content.trim().length < 50) {
+        toast.error('Content must be at least 50 characters long')
+        setIsSubmitting(false)
+        return
+      }
+
+      if (!excerpt.trim()) {
+        toast.error('Excerpt is required')
+        setIsSubmitting(false)
+        return
+      }
+
+      if (excerpt.trim().length < 10) {
+        toast.error('Excerpt must be at least 10 characters long')
+        setIsSubmitting(false)
+        return
+      }
+
+      if (!slug.trim()) {
         toast.error('Slug is required')
         setIsSubmitting(false)
         return
@@ -147,19 +195,24 @@ export default function CreateBlogPage() {
         return
       }
 
-      // Prepare data for submission
+      // Prepare data for submission according to API schema
       const blogPostData = {
-        title,
-        slug,
-        content,
-        excerpt: excerpt || content.substring(0, 150) + '...',
+        title: title.trim(),
+        content: content.trim(),
+        excerpt: excerpt.trim(),
         category,
         tags,
         status: publishStatus,
-        publishDate: publishStatus === 'scheduled' ? `${publishDate}T${publishTime}:00` :
-                    publishStatus === 'published' ? new Date().toISOString() : null,
-        metaTitle: metaTitle || title,
-        metaDescription: metaDescription || excerpt,
+        coverImage: coverImagePreview || '', // Include the uploaded image path
+        author: {
+          name: user?.name || "Admin User",
+          avatar: user?.profileImage || ""
+        },
+        seoMeta: {
+          title: metaTitle.trim() || title.trim(),
+          description: metaDescription.trim() || excerpt.trim(),
+          keywords: tags
+        }
       }
 
       // Submit to real API
@@ -175,9 +228,43 @@ export default function CreateBlogPage() {
       } else {
         toast.error(response.error || 'Failed to create blog post');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating blog post:', error)
-      toast.error('Failed to create blog post')
+
+      // Handle different types of errors with user-friendly messages
+      if (error.message) {
+        const errorMessage = error.message;
+
+        // Parse specific validation errors
+        if (errorMessage.includes('"content" length must be at least')) {
+          toast.error('Content must be at least 50 characters long');
+        } else if (errorMessage.includes('"excerpt" length must be at least')) {
+          toast.error('Excerpt must be at least 10 characters long');
+        } else if (errorMessage.includes('"author" is required')) {
+          toast.error('Author information is missing. Please try logging in again.');
+        } else if (errorMessage.includes('duplicate key')) {
+          toast.error('A blog post with this title or slug already exists. Please use a different title.');
+        } else if (errorMessage.includes('validation failed')) {
+          // Extract specific validation errors from the message
+          const validationErrors = errorMessage.split(',').map((err: string) => err.trim());
+          validationErrors.forEach((err: string) => {
+            if (err.includes('content')) {
+              toast.error('Content validation failed: Please check your content length');
+            } else if (err.includes('excerpt')) {
+              toast.error('Excerpt validation failed: Please check your excerpt length');
+            } else if (err.includes('title')) {
+              toast.error('Title validation failed: Please check your title');
+            } else {
+              toast.error(err);
+            }
+          });
+        } else {
+          // Show the full error message for other errors
+          toast.error(errorMessage);
+        }
+      } else {
+        toast.error('Failed to create blog post. Please check your internet connection and try again.');
+      }
     } finally {
       setIsSubmitting(false)
     }
@@ -257,7 +344,7 @@ export default function CreateBlogPage() {
                 <TabsContent value="content" className="space-y-4">
                   {/* Title */}
                   <div>
-                    <Label htmlFor="title">Title</Label>
+                    <Label htmlFor="title">Title *</Label>
                     <Input
                       id="title"
                       value={title}
@@ -291,9 +378,9 @@ export default function CreateBlogPage() {
                   {/* Content */}
                   <div className="mt-4">
                     <div className="flex justify-between items-center mb-1">
-                      <Label htmlFor="content">Content (Markdown)</Label>
-                      <div className="text-xs text-gray-500">
-                        {content.length} characters
+                      <Label htmlFor="content">Content (Markdown) *</Label>
+                      <div className={`text-xs ${content.length < 50 ? 'text-red-500' : 'text-gray-500'}`}>
+                        {content.length} / 50+ characters required
                       </div>
                     </div>
 
@@ -323,9 +410,9 @@ export default function CreateBlogPage() {
                   {/* Excerpt */}
                   <div>
                     <div className="flex justify-between">
-                      <Label htmlFor="excerpt">Excerpt (Summary)</Label>
-                      <div className="text-xs text-gray-500">
-                        {excerpt.length} / 200 characters
+                      <Label htmlFor="excerpt">Excerpt (Summary) *</Label>
+                      <div className={`text-xs ${excerpt.length < 10 ? 'text-red-500' : excerpt.length > 200 ? 'text-orange-500' : 'text-gray-500'}`}>
+                        {excerpt.length} / 10-200 characters
                       </div>
                     </div>
                     <Textarea
@@ -488,7 +575,7 @@ export default function CreateBlogPage() {
               <div className="space-y-4">
                 {/* Category */}
                 <div>
-                  <Label htmlFor="category">Category</Label>
+                  <Label htmlFor="category">Category *</Label>
                   <select
                     id="category"
                     value={category}

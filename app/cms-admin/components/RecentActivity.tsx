@@ -121,7 +121,7 @@ export function RecentActivity() {
         </div>
       )}
       
-      <Link href="/cms-admin/dashboard/activities" className="block w-full mt-4 text-center text-sm text-blue-600 hover:text-blue-700 font-medium">
+      <Link href="/cms-admin/dashboard/activity" className="block w-full mt-4 text-center text-sm text-blue-600 hover:text-blue-700 font-medium">
         View all activity
       </Link>
     </div>

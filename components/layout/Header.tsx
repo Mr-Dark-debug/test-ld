@@ -188,7 +188,7 @@ export default function Header() {
       {/* Only show header if not in /cms-admin */}
       {!(pathname && pathname.startsWith('/cms-admin')) && (
         <header 
-          className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 py-3 ${
+          className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 py-3 ${
             !headerVisible && !isMobileMenuOpen ? 'transform -translate-y-full' : 'transform translate-y-0'
           } backdrop-blur-md`}
         >
@@ -320,7 +320,7 @@ export default function Header() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
+            className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50"
             onClick={toggleMobileMenu}
           >
             <motion.div 
@@ -328,7 +328,7 @@ export default function Header() {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ duration: 0.3, ease: "easeInOut" }}
-              className="fixed top-0 right-0 bottom-0 w-full max-w-sm bg-white dark:bg-gray-900 z-50 overflow-y-auto"
+              className="fixed top-0 right-0 bottom-0 w-full max-w-sm bg-white dark:bg-gray-900 z-[60] overflow-y-auto"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Close button */}

@@ -207,7 +207,7 @@ export default function AllProjectsPage() {
       </section>
 
       {/* Search and Filters Section - Fixed at top with better sticky behavior */}
-      <div className={`sticky -mt-16 top-0 z-40 w-full transition-all duration-300 ${
+      <div className={`sticky -mt-16 top-0 z-30 w-full transition-all duration-300 ${
         scrolled ? 'bg-background/95 dark:bg-gray-900/95 backdrop-blur-md shadow-md' : 'bg-transparent'
       }`}>
         <div className="container mx-auto px-4">
@@ -222,7 +222,7 @@ export default function AllProjectsPage() {
                 placeholder="Search by project name, location, or keyword..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 rounded-lg border-border dark:border-gray-700 focus:ring-primary dark:focus:ring-primary-dark focus:border-primary dark:focus:border-primary-dark bg-card/80 dark:bg-gray-800/80"
+                className="w-full pl-10 pr-16 py-2 rounded-lg border-border dark:border-gray-700 focus:ring-primary dark:focus:ring-primary-dark focus:border-primary dark:focus:border-primary-dark bg-card/80 dark:bg-gray-800/80"
               />
               
               {/* Mobile Filter Toggle */}

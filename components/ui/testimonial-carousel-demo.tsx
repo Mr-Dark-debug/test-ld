@@ -3,12 +3,24 @@
 import { useState, useEffect } from "react";
 import { TestimonialCarousel } from "@/components/ui/testimonial-carousel";
 import { TestimonialCarouselSkeleton } from "@/components/ui/loading";
+import { testimonialsApi } from "@/lib/api";
+
+interface TestimonialCarouselData {
+  title: string;
+  quote: string;
+  name: string;
+  role: string;
+  youtubeUrl: string;
+  thumbnailSrc: string;
+}
 
 export function TestimonialCarouselDemo() {
   const [isLoading, setIsLoading] = useState(true);
-  // Use static data for better performance - no API calls on every page load
-  const [testimonialData] = useState([
-    // Default YouTube testimonials - these load instantly
+  const [testimonialData, setTestimonialData] = useState<TestimonialCarouselData[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fallback static data in case API fails
+  const fallbackData = [
     {
       title: "Exceptional Quality",
       quote: "Laxmi Developers delivered beyond our expectations. The attention to detail and quality of construction is outstanding. We're extremely happy with our investment.",
@@ -41,15 +53,62 @@ export function TestimonialCarouselDemo() {
       youtubeUrl: "https://youtu.be/3bmdwCqPiBA",
       thumbnailSrc: "https://img.youtube.com/vi/3bmdwCqPiBA/maxresdefault.jpg",
     },
-  ]);
+  ];
 
-  // Simulate loading for better UX
+  // Helper function to extract YouTube video ID
+  const getYouTubeVideoId = (url: string) => {
+    if (!url) return null;
+    const regex = /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/;
+    const match = url.match(regex);
+    return match ? match[1] : null;
+  };
+
+  // Transform API testimonial to carousel format
+  const transformTestimonial = (testimonial: any) => {
+    const videoId = getYouTubeVideoId(testimonial.youtubeUrl);
+    return {
+      title: `${testimonial.rating} Star${testimonial.rating > 1 ? 's' : ''} Review`,
+      quote: testimonial.content,
+      name: testimonial.name,
+      role: [testimonial.designation, testimonial.company].filter(Boolean).join(', ') || 'Valued Client',
+      youtubeUrl: testimonial.youtubeUrl || '',
+      thumbnailSrc: videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : '',
+    };
+  };
+
+  // Fetch featured testimonials from API
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
+    const fetchTestimonials = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
 
-    return () => clearTimeout(timer);
+        // Fetch featured and approved testimonials
+        const response = await testimonialsApi.getAll({
+          featured: true,
+          approved: true,
+          limit: 6 // Limit to 6 featured testimonials
+        });
+
+        if (response.success && response.data && response.data.length > 0) {
+          // Transform API data to carousel format
+          const transformedData = response.data.map(transformTestimonial);
+          setTestimonialData(transformedData);
+        } else {
+          // Use fallback data if no featured testimonials found
+          setTestimonialData(fallbackData);
+        }
+      } catch (err) {
+        console.error('Error fetching testimonials:', err);
+        setError('Failed to load testimonials');
+        // Use fallback data on error
+        setTestimonialData(fallbackData);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchTestimonials();
   }, []);
 
   if (isLoading) {

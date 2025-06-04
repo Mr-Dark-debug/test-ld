@@ -132,6 +132,50 @@ export default function UsersList() {
     }
   };
 
+  // Role hierarchy helper functions
+  const roleHierarchy = {
+    'super_admin': 4,
+    'admin': 3,
+    'editor': 2,
+    'user': 1
+  };
+
+  const canModifyUser = (targetUser: any) => {
+    if (!user) return false;
+
+    // Super admin can modify anyone except other super admins (but can modify themselves)
+    if (user.role === 'super_admin') {
+      return true;
+    }
+
+    // No one can modify super admin except super admin
+    if (targetUser.role === 'super_admin') {
+      return false;
+    }
+
+    // Users can only modify users with roles lower than their own
+    const currentUserLevel = roleHierarchy[user.role as keyof typeof roleHierarchy] || 0;
+    const targetUserLevel = roleHierarchy[targetUser.role as keyof typeof roleHierarchy] || 0;
+
+    return targetUserLevel < currentUserLevel;
+  };
+
+  const canDeleteUser = (targetUser: any) => {
+    if (!user) return false;
+
+    // Only super admin can delete users
+    if (user.role !== 'super_admin') {
+      return false;
+    }
+
+    // No one can delete super admin
+    if (targetUser.role === 'super_admin') {
+      return false;
+    }
+
+    return true;
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -163,13 +207,15 @@ export default function UsersList() {
             <h1 className="text-2xl font-bold text-gray-900">User Management</h1>
             <p className="text-gray-600 mt-1">Manage system users and their permissions</p>
           </div>
-          <Button
-            onClick={() => router.push('/cms-admin/dashboard/users/create')}
-            className="inline-flex items-center"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Add User
-          </Button>
+          {(user?.role === 'super_admin' || user?.role === 'admin') && (
+            <Button
+              onClick={() => router.push('/cms-admin/dashboard/users/create')}
+              className="inline-flex items-center"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Add User
+            </Button>
+          )}
         </div>
 
         {/* Filters */}
@@ -326,32 +372,38 @@ export default function UsersList() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <div className="flex items-center justify-end space-x-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => toggleUserStatus(userData._id, userData.isActive)}
-                            className={userData.isActive ? 'text-red-600 hover:text-red-700' : 'text-green-600 hover:text-green-700'}
-                          >
-                            {userData.isActive ? (
-                              <>
-                                <UserX className="w-3 h-3 mr-1" />
-                                Deactivate
-                              </>
-                            ) : (
-                              <>
-                                <UserCheck className="w-3 h-3 mr-1" />
-                                Activate
-                              </>
-                            )}
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => router.push(`/cms-admin/dashboard/users/${userData._id}`)}
-                          >
-                            <Edit className="w-3 h-3 mr-1" />
-                            Edit
-                          </Button>
+                          {/* Only super admin can activate/deactivate users (with role hierarchy) */}
+                          {canDeleteUser(userData) && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => toggleUserStatus(userData._id, userData.isActive)}
+                              className={userData.isActive ? 'text-red-600 hover:text-red-700' : 'text-green-600 hover:text-green-700'}
+                            >
+                              {userData.isActive ? (
+                                <>
+                                  <UserX className="w-3 h-3 mr-1" />
+                                  Deactivate
+                                </>
+                              ) : (
+                                <>
+                                  <UserCheck className="w-3 h-3 mr-1" />
+                                  Activate
+                                </>
+                              )}
+                            </Button>
+                          )}
+                          {/* Users can edit based on role hierarchy */}
+                          {canModifyUser(userData) && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => router.push(`/cms-admin/dashboard/users/${userData._id}`)}
+                            >
+                              <Edit className="w-3 h-3 mr-1" />
+                              Edit
+                            </Button>
+                          )}
                         </div>
                       </td>
                     </tr>

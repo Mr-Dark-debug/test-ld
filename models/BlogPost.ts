@@ -36,7 +36,6 @@ const BlogPostSchema = new Schema<IBlogPost>({
   },
   slug: {
     type: String,
-    required: true,
     unique: true,
     lowercase: true,
     trim: true

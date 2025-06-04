@@ -2,6 +2,18 @@
 import { IconArrowNarrowRight, IconPlayerPlay, IconPlayerPause, IconVolume, IconVolumeOff } from "@tabler/icons-react";
 import { useState, useRef, useId, useEffect } from "react";
 
+// Add YouTube API type declarations
+interface YT {
+  Player: any;
+}
+
+declare global {
+  interface Window {
+    YT?: YT;
+    onYouTubeIframeAPIReady?: () => void;
+  }
+}
+
 interface TestimonialData {
   title: string;
   quote: string;
@@ -18,11 +30,14 @@ interface TestimonialSlideProps {
   current: number;
   handleSlideClick: (index: number) => void;
   totalItems: number;
+  onVideoStateChange: (isPlaying: boolean) => void;
 }
 
-const TestimonialSlide = ({ testimonial, index, current, handleSlideClick, totalItems }: TestimonialSlideProps) => {
+const TestimonialSlide = ({ testimonial, index, current, handleSlideClick, totalItems, onVideoStateChange }: TestimonialSlideProps) => {
   const slideRef = useRef<HTMLLIElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
   const [showText, setShowText] = useState(true);
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -92,15 +107,10 @@ const TestimonialSlide = ({ testimonial, index, current, handleSlideClick, total
     }
   };
 
-  const handleVideoPlay = () => {
-    setIsPlaying(true);
-    setShowText(false);
-  };
-
-  const handleVideoPause = () => {
-    setIsPlaying(false);
-    if (!isHovered) {
-      setShowText(true);
+  const handleToggleMute = () => {
+    if (videoRef.current) {
+      videoRef.current.muted = !videoRef.current.muted;
+      setIsMuted(!isMuted);
     }
   };
 
@@ -113,6 +123,47 @@ const TestimonialSlide = ({ testimonial, index, current, handleSlideClick, total
 
   const { videoSrc, youtubeUrl, thumbnailSrc, quote, title, name, role } = testimonial;
   const youtubeVideoId = youtubeUrl ? getYouTubeVideoId(youtubeUrl) : null;
+
+  // Setup YouTube API for event handling
+  useEffect(() => {
+    if (youtubeVideoId && current === index && iframeRef.current) {
+      // Add YouTube API script if not already loaded
+      if (!window.YT) {
+        const tag = document.createElement('script');
+        tag.src = 'https://www.youtube.com/iframe_api';
+        const firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag);
+      }
+
+      // Function to be called when YouTube API is ready
+      const onYouTubeIframeAPIReady = () => {
+        if (!iframeRef.current) return;
+        
+        // Create new YouTube player with event handlers
+        if (window.YT && window.YT.Player) {
+          new window.YT.Player(iframeRef.current, {
+            events: {
+              onStateChange: (event: any) => {
+                // YouTube states: -1 (unstarted), 0 (ended), 1 (playing), 2 (paused), 3 (buffering), 5 (video cued)
+                if (event.data === 1) { // Playing
+                  onVideoStateChange(true);
+                } else if (event.data === 0 || event.data === 2) { // Ended or Paused
+                  onVideoStateChange(false);
+                }
+              }
+            }
+          });
+        }
+      };
+
+      // Setup the API callback if not already defined
+      if (window.YT && window.YT.Player) {
+        onYouTubeIframeAPIReady();
+      } else {
+        window.onYouTubeIframeAPIReady = onYouTubeIframeAPIReady;
+      }
+    }
+  }, [current, index, youtubeVideoId, onVideoStateChange]);
 
   return (
     <div className="[perspective:1200px] [transform-style:preserve-3d]">
@@ -180,35 +231,6 @@ const TestimonialSlide = ({ testimonial, index, current, handleSlideClick, total
                 playsInline
                 muted={isMuted}
               />
-
-              {/* Video controls in top-right corner - only for regular videos */}
-              <div className="absolute top-4 right-4 flex items-center space-x-2 z-20">
-                <button
-                  type="button"
-                  onClick={handlePlayVideo}
-                  className="w-8 h-8 sm:w-10 sm:h-10 bg-accent/90 rounded-full flex items-center justify-center cursor-pointer hover:bg-accent transition-colors"
-                  aria-label={isPlaying ? "Pause video" : "Play video"}
-                >
-                  {isPlaying ? (
-                    <IconPlayerPause className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-                  ) : (
-                    <IconPlayerPlay className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-                  )}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleToggleMute}
-                  className="w-8 h-8 sm:w-10 sm:h-10 bg-accent/90 rounded-full flex items-center justify-center cursor-pointer hover:bg-accent transition-colors"
-                  aria-label={isMuted ? "Unmute video" : "Mute video"}
-                >
-                  {isMuted ? (
-                    <IconVolumeOff className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-                  ) : (
-                    <IconVolume className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-                  )}
-                </button>
-              </div>
             </>
           ) : (
             // Fallback: show thumbnail image if no video
@@ -250,20 +272,6 @@ const TestimonialSlide = ({ testimonial, index, current, handleSlideClick, total
             </div>
           </div>
         </article>
-
-        {/* Play button hint for YouTube videos */}
-        {youtubeVideoId && current === index && showText && (
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-none">
-            <div className="bg-black/50 rounded-full p-4 backdrop-blur-sm">
-              <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
-                <svg className="w-6 h-6 text-black ml-1" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M8 5v14l11-7z"/>
-                </svg>
-              </div>
-            </div>
-            <p className="text-white text-sm text-center mt-2 font-medium">Hover to play video</p>
-          </div>
-        )}
       </li>
     </div>
   );
@@ -307,16 +315,17 @@ export function TestimonialCarousel({
   scrollInterval = 5000
 }: TestimonialCarouselProps) {
   const [current, setCurrent] = useState(0);
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const autoScrollRef = useRef<NodeJS.Timeout | null>(null);
   const carouselRef = useRef<HTMLDivElement>(null);
   const isHovering = useRef(false);
 
   // Auto scroll functionality with looping
   useEffect(() => {
-    if (autoScroll) {
+    if (autoScroll && !isVideoPlaying) {
       const startAutoScroll = () => {
         autoScrollRef.current = setInterval(() => {
-          if (!isHovering.current) {
+          if (!isHovering.current && !isVideoPlaying) {
             setCurrent(prev => (prev + 1) % testimonials.length);
           }
         }, scrollInterval);
@@ -330,7 +339,7 @@ export function TestimonialCarousel({
         }
       };
     }
-  }, [autoScroll, testimonials.length, scrollInterval]);
+  }, [autoScroll, testimonials.length, scrollInterval, isVideoPlaying]);
 
   // Pause auto-scroll on hover
   useEffect(() => {
@@ -368,6 +377,12 @@ export function TestimonialCarousel({
   const handleSlideClick = (index: number) => {
     if (current !== index) {
       setCurrent(index);
+    } else {
+      // If clicking on current slide with YouTube video, prevent auto-scrolling
+      const testimonial = testimonials[index];
+      if (testimonial.youtubeUrl) {
+        setIsVideoPlaying(true);
+      }
     }
   };
 
@@ -394,6 +409,7 @@ export function TestimonialCarousel({
               current={current}
               handleSlideClick={handleSlideClick}
               totalItems={testimonials.length}
+              onVideoStateChange={(isPlaying) => setIsVideoPlaying(isPlaying)}
             />
           ))}
         </ul>

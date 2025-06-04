@@ -43,7 +43,6 @@ async function getTestimonialsHandler(req: AuthenticatedRequest) {
     const skip = (page - 1) * limit;
 
     const testimonials = await Testimonial.find(query)
-      .populate('projectId', 'title type status')
       .sort({ isFeatured: -1, rating: -1, createdAt: -1 })
       .skip(skip)
       .limit(limit)
@@ -95,9 +94,6 @@ async function createTestimonialHandler(req: AuthenticatedRequest) {
     };
 
     const testimonial = await Testimonial.create(testimonialData);
-    
-    // Populate the created testimonial
-    await testimonial.populate('projectId', 'title type status');
 
     return NextResponse.json({
       success: true,
@@ -116,22 +112,37 @@ async function createTestimonialHandler(req: AuthenticatedRequest) {
   }
 }
 
-// Route handlers
-export const GET = withMiddleware(
-  withCors,
-  withOptionalAuth,
-  withErrorHandling
-)(getTestimonialsHandler);
+// Export the handlers directly
+export async function GET(req: NextRequest) {
+  try {
+    // Apply optional authentication middleware (allows both authenticated and public access)
+    const authResult = await withOptionalAuth(async (authReq: AuthenticatedRequest) => {
+      return getTestimonialsHandler(authReq);
+    })(req as AuthenticatedRequest);
 
-export const POST = withMiddleware(
-  withCors,
-  withOptionalAuth,
-  withErrorHandling
-)(createTestimonialHandler);
+    return authResult;
+  } catch (error) {
+    console.error('GET testimonials error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
 
-// Helper function to combine middlewares
-function withMiddleware(...middlewares: Array<(handler: any) => any>) {
-  return function(handler: (req: AuthenticatedRequest) => Promise<NextResponse>) {
-    return middlewares.reduceRight((acc, middleware) => middleware(acc), handler);
-  };
+export async function POST(req: NextRequest) {
+  try {
+    // Apply authentication middleware for creating testimonials
+    const authResult = await withAuth(async (authReq: AuthenticatedRequest) => {
+      return createTestimonialHandler(authReq);
+    })(req as AuthenticatedRequest);
+
+    return authResult;
+  } catch (error) {
+    console.error('POST testimonials error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
 }

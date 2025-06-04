@@ -533,63 +533,42 @@ class App {
     borderRadius: number,
     font: string
   ) {
-    const defaultItems = [
-      {
-        image: `/images/projects/Aleta.jpg`,
-        text: "Aleta",
-      },
-      {
-        image: `/images/projects/Alexa.jpg`,
-        text: "Alexa",
-      },
-      {
-        image: `/images/projects/Millennium Business Hub.jpg`,
-        text: "Millennium Business Hub",
-      },
-      {
-        image: `/images/projects/Millennium Business Hub 2.jpg`,
-        text: "Millennium Business Hub 2",
-      },
-      {
-        image: `/images/projects/Millennium Business Hub 3.jpg`,
-        text: "Millennium Business Hub 3",
-      },
-      {
-        image: `/images/projects/Millennium City Central.jpg`,
-        text: "Millennium City Central",
-      },
-      {
-        image: `/images/projects/Millennium Textile Market 3.jpg`,
-        text: "Millennium Textile Market",
-      },
-      {
-        image: `/images/projects/Laxmi Nova.jpg`,
-        text: "Laxmi Nova",
-      },
-      {
-        image: `/images/projects/Millennium Park.jpg`,
-        text: "Millennium Park",
-      },
-    ];
-    const galleryItems = items && items.length ? items : defaultItems;
-    this.mediasImages = galleryItems.concat(galleryItems);
-    this.medias = this.mediasImages.map((data, index) => {
-      return new Media({
+    // Use the provided items or fall back to empty array
+    const galleryItems = items && items.length > 0 ? items : [];
+    
+    // Prevent duplicates at the seam when we join the arrays
+    // If the first and last items have the same image, we need to shuffle
+    if (galleryItems.length > 2 && 
+        galleryItems[0].image === galleryItems[galleryItems.length - 1].image) {
+      // Swap the last item with the second-to-last item
+      const lastIndex = galleryItems.length - 1;
+      const temp = galleryItems[lastIndex];
+      galleryItems[lastIndex] = galleryItems[lastIndex - 1];
+      galleryItems[lastIndex - 1] = temp;
+    }
+    
+    // Duplicate the items to create a continuous loop effect
+    this.mediasImages = [...galleryItems, ...galleryItems];
+
+    // Calculate dimensions
+    this.medias = this.mediasImages.map((item, index) => {
+      const media = new Media({
         geometry: this.planeGeometry,
         gl: this.gl,
-        image: data.image,
+        image: item.image,
         index,
         length: this.mediasImages.length,
         renderer: this.renderer,
         scene: this.scene,
         screen: this.screen,
-        text: data.text,
+        text: item.text,
         viewport: this.viewport,
         bend,
         textColor,
         borderRadius,
         font,
       });
+      return media;
     });
   }
 
@@ -737,17 +716,40 @@ export default function CircularGallery({
   const dynamicTextColor = textColor || (theme === 'dark' ? '#ffffff' : '#000000');
   
   // Define default items with project images
-  const defaultItems = useMemo(() => [
-    { image: "/images/projects/Aleta.jpg", text: "Aleta" },
-    { image: "/images/projects/Alexa.jpg", text: "Alexa" },
-    { image: "/images/projects/Millennium Business Hub.jpg", text: "Millennium Business Hub" },
-    { image: "/images/projects/Millennium Business Hub 2.jpg", text: "Millennium Business Hub 2" },
-    { image: "/images/projects/Millennium Business Hub 3.jpg", text: "Millennium Business Hub 3" },
-    { image: "/images/projects/Millennium City Central.jpg", text: "Millennium City Central" },
-    { image: "/images/projects/Millennium Textile Market 3.jpg", text: "Millennium Textile Market" },
-    { image: "/images/projects/Laxmi Nova.jpg", text: "Laxmi Nova" },
-    { image: "/images/projects/Millennium Park.jpg", text: "Millennium Park" },
-  ], []);
+  const defaultItems = useMemo(() => {
+    // Original array of items
+    const originalItems = [
+      { image: "/images/projects/Aleta.jpg", text: "Aleta" },
+      { image: "/images/projects/Alexa.jpg", text: "Alexa" },
+      { image: "/images/projects/Millennium Business Hub.jpg", text: "Millennium Business Hub" },
+      { image: "/images/projects/Millennium Business Hub 2.jpg", text: "Millennium Business Hub 2" },
+      { image: "/images/projects/Millennium Business Hub 3.jpg", text: "Millennium Business Hub 3" },
+      { image: "/images/projects/Millennium City Central.jpg", text: "Millennium City Central" },
+      { image: "/images/projects/Millennium Textile Market 3.jpg", text: "Millennium Textile Market" },
+      { image: "/images/projects/Laxmi Nova.jpg", text: "Laxmi Nova" },
+      { image: "/images/projects/Millennium Park.jpg", text: "Millennium Park" },
+    ];
+    
+    // Rearrange items to ensure no consecutive duplicates
+    const rearrangedItems = [...originalItems];
+    
+    // Check for consecutive duplicates and swap if needed
+    for (let i = 1; i < rearrangedItems.length; i++) {
+      if (rearrangedItems[i].image === rearrangedItems[i-1].image) {
+        // Find a non-duplicate item to swap with
+        for (let j = i + 1; j < rearrangedItems.length; j++) {
+          if (rearrangedItems[j].image !== rearrangedItems[i-1].image && 
+              (j === rearrangedItems.length - 1 || rearrangedItems[j].image !== rearrangedItems[j+1].image)) {
+            // Swap items i and j
+            [rearrangedItems[i], rearrangedItems[j]] = [rearrangedItems[j], rearrangedItems[i]];
+            break;
+          }
+        }
+      }
+    }
+    
+    return rearrangedItems;
+  }, []);
   
   // Memoize the gallery items to prevent unnecessary re-renders
   const galleryItems = useMemo(() => items || defaultItems, [items, defaultItems]);

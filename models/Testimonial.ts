@@ -9,7 +9,7 @@ export interface ITestimonial extends Document {
   rating: number;
   image?: string;
   youtubeUrl?: string;
-  projectId?: mongoose.Types.ObjectId;
+
   isApproved: boolean;
   isFeatured: boolean;
   createdAt: Date;
@@ -56,18 +56,15 @@ const TestimonialSchema = new Schema<ITestimonial>({
     trim: true,
     validate: {
       validator: function(v: string) {
-        if (!v) return true; // Optional field
-        // Validate YouTube URL format
-        const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)[a-zA-Z0-9_-]{11}(&.*)?$/;
+        if (!v || v === '') return true; // Optional field, allow empty strings
+        // Validate YouTube URL format - more flexible to allow query parameters
+        const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)[a-zA-Z0-9_-]{11}.*$/;
         return youtubeRegex.test(v);
       },
       message: 'Please provide a valid YouTube URL'
     }
   },
-  projectId: {
-    type: Schema.Types.ObjectId,
-    ref: 'Project'
-  },
+
   isApproved: {
     type: Boolean,
     default: false
@@ -84,7 +81,7 @@ const TestimonialSchema = new Schema<ITestimonial>({
 TestimonialSchema.index({ isApproved: 1 });
 TestimonialSchema.index({ isFeatured: 1 });
 TestimonialSchema.index({ rating: -1 });
-TestimonialSchema.index({ projectId: 1 });
+
 TestimonialSchema.index({ isApproved: 1, isFeatured: 1 });
 TestimonialSchema.index({ createdAt: -1 });
 
@@ -97,9 +94,7 @@ TestimonialSchema.statics.findFeatured = function() {
   return this.find({ isApproved: true, isFeatured: true }).sort({ rating: -1, createdAt: -1 });
 };
 
-TestimonialSchema.statics.findByProject = function(projectId: string) {
-  return this.find({ projectId, isApproved: true }).sort({ rating: -1, createdAt: -1 });
-};
+
 
 TestimonialSchema.statics.findByRating = function(minRating: number = 4) {
   return this.find({ rating: { $gte: minRating }, isApproved: true }).sort({ rating: -1, createdAt: -1 });

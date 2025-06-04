@@ -15,7 +15,6 @@ interface TestimonialFormData {
   rating: number;
   image: string;
   youtubeUrl: string;
-  projectId: string;
   isApproved: boolean;
   isFeatured: boolean;
 }
@@ -36,7 +35,6 @@ export default function TestimonialsList() {
     rating: 5,
     image: '',
     youtubeUrl: '',
-    projectId: '',
     isApproved: true,
     isFeatured: false
   });
@@ -122,7 +120,7 @@ export default function TestimonialsList() {
       rating: testimonial.rating,
       image: testimonial.image || '',
       youtubeUrl: testimonial.youtubeUrl || '',
-      projectId: testimonial.projectId?._id || '',
+
       isApproved: testimonial.isApproved,
       isFeatured: testimonial.isFeatured
     });
@@ -138,7 +136,6 @@ export default function TestimonialsList() {
       rating: 5,
       image: '',
       youtubeUrl: '',
-      projectId: '',
       isApproved: true,
       isFeatured: false
     });
@@ -255,54 +252,47 @@ export default function TestimonialsList() {
                   className="bg-white rounded-xl shadow-sm border border-gray-200 p-6"
                 >
                   <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center">
-                      {testimonial.image ? (
-                        <img
-                          src={testimonial.image}
-                          alt={testimonial.name}
-                          className="w-12 h-12 rounded-full object-cover mr-4"
-                        />
-                      ) : (
-                        <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center mr-4">
-                          <span className="text-gray-600 font-medium">
-                            {testimonial.name.charAt(0)}
-                          </span>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h3 className="text-lg font-semibold text-gray-900">
+                            {testimonial.name}
+                          </h3>
+                          {testimonial.designation && (
+                            <p className="text-sm text-gray-600">
+                              {testimonial.designation}
+                            </p>
+                          )}
+                          {testimonial.company && (
+                            <p className="text-xs text-gray-500">
+                              {testimonial.company}
+                            </p>
+                          )}
                         </div>
-                      )}
-                      <div>
-                        <h3 className="text-sm font-semibold text-gray-900">
-                          {testimonial.name}
-                        </h3>
-                        <p className="text-sm text-gray-600">
-                          {testimonial.designation}
-                        </p>
-                        {testimonial.company && (
-                          <p className="text-xs text-gray-500">
-                            {testimonial.company}
-                          </p>
-                        )}
+                        <div className="flex items-center space-x-2">
+                          {testimonial.youtubeUrl && (
+                            <div className="w-4 h-4 text-red-600" title="Has YouTube video">
+                              <Youtube className="w-4 h-4" />
+                            </div>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => handleEdit(testimonial)}
+                            className="p-2 text-gray-400 hover:text-blue-600 transition-colors rounded-lg hover:bg-blue-50"
+                            title="Edit testimonial"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDelete(testimonial._id)}
+                            className="p-2 text-gray-400 hover:text-red-600 transition-colors rounded-lg hover:bg-red-50"
+                            title="Delete testimonial"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      {testimonial.youtubeUrl && (
-                        <Youtube className="w-4 h-4 text-red-600" title="Has YouTube video" />
-                      )}
-                      <button
-                        type="button"
-                        onClick={() => handleEdit(testimonial)}
-                        className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
-                        title="Edit testimonial"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleDelete(testimonial._id)}
-                        className="p-1 text-gray-400 hover:text-red-600 transition-colors"
-                        title="Delete testimonial"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
                     </div>
                   </div>
 
@@ -321,17 +311,16 @@ export default function TestimonialsList() {
                     <div className="mb-3">
                       <div className="bg-gray-100 rounded-lg p-3">
                         <div className="flex items-center text-sm text-gray-600">
-                          <Youtube className="w-4 h-4 mr-2 text-red-600" />
+                          <div className="w-4 h-4 mr-2 text-red-600">
+                            <Youtube className="w-4 h-4" />
+                          </div>
                           <span className="truncate">{testimonial.youtubeUrl}</span>
                         </div>
                       </div>
                     </div>
                   )}
 
-                  <div className="flex items-center justify-between text-xs text-gray-500">
-                    <span>
-                      Project: {testimonial.projectId?.title || 'None'}
-                    </span>
+                  <div className="flex items-center justify-end text-xs text-gray-500">
                     <div className="flex items-center space-x-2">
                       <button
                         type="button"
@@ -349,7 +338,7 @@ export default function TestimonialsList() {
                         title={testimonial.isFeatured ? 'Featured' : 'Not featured'}
                         aria-label={testimonial.isFeatured ? 'Remove from featured' : 'Mark as featured'}
                       >
-                        {testimonial.isFeatured ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                        <Eye className="w-4 h-4" />
                       </button>
                     </div>
                   </div>
@@ -455,7 +444,7 @@ export default function TestimonialsList() {
 
                   <div>
                     <label htmlFor="testimonial-youtube" className="block text-sm font-medium text-gray-700 mb-1">
-                      YouTube Video URL
+                      YouTube Video URL (Optional)
                     </label>
                     <input
                       id="testimonial-youtube"
@@ -470,19 +459,7 @@ export default function TestimonialsList() {
                     </p>
                   </div>
 
-                  <div>
-                    <label htmlFor="testimonial-image" className="block text-sm font-medium text-gray-700 mb-1">
-                      Profile Image URL
-                    </label>
-                    <input
-                      id="testimonial-image"
-                      type="url"
-                      value={formData.image}
-                      onChange={(e) => setFormData({...formData, image: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      placeholder="https://example.com/image.jpg"
-                    />
-                  </div>
+
 
                   <div className="flex items-center space-x-4">
                     <label className="flex items-center">

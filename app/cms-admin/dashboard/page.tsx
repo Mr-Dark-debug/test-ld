@@ -6,6 +6,7 @@ import { StatsCard } from '../components/StatsCard'
 import { RecentActivity } from '../components/RecentActivity'
 import { LeadChart } from '../components/LeadChart'
 import { dashboardApi } from '@/lib/api'
+import { useAuth } from '@/contexts/AuthContext'
 import {
   Building2,
   FileText,
@@ -30,12 +31,18 @@ const iconMap = {
 };
 
 export default function DashboardOverview() {
+  const { user } = useAuth();
   const [stats, setStats] = useState<any[]>([]);
   const [analytics, setAnalytics] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<string>('');
   const [alerts, setAlerts] = useState<any[]>([]);
+
+  // Role-based access control
+  const hasAccess = (requiredRoles: string[]) => {
+    return user && requiredRoles.includes(user.role);
+  };
 
   // Fetch dashboard statistics and alerts
   const fetchDashboardStats = async () => {
@@ -174,7 +181,9 @@ export default function DashboardOverview() {
               Dashboard Overview
             </h1>
             <p className="text-gray-600 mt-1">
-              Welcome back! Here's what's happening with your real estate CMS.
+              Welcome back, {user?.name}! {user?.role === 'user'
+                ? "Here's your personal dashboard."
+                : "Here's what's happening with your real estate CMS."}
             </p>
             {error && (
               <p className="text-red-500 text-sm mt-1">
@@ -242,22 +251,45 @@ export default function DashboardOverview() {
               Quick Actions
             </h3>
             <div className="grid grid-cols-2 gap-4">
-              <a href="/cms-admin/projects/add" className="flex items-center justify-center p-4 border-2 border-dashed border-blue-300 rounded-lg text-blue-600 hover:bg-blue-50 transition-colors">
-                <Building2 className="w-5 h-5 mr-2" />
-                Add Project
+              {/* Content management actions - available to editors and above */}
+              {hasAccess(['super_admin', 'admin', 'editor']) && (
+                <>
+                  <a href="/cms-admin/dashboard/projects" className="flex items-center justify-center p-4 border-2 border-dashed border-blue-300 rounded-lg text-blue-600 hover:bg-blue-50 transition-colors">
+                    <Building2 className="w-5 h-5 mr-2" />
+                    Manage Projects
+                  </a>
+                  <a href="/cms-admin/dashboard/blogs/create" className="flex items-center justify-center p-4 border-2 border-dashed border-green-300 rounded-lg text-green-600 hover:bg-green-50 transition-colors">
+                    <FileText className="w-5 h-5 mr-2" />
+                    Write Blog
+                  </a>
+                  <a href="/cms-admin/dashboard/testimonials" className="flex items-center justify-center p-4 border-2 border-dashed border-amber-300 rounded-lg text-amber-600 hover:bg-amber-50 transition-colors">
+                    <MessageSquare className="w-5 h-5 mr-2" />
+                    Manage Testimonials
+                  </a>
+                </>
+              )}
+
+              {/* Lead management - available to admins and above */}
+              {hasAccess(['super_admin', 'admin']) && (
+                <a href="/cms-admin/dashboard/leads" className="flex items-center justify-center p-4 border-2 border-dashed border-purple-300 rounded-lg text-purple-600 hover:bg-purple-50 transition-colors">
+                  <Users className="w-5 h-5 mr-2" />
+                  View Leads
+                </a>
+              )}
+
+              {/* Settings - available to all users */}
+              <a href="/cms-admin/dashboard/settings" className="flex items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors">
+                <RefreshCw className="w-5 h-5 mr-2" />
+                Settings
               </a>
-              <a href="/cms-admin/dashboard/blogs/create" className="flex items-center justify-center p-4 border-2 border-dashed border-green-300 rounded-lg text-green-600 hover:bg-green-50 transition-colors">
-                <FileText className="w-5 h-5 mr-2" />
-                Write Blog
-              </a>
-              <a href="/cms-admin/dashboard/leads" className="flex items-center justify-center p-4 border-2 border-dashed border-purple-300 rounded-lg text-purple-600 hover:bg-purple-50 transition-colors">
-                <Users className="w-5 h-5 mr-2" />
-                View Leads
-              </a>
-              <a href="/cms-admin/dashboard/testimonials" className="flex items-center justify-center p-4 border-2 border-dashed border-amber-300 rounded-lg text-amber-600 hover:bg-amber-50 transition-colors">
-                <MessageSquare className="w-5 h-5 mr-2" />
-                Add Testimonial
-              </a>
+
+              {/* User management - super admin and admin */}
+              {hasAccess(['super_admin', 'admin']) && (
+                <a href="/cms-admin/dashboard/users" className="flex items-center justify-center p-4 border-2 border-dashed border-indigo-300 rounded-lg text-indigo-600 hover:bg-indigo-50 transition-colors">
+                  <Users className="w-5 h-5 mr-2" />
+                  Manage Users
+                </a>
+              )}
             </div>
           </div>
           {/* Pending Approvals & Alerts */}

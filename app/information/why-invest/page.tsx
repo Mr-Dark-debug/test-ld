@@ -3,6 +3,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/Button";
 import { FeatureCard } from "@/components/ui/FeatureCard";
 import { TrendingUp, DollarSign, Award, Home, Building } from "@/components/ui/LucideIcons";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Why Invest in Real Estate | Laxmi Developers",
@@ -75,7 +76,9 @@ export default function WhyInvestPage() {
       {/* Hero Section */}
       <section className="pt-32 pb-16 bg-gradient-to-b from-primary to-primary/90 text-foreground">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-4xl md:text-5xl font-display mb-6 text-center">Why Invest in Real Estate</h1>
+          <h1 className="text-4xl md:text-5xl font-display mb-6 text-center">
+            Why Invest in <br className="sm:hidden" />Real Estate
+          </h1>
           <p className="text-xl text-center max-w-3xl mx-auto mb-8">
             Discover the benefits of investing in real estate in Surat and why Laxmi Developers is your ideal investment partner.
           </p>
@@ -85,7 +88,9 @@ export default function WhyInvestPage() {
       {/* Benefits of Real Estate Investment */}
       <section className="py-16 bg-background">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-display mb-12 text-center">Benefits of Real Estate Investment</h2>
+          <h2 className="text-3xl font-display mb-12 text-center">
+            Benefits of Real Estate <br className="sm:hidden" />Investment
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {benefits.map((benefit, index) => (
               <FeatureCard
@@ -104,7 +109,9 @@ export default function WhyInvestPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-3xl font-display mb-6">Why Invest in Surat?</h2>
+              <h2 className="text-3xl font-display mb-6">
+                Why Invest in <br className="sm:hidden" />Surat?
+              </h2>
               <p className="text-lg mb-8">
                 Surat, known as the Diamond City and a major textile hub, has emerged as one of India's fastest-growing urban centers with tremendous investment potential.
               </p>
@@ -137,7 +144,9 @@ export default function WhyInvestPage() {
       {/* Why Choose Laxmi Developers */}
       <section className="py-16 bg-background">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-display mb-12 text-center">Why Choose Laxmi Developers?</h2>
+          <h2 className="text-3xl font-display mb-12 text-center">
+            Why Choose <br className="sm:hidden" />Laxmi Developers?
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {whyChooseLaxmi.map((item, index) => (
               <FeatureCard
@@ -154,26 +163,21 @@ export default function WhyInvestPage() {
       {/* CTA Section */}
       <section className="py-16 bg-primary text-foreground">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-display mb-6">Ready to Invest?</h2>
+          <h2 className="text-3xl font-display mb-6">
+            Ready to <br className="sm:hidden" />Invest?
+          </h2>
           <p className="text-lg max-w-2xl mx-auto mb-8">
             Explore our ongoing and upcoming projects to find the perfect investment opportunity for your portfolio.
           </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
+          <Link href="/projects" className="no-underline">
             <Button 
-              href="/projects"
               variant="default"
               size="lg"
+              className="min-w-[200px]"
             >
-              Explore Residential Projects
+              View All Projects
             </Button>
-            <Button 
-              href="/projects"
-              variant="outline"
-              size="lg"
-            >
-              Explore Commercial Projects
-            </Button>
-          </div>
+          </Link>
         </div>
       </section>
     </main>

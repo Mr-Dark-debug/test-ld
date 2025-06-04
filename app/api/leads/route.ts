@@ -167,22 +167,37 @@ async function createLeadHandler(req: AuthenticatedRequest) {
   }
 }
 
-// Route handlers
-export const GET = withMiddleware(
-  withCors,
-  withAuth,
-  withErrorHandling
-)(getLeadsHandler);
+// Export the handlers directly
+export async function GET(req: NextRequest) {
+  try {
+    // Apply authentication middleware
+    const authResult = await withAuth(async (authReq: AuthenticatedRequest) => {
+      return getLeadsHandler(authReq);
+    })(req as AuthenticatedRequest);
 
-export const POST = withMiddleware(
-  withCors,
-  withAuth,
-  withErrorHandling
-)(createLeadHandler);
+    return authResult;
+  } catch (error) {
+    console.error('GET leads error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
 
-// Helper function to combine middlewares
-function withMiddleware(...middlewares: Array<(handler: any) => any>) {
-  return function(handler: (req: AuthenticatedRequest) => Promise<NextResponse>) {
-    return middlewares.reduceRight((acc, middleware) => middleware(acc), handler);
-  };
+export async function POST(req: NextRequest) {
+  try {
+    // Apply authentication middleware
+    const authResult = await withAuth(async (authReq: AuthenticatedRequest) => {
+      return createLeadHandler(authReq);
+    })(req as AuthenticatedRequest);
+
+    return authResult;
+  } catch (error) {
+    console.error('POST leads error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
 }

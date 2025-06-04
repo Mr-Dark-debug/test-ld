@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/Button";
 import ScrollingFeatureCards from "@/components/ui/ScrollingFeatureCards";
 import { TestimonialCarouselDemo } from "@/components/ui/testimonial-carousel-demo";
 import AwardsSection from "@/components/sections/AwardsSection";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Why Choose Laxmi Developers | Laxmi Developers",
@@ -42,7 +43,7 @@ export default function WhyLaxmiPage() {
       <section className="relative py-24 bg-primary">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <AnimatedTitle as="h1" className="text-foreground mb-6">
-            Why Choose Laxmi Developers?
+            <>Why Choose <br className="sm:hidden" />Laxmi Developers?</>
           </AnimatedTitle>
           <p className="text-xl text-foreground/80 max-w-3xl mx-auto">
             For over two decades, we have been building trust and delivering excellence in every project we undertake.
@@ -55,7 +56,7 @@ export default function WhyLaxmiPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto text-center mb-10">
             <AnimatedTitle as="h2" className="mb-6">
-              Our Core Values
+              <>Our Core <br className="sm:hidden" />Values</>
             </AnimatedTitle>
             <p className="text-foreground/80">
               At Laxmi Developers, our success is built on these foundational values that guide everything we do.
@@ -73,7 +74,7 @@ export default function WhyLaxmiPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto text-center">
             <AnimatedTitle as="h2" className="mb-6">
-              Our Legacy of Excellence
+              <>Our Legacy of <br className="sm:hidden" />Excellence</>
             </AnimatedTitle>
             <p className="text-foreground/80 mb-6">
               Laxmi Developers was established in 2001 with a vision to transform the real estate landscape of Surat. Over the years, we have successfully delivered premium residential and commercial projects that stand as testaments to our commitment to excellence and innovation.
@@ -90,7 +91,7 @@ export default function WhyLaxmiPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12 md:mb-16">
             <AnimatedTitle as="h2" className="mb-4">
-              The Pillars of Our Success
+              <>The Pillars of Our <br className="sm:hidden" />Success</>
             </AnimatedTitle>
             <p className="text-lg text-foreground/70 max-w-2xl mx-auto">
               Our commitment to excellence is built on these core principles
@@ -106,7 +107,7 @@ export default function WhyLaxmiPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
             <div>
               <AnimatedTitle as="h2" className="mb-6">
-                Our Customer-Centric Approach
+                <>Our Customer-Centric <br className="sm:hidden" />Approach</>
               </AnimatedTitle>
               <p className="text-foreground/80 mb-6">
                 At Laxmi Developers, we follow a meticulous approach in every project we undertake, from initial concept to final delivery. Our process is designed to ensure that each property not only meets but exceeds industry standards and client expectations.
@@ -186,7 +187,7 @@ export default function WhyLaxmiPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <AnimatedTitle as="h2" className="mb-4">
-              Innovative Design Philosophy
+              <>Innovative Design <br className="sm:hidden" />Philosophy</>
             </AnimatedTitle>
             <p className="text-lg text-foreground/70 max-w-2xl mx-auto">
               Our designs blend aesthetics with functionality to create spaces that inspire
@@ -226,7 +227,7 @@ export default function WhyLaxmiPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <AnimatedTitle as="h2" className="mb-4">
-              Our Commitment to Timely Delivery
+              <>Our Commitment to <br className="sm:hidden" />Timely Delivery</>
             </AnimatedTitle>
             <p className="text-lg text-foreground/70 max-w-2xl mx-auto">
               We understand the value of time and deliver our projects when promised
@@ -270,18 +271,22 @@ export default function WhyLaxmiPage() {
       <section className="py-20 bg-primary">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <AnimatedTitle as="h2" className="text-foreground mb-6">
-            Ready to Experience Excellence?
+            <>Ready to Experience <br className="sm:hidden" />Excellence?</>
           </AnimatedTitle>
           <p className="text-xl text-foreground/80 max-w-3xl mx-auto mb-8">
             Explore our projects or get in touch with our team to discuss your real estate needs.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Button variant="default" size="lg">
-              Explore Projects
-            </Button>
-            <Button variant="default" size="lg">
-              Contact Us
-            </Button>
+            <Link href="/projects" className="no-underline">
+              <Button variant="default" size="lg" className="min-w-[150px]">
+                Explore Projects
+              </Button>
+            </Link>
+            <Link href="/contact" className="no-underline">
+              <Button variant="default" size="lg" className="min-w-[150px]">
+                Contact Us
+              </Button>
+            </Link>
           </div>
         </div>
       </section>

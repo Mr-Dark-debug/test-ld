@@ -87,7 +87,7 @@ const Metric = ({ value, label, icon }: MetricProps) => {
             <span className="bg-gradient-to-r from-accent to-accent/80 bg-clip-text text-transparent group-hover:from-accent/90 group-hover:to-accent transition-all duration-300 dark:from-blue-400 dark:to-blue-500">
               {animatedValue.replace(/\+$/, '')}
             </span>
-            <span className="text-xl sm:text-2xl text-accent align-top ml-0.5 group-hover:text-accent/90 dark:text-blue-400">
+            <span className="text-2xl sm:text-3xl text-accent align-top ml-0.5 group-hover:text-accent/90 dark:text-blue-400">
               {animatedValue.includes('+') ? '+' : ''}
             </span>
             {/* Properly centered underline */}

@@ -1,13 +1,13 @@
 "use client";
 
-import React from "react";
+import React, { ReactNode } from "react";
 import Image from "next/image";
 import { useTheme } from "@/lib/theme-context";
 import AnimatedTitle from "@/components/ui/AnimatedTitle";
 import { AuroraButton } from "@/components/ui/aurora-button";
 
 interface CtaBannerProps {
-  title: string;
+  title: string | ReactNode;
   description?: string;
   backgroundImageSrc?: string;
   buttons: {
@@ -60,9 +60,14 @@ export default function CtaBanner({
       {/* Content */}
       <div className="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center">
         <div className={`flex flex-col w-full max-w-3xl items-center text-center mx-auto`}>
-          <AnimatedTitle as="h2" className="text-foreground mb-6 text-3xl md:text-4xl lg:text-5xl">
-            {title}
-          </AnimatedTitle>
+          <div className="w-full">
+            <AnimatedTitle 
+              as="h2" 
+              className="text-foreground mb-6 text-3xl md:text-4xl lg:text-5xl"
+            >
+              {title}
+            </AnimatedTitle>
+          </div>
           {description && (
             <p className="text-lg md:text-xl text-foreground/80 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
               {description}

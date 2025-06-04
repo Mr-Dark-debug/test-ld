@@ -21,7 +21,9 @@ import {
   Globe,
   Download,
   Filter,
-  Award
+  Award,
+  Cog,
+  Activity
 } from 'lucide-react'
 import Image from 'next/image'
 import { useAuth } from '@/contexts/AuthContext'
@@ -31,96 +33,175 @@ interface SidebarProps {
   onClose: () => void
 }
 
-const navigation = [
-  {
-    name: 'Dashboard',
-    href: '/cms-admin/dashboard',
-    icon: LayoutDashboard,
-  },
-  {
-    name: 'Projects',
-    href: '/cms-admin/dashboard/projects',
-    icon: Building2,
-  },
-  {
-    name: 'Blogs',
-    href: '/cms-admin/dashboard/blogs',
-    icon: FileText,
-  },
-  {
-    name: 'Leads',
-    icon: Users,
-    submenu: true,
-    submenuItems: [
+// Define navigation items with role-based access
+const getNavigationItems = (userRole: string) => {
+  const baseNavigation = [
+    {
+      name: 'Dashboard',
+      href: '/cms-admin/dashboard',
+      icon: LayoutDashboard,
+      roles: ['super_admin', 'admin', 'editor', 'user'],
+    },
+  ];
+
+  // Content management (available to editors and above)
+  if (['super_admin', 'admin', 'editor'].includes(userRole)) {
+    baseNavigation.push(
       {
-        name: 'All Leads',
-        href: '/cms-admin/dashboard/leads',
-        icon: Filter,
+        name: 'Projects',
+        href: '/cms-admin/dashboard/projects',
+        icon: Building2,
+        roles: ['super_admin', 'admin', 'editor'],
       },
       {
-        name: 'Contact Inquiries',
-        href: '/cms-admin/dashboard/leads/contact',
-        icon: Globe,
+        name: 'Blogs',
+        href: '/cms-admin/dashboard/blogs',
+        icon: FileText,
+        roles: ['super_admin', 'admin', 'editor'],
       },
       {
-        name: 'Brochure Requests',
-        href: '/cms-admin/dashboard/leads/brochures',
-        icon: Download,
-      },
-    ],
-  },
-  {
-    name: 'Testimonials',
-    href: '/cms-admin/dashboard/testimonials',
-    icon: MessageSquare,
-  },
-  {
-    name: 'Pages',
-    icon: FileEdit,
-    submenu: true,
-    submenuItems: [
+        name: 'Testimonials',
+        href: '/cms-admin/dashboard/testimonials',
+        icon: MessageSquare,
+        roles: ['super_admin', 'admin', 'editor'],
+      }
+    );
+  }
+
+  // Lead management (available to admins and above)
+  if (['super_admin', 'admin'].includes(userRole)) {
+    baseNavigation.push({
+      name: 'Leads',
+      icon: Users,
+      submenu: true,
+      roles: ['super_admin', 'admin'],
+      submenuItems: [
+        {
+          name: 'All Leads',
+          href: '/cms-admin/dashboard/leads',
+          icon: Filter,
+          roles: ['super_admin', 'admin'],
+        },
+        {
+          name: 'Contact Inquiries',
+          href: '/cms-admin/dashboard/leads/contact',
+          icon: Globe,
+          roles: ['super_admin', 'admin'],
+        },
+        {
+          name: 'Brochure Requests',
+          href: '/cms-admin/dashboard/leads/brochures',
+          icon: Download,
+          roles: ['super_admin', 'admin'],
+        },
+      ],
+    });
+  }
+
+  // Page management (available to editors and above)
+  if (['super_admin', 'admin', 'editor'].includes(userRole)) {
+    baseNavigation.push({
+      name: 'Pages',
+      icon: FileEdit,
+      submenu: true,
+      roles: ['super_admin', 'admin', 'editor'],
+      submenuItems: [
+        {
+          name: 'About Us',
+          href: '/cms-admin/dashboard/pages/about-us',
+          icon: Info,
+          roles: ['super_admin', 'admin', 'editor'],
+        },
+        {
+          name: 'Contact Us',
+          href: '/cms-admin/dashboard/pages/contact-us',
+          icon: MapPin,
+          roles: ['super_admin', 'admin', 'editor'],
+        },
+        {
+          name: 'Careers',
+          href: '/cms-admin/dashboard/pages/careers',
+          icon: Users,
+          roles: ['super_admin', 'admin', 'editor'],
+        },
+        {
+          name: 'Awards',
+          href: '/cms-admin/dashboard/pages/awards',
+          icon: Award,
+          roles: ['super_admin', 'admin', 'editor'],
+        },
+      ],
+    });
+  }
+
+  // Settings - always available but with different submenu items based on role
+  if (userRole === 'user') {
+    // Regular users only see general settings
+    baseNavigation.push({
+      name: 'Settings',
+      href: '/cms-admin/dashboard/settings',
+      icon: Settings,
+      roles: ['super_admin', 'admin', 'editor', 'user'],
+    });
+  } else {
+    // Admins and above see settings with submenu
+    const settingsSubmenu = [
       {
-        name: 'About Us',
-        href: '/cms-admin/dashboard/pages/about-us',
-        icon: Info,
-      },
-      {
-        name: 'Contact Us',
-        href: '/cms-admin/dashboard/pages/contact-us',
-        icon: MapPin,
-      },
-      {
-        name: 'Careers',
-        href: '/cms-admin/dashboard/pages/careers',
+        name: 'General',
+        href: '/cms-admin/dashboard/settings',
+        icon: Cog,
+        roles: ['super_admin', 'admin', 'editor'],
+      }
+    ];
+
+    // User management (super_admin and admin)
+    if (['super_admin', 'admin'].includes(userRole)) {
+      settingsSubmenu.push({
+        name: 'Users',
+        href: '/cms-admin/dashboard/users',
         icon: Users,
-      },
-      {
-        name: 'Awards',
-        href: '/cms-admin/dashboard/pages/awards',
-        icon: Award,
-      },
-    ],
-  },
-  {
-    name: 'Settings',
-    href: '/cms-admin/dashboard/settings',
-    icon: Settings,
-  },
-]
+        roles: ['super_admin', 'admin'],
+      });
+    }
+
+    // Activity log (admin and above)
+    if (['super_admin', 'admin', 'editor'].includes(userRole)) {
+      settingsSubmenu.push({
+        name: 'Activity Log',
+        href: '/cms-admin/dashboard/activity',
+        icon: Activity,
+        roles: ['super_admin', 'admin', 'editor'],
+      });
+    }
+
+    baseNavigation.push({
+      name: 'Settings',
+      icon: Settings,
+      submenu: true,
+      roles: ['super_admin', 'admin', 'editor'],
+      submenuItems: settingsSubmenu,
+    });
+  }
+
+  return baseNavigation;
+};
 
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname() || ''
   const { user } = useAuth()
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null)
-  
+
+  // Get navigation items based on user role
+  const navigation = user ? getNavigationItems(user.role) : [];
+
   useEffect(() => {
     navigation.forEach(item => {
-      if (item.submenu && item.submenuItems?.some(subItem => 
+      if (item.submenu && item.submenuItems?.some(subItem =>
         pathname === subItem.href || pathname.startsWith(`${subItem.href}/`))) {
         setOpenSubmenu(item.name);
       }
     });
-  }, [pathname]);
+  }, [pathname, navigation]);
   
   const toggleSubmenu = (name: string) => {
     setOpenSubmenu(openSubmenu === name ? null : name)
@@ -155,6 +236,8 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         return 'Admin';
       case 'editor':
         return 'Editor';
+      case 'user':
+        return 'User';
       default:
         return role;
     }

@@ -65,7 +65,7 @@ export function InformationPageContent({ infoCards }: InformationPageContentProp
       <section className="pt-32 pb-16 bg-gradient-to-b from-primary to-primary/90 text-foreground">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <AnimatedTitle as="h1" className="mb-6 text-center">
-            Information & Resources
+            <>Information & <br className="sm:hidden" />Resources</>
           </AnimatedTitle>
           <p className="text-xl text-center max-w-3xl mx-auto mb-8">
             Explore our helpful tools and resources to make informed decisions about your real estate investments.
@@ -76,7 +76,9 @@ export function InformationPageContent({ infoCards }: InformationPageContentProp
       {/* Information Cards */}
       <section className="py-16 bg-background">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center mb-12">Helpful Tools</h2>
+          <h2 className="text-3xl font-bold text-center mb-12">
+            <>Helpful <br className="sm:hidden" />Tools</>
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {infoCards.map((card, index) => (
               <FeatureCard
@@ -105,7 +107,9 @@ export function InformationPageContent({ infoCards }: InformationPageContentProp
         </div>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="max-w-6xl mx-auto">
-            <h2 className="text-3xl font-bold text-center mb-4">Frequently Asked Questions</h2>
+            <h2 className="text-3xl font-bold text-center mb-4">
+              <>Frequently Asked <br className="sm:hidden" />Questions</>
+            </h2>
             <p className="text-muted-foreground text-center mb-12 max-w-2xl mx-auto">
               Find answers to common questions about our properties, payment plans, and investment opportunities.
             </p>
@@ -145,7 +149,9 @@ export function InformationPageContent({ infoCards }: InformationPageContentProp
               <div className="lg:w-1/3 flex items-center justify-center">
                 <div className="h-full flex flex-col items-center justify-center text-center">
                   <div className="mb-6">
-                    <h3 className="text-2xl font-bold mb-3">Still have questions?</h3>
+                    <h3 className="text-2xl font-bold mb-3">
+                      <>Still have <br className="sm:hidden" />questions?</>
+                    </h3>
                     <p className="text-muted-foreground mb-6">
                       Our team is here to help you with any questions you may have about our properties or the buying process.
                     </p>

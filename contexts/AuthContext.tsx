@@ -8,7 +8,7 @@ interface User {
   _id: string;
   email: string;
   name: string;
-  role: 'super_admin' | 'admin' | 'editor';
+  role: 'super_admin' | 'admin' | 'editor' | 'user';
   isActive: boolean;
   phone?: string;
   lastLogin?: string;

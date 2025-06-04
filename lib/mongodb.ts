@@ -1,11 +1,12 @@
 import mongoose from 'mongoose';
+import { DATABASE_CONFIG, MONGODB_OPTIONS } from './config';
 
 declare global {
   var mongoose: any; // This must be a `var` and not a `let / const`
 }
 
-// Use a fallback MongoDB URI if environment variable is not set
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/laxmidev';
+// Use MongoDB URI from config
+const MONGODB_URI = DATABASE_CONFIG.MONGODB_URI;
 
 /**
  * Global is used here to maintain a cached connection across hot reloads
@@ -19,49 +20,53 @@ if (!cached) {
 }
 
 async function connectDB() {
-  if (cached.conn) {
+  if (cached.conn && mongoose.connection.readyState === 1) {
     return cached.conn;
   }
 
   if (!cached.promise) {
-    const opts = {
-      bufferCommands: false,
-      connectTimeoutMS: 10000, // Reduce timeout to 10 seconds
-      socketTimeoutMS: 45000, // Socket timeout
-      serverSelectionTimeoutMS: 10000, // Reduce server selection timeout
-      maxPoolSize: 10, // Maximum number of connections in the pool
-      minPoolSize: 1, // Minimum number of connections in the pool
-      retryWrites: true,
-      retryReads: true,
-    };
+    const opts = MONGODB_OPTIONS;
 
+    console.log('🔄 Connecting to MongoDB...');
     cached.promise = mongoose.connect(MONGODB_URI, opts)
       .then((mongoose) => {
-        console.log('✅ Connected to MongoDB');
+        console.log('✅ Connected to MongoDB successfully');
         return mongoose;
       })
       .catch((error) => {
         console.error('❌ MongoDB connection error:', error);
-        // For development purposes, create a mock connection that won't throw errors
-        if (process.env.NODE_ENV === 'development') {
-          console.log('🔄 Using mock MongoDB connection for development');
-          return mongoose; // Return mongoose instance even though connection failed
-        }
+        cached.promise = null; // Reset promise on error
         throw error;
       });
   }
 
   try {
     cached.conn = await cached.promise;
+
+    // Ensure connection is ready with timeout
+    if (mongoose.connection.readyState !== 1) {
+      console.log('⏳ Waiting for MongoDB connection to be ready...');
+      await new Promise((resolve, reject) => {
+        const timeout = setTimeout(() => {
+          reject(new Error('MongoDB connection timeout'));
+        }, 10000); // 10 second timeout
+
+        mongoose.connection.once('connected', () => {
+          clearTimeout(timeout);
+          resolve(true);
+        });
+
+        // If already connected, resolve immediately
+        if (mongoose.connection.readyState === 1) {
+          clearTimeout(timeout);
+          resolve(true);
+        }
+      });
+    }
+
   } catch (e) {
     cached.promise = null;
-    console.error('❌ MongoDB connection error:', e);
-    
-    // For development purposes, don't throw the error
-    if (process.env.NODE_ENV === 'development') {
-      console.log('🔄 Continuing with mock MongoDB connection');
-      return mongoose;
-    }
+    console.error('❌ MongoDB connection failed:', e);
     throw e;
   }
 

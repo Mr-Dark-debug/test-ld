@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Menu, Bell, Search, User, LogOut, Settings } from 'lucide-react'
+import { Menu, Search, User, LogOut, Settings } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { toast } from 'sonner'
 import { UserProfile } from './UserProfile'
@@ -65,16 +65,6 @@ export function Header({ onMenuClick }: HeaderProps) {
           </div>
         </div>
         <div className="flex items-center space-x-4">
-          {/* Notifications */}
-          <button
-            type="button"
-            title="Notifications"
-            aria-label="View notifications"
-            className="p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-lg relative"
-          >
-            <Bell className="w-5 h-5" />
-            <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-          </button>
           {/* Profile */}
           <div className="relative">
             <button

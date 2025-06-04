@@ -1,4 +1,5 @@
 import Joi from 'joi';
+import { VALIDATION_CONFIG } from './config';
 
 // User validation schemas
 export const loginSchema = Joi.object({
@@ -107,13 +108,15 @@ export const updateAmenitySchema = createAmenitySchema.fork(
 // Testimonial validation schemas
 export const createTestimonialSchema = Joi.object({
   name: Joi.string().min(2).max(50).required(),
-  designation: Joi.string().max(50).optional(),
-  company: Joi.string().max(50).optional(),
+  designation: Joi.string().max(50).allow('').optional(),
+  company: Joi.string().max(50).allow('').optional(),
   content: Joi.string().min(10).max(500).required(),
   rating: Joi.number().min(1).max(5).required(),
-  image: Joi.string().uri().optional(),
-  youtubeUrl: Joi.string().pattern(/^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)[a-zA-Z0-9_-]{11}(&.*)?$/).optional(),
-  projectId: Joi.string().hex().length(24).optional(),
+  image: Joi.string().uri().allow('').optional(),
+  youtubeUrl: Joi.alternatives().try(
+    Joi.string().pattern(/^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)[a-zA-Z0-9_-]{11}.*$/),
+    Joi.string().allow('')
+  ).optional(),
   isApproved: Joi.boolean().default(false),
   isFeatured: Joi.boolean().default(false)
 });
@@ -131,9 +134,10 @@ export const createBlogSchema = Joi.object({
   category: Joi.string().required(),
   tags: Joi.array().items(Joi.string()).default([]),
   status: Joi.string().valid('draft', 'published', 'archived').default('draft'),
+  coverImage: Joi.string().allow('').optional(),
   author: Joi.object({
     name: Joi.string().required(),
-    avatar: Joi.string().optional()
+    avatar: Joi.string().allow('').optional()
   }).required(),
   seoMeta: Joi.object({
     title: Joi.string().max(60),
@@ -149,11 +153,11 @@ export const updateBlogSchema = createBlogSchema.fork(
 
 // Lead validation schemas
 export const contactLeadSchema = Joi.object({
-  name: Joi.string().min(2).max(50).required(),
+  name: Joi.string().min(VALIDATION_CONFIG.NAME_MIN_LENGTH).max(VALIDATION_CONFIG.NAME_MAX_LENGTH).required(),
   email: Joi.string().email().required(),
-  phone: Joi.string().pattern(/^[+]?[0-9\s\-\(\)]{10,15}$/).required(),
+  phone: Joi.string().pattern(VALIDATION_CONFIG.PHONE_PATTERN).required(),
   projectInterest: Joi.string().optional(),
-  message: Joi.string().max(500).required()
+  message: Joi.string().max(VALIDATION_CONFIG.MESSAGE_MAX_LENGTH).required()
 });
 
 export const brochureLeadSchema = Joi.object({

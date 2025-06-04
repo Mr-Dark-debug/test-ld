@@ -1,9 +1,10 @@
 // API utility functions for frontend
 
 import { apiCache } from './performance';
+import { FRONTEND_CONFIG, getApiUrl } from './config';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || (typeof window !== 'undefined' ? window.location.origin : 'https://laxmidev-ashy.vercel.app');
+const API_BASE_URL = FRONTEND_CONFIG.API_URL;
+const BASE_URL = FRONTEND_CONFIG.BASE_URL;
 
 interface ApiResponse<T = any> {
   success: boolean;
@@ -399,6 +400,10 @@ export const blogsApi = {
 
     const query = searchParams.toString();
     return apiRequest<any[]>(`/blogs${query ? `?${query}` : ''}`);
+  },
+
+  getById: async (id: string) => {
+    return apiRequest<any>(`/blogs/${id}?admin=true`);
   },
 
   getBySlug: async (slug: string) => {

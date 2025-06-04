@@ -1,4 +1,5 @@
 import mongoose, { Document, Schema } from 'mongoose';
+import { VALIDATION_CONFIG } from '@/lib/config';
 
 export interface ILead extends Document {
   _id: string;
@@ -31,21 +32,21 @@ const LeadSchema = new Schema<ILead>({
     type: String,
     required: [true, 'Name is required'],
     trim: true,
-    minlength: [2, 'Name must be at least 2 characters long'],
-    maxlength: [50, 'Name cannot exceed 50 characters']
+    minlength: [VALIDATION_CONFIG.NAME_MIN_LENGTH, `Name must be at least ${VALIDATION_CONFIG.NAME_MIN_LENGTH} characters long`],
+    maxlength: [VALIDATION_CONFIG.NAME_MAX_LENGTH, `Name cannot exceed ${VALIDATION_CONFIG.NAME_MAX_LENGTH} characters`]
   },
   email: {
     type: String,
     required: [true, 'Email is required'],
     lowercase: true,
     trim: true,
-    match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please provide a valid email']
+    match: [VALIDATION_CONFIG.EMAIL_PATTERN, 'Please provide a valid email']
   },
   phone: {
     type: String,
     required: [true, 'Phone number is required'],
     trim: true,
-    match: [/^[+]?[0-9\s\-\(\)]{10,15}$/, 'Please provide a valid phone number']
+    match: [VALIDATION_CONFIG.PHONE_PATTERN, 'Please provide a valid phone number']
   },
   projectId: {
     type: Schema.Types.ObjectId,
@@ -58,7 +59,7 @@ const LeadSchema = new Schema<ILead>({
   message: {
     type: String,
     trim: true,
-    maxlength: [500, 'Message cannot exceed 500 characters']
+    maxlength: [VALIDATION_CONFIG.MESSAGE_MAX_LENGTH, `Message cannot exceed ${VALIDATION_CONFIG.MESSAGE_MAX_LENGTH} characters`]
   },
   jobId: {
     type: Schema.Types.ObjectId,
