@@ -12,7 +12,8 @@ const testContactForm = async () => {
     console.log('Testing contact form API...');
     console.log('Test data:', testData);
 
-    const response = await fetch('http://localhost:3000/api/leads/contact', {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    const response = await fetch(`${baseUrl}/api/leads/contact`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -1,5 +1,7 @@
 // Activity logging utility functions
 
+import { getApiUrl } from './config';
+
 interface LogActivityParams {
   type: 'project' | 'blog' | 'lead' | 'testimonial' | 'user' | 'amenity' | 'system';
   action: 'create' | 'update' | 'delete' | 'login' | 'logout' | 'approve' | 'feature' | 'other';
@@ -17,7 +19,8 @@ interface LogActivityParams {
  */
 export async function logActivity(params: LogActivityParams): Promise<boolean> {
   try {
-    const response = await fetch('/api/activities', {
+    const apiUrl = getApiUrl('activities');
+    const response = await fetch(apiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -10,13 +10,13 @@ interface ProjectDetailPageProps {
 
 async function getProject(slug: string) {
   try {
-    // Use local development URL in development, production URL in production
-    const baseUrl = process.env.NODE_ENV === 'development'
-      ? 'http://localhost:3000'
-      : process.env.NEXT_PUBLIC_BASE_URL ||
-        (process.env.VERCEL_URL
-          ? `https://${process.env.VERCEL_URL}`
-          : 'https://laxmidev-ashy.vercel.app');
+    // Use environment variable for base URL
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ||
+      (process.env.VERCEL_URL
+        ? `https://${process.env.VERCEL_URL}`
+        : (process.env.NODE_ENV === 'development'
+          ? 'http://localhost:3000'
+          : 'https://laxmidev-ashy.vercel.app'));
 
     console.log(`Fetching project: ${baseUrl}/api/projects/${slug}`);
 

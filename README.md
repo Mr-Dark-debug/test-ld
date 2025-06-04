@@ -191,6 +191,45 @@ Navigate to `http://localhost:3000/cms-admin` and login with default credentials
 
 ⚠️ **Important**: Change these credentials immediately in production!
 
+## 🚀 Production Deployment Checklist
+
+### **Pre-Deployment Checklist**
+- [ ] **Environment Variables**: All production environment variables configured
+- [ ] **Database**: MongoDB Atlas cluster set up with proper authentication
+- [ ] **Security**: Strong JWT secret generated (minimum 32 characters)
+- [ ] **Domain**: Custom domain configured and DNS records set
+- [ ] **SSL**: HTTPS certificate configured
+- [ ] **Admin Credentials**: Default admin passwords changed
+- [ ] **File Uploads**: Upload directory and permissions configured
+- [ ] **Error Handling**: Error tracking service integrated (optional)
+
+### **Post-Deployment Checklist**
+- [ ] **Functionality**: All major features tested in production
+- [ ] **Authentication**: Login/logout working correctly
+- [ ] **API Endpoints**: All API routes responding correctly
+- [ ] **File Uploads**: Image and document uploads working
+- [ ] **Database**: Data persistence and retrieval working
+- [ ] **Performance**: Page load times acceptable
+- [ ] **Mobile**: Responsive design working on mobile devices
+- [ ] **SEO**: Meta tags and sitemap configured
+- [ ] **Analytics**: Tracking and monitoring set up
+- [ ] **Backup**: Database backup strategy implemented
+
+### **Environment Variables Checklist**
+```env
+# Required for Production
+✅ MONGODB_URI="mongodb+srv://..."
+✅ JWT_SECRET="your_32_character_secret"
+✅ NEXT_PUBLIC_BASE_URL="https://your-domain.com"
+✅ NODE_ENV="production"
+
+# Optional but Recommended
+✅ MAX_FILE_SIZE=50000000
+✅ UPLOAD_PATH="public/uploads"
+✅ JWT_EXPIRES_IN="24h"
+✅ PORT=3000
+```
+
 ## 🚀 Production Deployment
 
 ### **Environment Variables for Production**
@@ -205,15 +244,134 @@ JWT_SECRET="your_production_jwt_secret_minimum_32_characters"
 ### **Deployment Platforms**
 
 #### **Vercel (Recommended)**
-1. Connect your GitHub repository to Vercel
-2. Add environment variables in Vercel dashboard
-3. Deploy automatically on push to main branch
+1. **Connect Repository**: Link your GitHub repository to Vercel
+2. **Environment Variables**: Add all environment variables in Vercel dashboard:
+   ```
+   MONGODB_URI=your_production_mongodb_uri
+   JWT_SECRET=your_production_jwt_secret_minimum_32_characters
+   NEXT_PUBLIC_BASE_URL=https://your-domain.vercel.app
+   NODE_ENV=production
+   ```
+3. **Deploy**: Automatic deployment on push to main branch
+4. **Custom Domain**: Configure custom domain in Vercel settings
 
-#### **Other Platforms**
-- **Netlify**: Configure build settings and environment variables
-- **Railway**: Connect repository and set environment variables
-- **DigitalOcean App Platform**: Configure app spec and environment
-- **AWS Amplify**: Set up build configuration and environment variables
+#### **Netlify**
+1. **Build Settings**:
+   - Build command: `npm run build`
+   - Publish directory: `.next`
+2. **Environment Variables**: Add in Netlify dashboard
+3. **Functions**: Enable Next.js runtime for API routes
+
+#### **Railway**
+1. **Connect Repository**: Link GitHub repository
+2. **Environment Variables**: Set in Railway dashboard
+3. **Custom Domain**: Configure domain in Railway settings
+4. **Database**: Use Railway's MongoDB addon or external MongoDB Atlas
+
+#### **DigitalOcean App Platform**
+1. **App Spec Configuration**:
+   ```yaml
+   name: laxmidev-cms
+   services:
+   - name: web
+     source_dir: /
+     github:
+       repo: your-username/laxmidev
+       branch: main
+     run_command: npm start
+     build_command: npm run build
+     environment_slug: node-js
+     instance_count: 1
+     instance_size_slug: basic-xxs
+     envs:
+     - key: NODE_ENV
+       value: production
+     - key: NEXT_PUBLIC_BASE_URL
+       value: https://your-app.ondigitalocean.app
+   ```
+
+#### **AWS Amplify**
+1. **Build Configuration** (`amplify.yml`):
+   ```yaml
+   version: 1
+   frontend:
+     phases:
+       preBuild:
+         commands:
+           - npm ci
+       build:
+         commands:
+           - npm run build
+     artifacts:
+       baseDirectory: .next
+       files:
+         - '**/*'
+     cache:
+       paths:
+         - node_modules/**/*
+   ```
+2. **Environment Variables**: Set in Amplify console
+3. **Custom Domain**: Configure in Amplify domain management
+
+#### **Self-Hosted (VPS/Dedicated Server)**
+1. **Server Setup**:
+   ```bash
+   # Install Node.js 18+
+   curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+   sudo apt-get install -y nodejs
+
+   # Install PM2 for process management
+   npm install -g pm2
+
+   # Clone and setup project
+   git clone https://github.com/your-username/laxmidev.git
+   cd laxmidev
+   npm install
+   npm run build
+   ```
+
+2. **PM2 Configuration** (`ecosystem.config.js`):
+   ```javascript
+   module.exports = {
+     apps: [{
+       name: 'laxmidev-cms',
+       script: 'npm',
+       args: 'start',
+       env: {
+         NODE_ENV: 'production',
+         PORT: 3000,
+         NEXT_PUBLIC_BASE_URL: 'https://your-domain.com'
+       }
+     }]
+   };
+   ```
+
+3. **Start Application**:
+   ```bash
+   pm2 start ecosystem.config.js
+   pm2 save
+   pm2 startup
+   ```
+
+4. **Nginx Configuration**:
+   ```nginx
+   server {
+     listen 80;
+     server_name your-domain.com;
+
+     location / {
+       proxy_pass http://localhost:3000;
+       proxy_http_version 1.1;
+       proxy_set_header Upgrade $http_upgrade;
+       proxy_set_header Connection 'upgrade';
+       proxy_set_header Host $host;
+       proxy_set_header X-Real-IP $remote_addr;
+       proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+       proxy_set_header X-Forwarded-Proto $scheme;
+       proxy_cache_bypass $http_upgrade;
+     }
+   }
+   ```
 
 ### **Build Commands**
 ```bash
@@ -229,6 +387,39 @@ npm run lint
 # Type checking
 npm run type-check
 ```
+
+### **Security Considerations for Production**
+
+#### **Environment Variables Security**
+- ✅ **Never commit `.env` files** to version control
+- ✅ **Use strong JWT secrets** (minimum 32 characters, random)
+- ✅ **Rotate secrets regularly** in production
+- ✅ **Use different secrets** for different environments
+
+#### **Database Security**
+- ✅ **Enable MongoDB authentication** and use strong passwords
+- ✅ **Use MongoDB Atlas** with IP whitelisting for cloud deployment
+- ✅ **Enable SSL/TLS** for database connections
+- ✅ **Regular database backups** and disaster recovery plan
+
+#### **Application Security**
+- ✅ **Change default admin credentials** immediately
+- ✅ **Implement rate limiting** for API endpoints (already configured)
+- ✅ **Use HTTPS** in production (SSL/TLS certificates)
+- ✅ **Enable CORS** properly for your domain
+- ✅ **Regular security updates** for dependencies
+
+#### **File Upload Security**
+- ✅ **File type validation** (already implemented)
+- ✅ **File size limits** (configurable via MAX_FILE_SIZE)
+- ✅ **Virus scanning** for uploaded files (recommended)
+- ✅ **CDN integration** for file serving (recommended)
+
+#### **Monitoring & Logging**
+- ✅ **Error tracking** (Sentry, LogRocket, etc.)
+- ✅ **Performance monitoring** (New Relic, DataDog, etc.)
+- ✅ **Uptime monitoring** (Pingdom, UptimeRobot, etc.)
+- ✅ **Activity logs** (already implemented in the system)
 
 ## 📊 API Documentation
 
