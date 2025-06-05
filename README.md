@@ -465,7 +465,7 @@ npm run type-check
 | `MAX_FILE_SIZE` | Max upload file size in bytes | No | `50000000` |
 | `UPLOAD_PATH` | File upload directory | No | `public/uploads` |
 | `NEXT_PUBLIC_API_URL` | Frontend API base URL | No | `/api` |
-| `NEXT_PUBLIC_BASE_URL` | Frontend base URL | Yes | `http://localhost:3000` |
+| `NEXT_PUBLIC_BASE_URL` | Frontend base URL (must match server port) | Yes | `http://localhost:3000` |
 
 ### **Database Collections**
 - `users` - User accounts and authentication
@@ -706,6 +706,43 @@ laxmidev/
 ## 📝 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🔧 Troubleshooting
+
+### **Common Issues**
+
+#### **Project Detail Pages Show 404 Error**
+**Problem**: Clicking "View Details" on projects shows 404 page.
+
+**Solution**:
+1. Check that `NEXT_PUBLIC_BASE_URL` in `.env` matches your server port
+2. If server runs on `localhost:3000`, set `NEXT_PUBLIC_BASE_URL="http://localhost:3000"`
+3. If server runs on `localhost:3001`, set `NEXT_PUBLIC_BASE_URL="http://localhost:3001"`
+4. Restart the development server after changing environment variables
+
+#### **Environment Variable Not Working**
+**Problem**: Changes to `.env` file not taking effect.
+
+**Solution**:
+1. Restart the development server completely
+2. Clear browser cache and reload
+3. Check that variable names start with `NEXT_PUBLIC_` for client-side access
+
+#### **Database Connection Issues**
+**Problem**: MongoDB connection errors.
+
+**Solution**:
+1. Verify `MONGODB_URI` is correct
+2. Check MongoDB Atlas IP whitelist settings
+3. Ensure database user has proper permissions
+
+#### **Port Already in Use**
+**Problem**: `Port 3000 is in use` error.
+
+**Solution**:
+1. Kill process on port 3000: `taskkill /PID <PID> /F` (Windows) or `kill -9 <PID>` (Mac/Linux)
+2. Use different port: `npm run dev -- -p 3001`
+3. Update `NEXT_PUBLIC_BASE_URL` to match the new port
 
 ## 🆘 Support
 

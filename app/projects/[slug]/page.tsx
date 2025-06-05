@@ -10,13 +10,21 @@ interface ProjectDetailPageProps {
 
 async function getProject(slug: string) {
   try {
-    // Use environment variable for base URL
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ||
-      (process.env.VERCEL_URL
-        ? `https://${process.env.VERCEL_URL}`
-        : (process.env.NODE_ENV === 'development'
-          ? 'http://localhost:3000'
-          : 'https://laxmidev-ashy.vercel.app'));
+    // Use environment variable for base URL with fallbacks
+    let baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+
+    // If no base URL is set, determine it based on environment
+    if (!baseUrl) {
+      if (process.env.VERCEL_URL) {
+        baseUrl = `https://${process.env.VERCEL_URL}`;
+      } else if (process.env.NODE_ENV === 'development') {
+        // In development, try to detect the current port
+        baseUrl = 'http://localhost:3000';
+      } else {
+        // Production fallback
+        baseUrl = 'https://laxmidev-ashy.vercel.app';
+      }
+    }
 
     console.log(`Fetching project: ${baseUrl}/api/projects/${slug}`);
 

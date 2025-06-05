@@ -5,10 +5,24 @@ import Amenity from '@/models/Amenity';
 import User from '@/models/User';
 import { validateRequest, updateProjectSchema } from '@/lib/validation';
 
+// Ensure models are registered
+const ensureModelsRegistered = () => {
+  try {
+    // Import models to ensure they are registered
+    require('@/models/User');
+    require('@/models/Project');
+    require('@/models/Amenity');
+  } catch (error) {
+    console.log('Models already registered or error:', error);
+  }
+};
+
 // GET /api/projects/[slug] - Get single project by slug
 async function getProjectHandler(req: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   try {
     await connectDB();
+    // Ensure all models are registered
+    ensureModelsRegistered();
   } catch (error) {
     console.error('Database connection failed:', error);
     return NextResponse.json(
@@ -20,11 +34,6 @@ async function getProjectHandler(req: NextRequest, { params }: { params: Promise
   try {
     const { slug } = await params;
     console.log(`Looking for project with slug: ${slug}`);
-
-    // Ensure Amenity model is registered
-    if (!Amenity) {
-      console.error('Amenity model not found');
-    }
 
     const project = await Project.findOne({ slug })
       .populate('amenities', 'name icon category description')
