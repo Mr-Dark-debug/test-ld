@@ -25,25 +25,25 @@ const categories = [
   {
     id: 'promotional',
     label: 'Promotional',
-    icon: '✨',
+    //icon: '✨',
     imageUrl: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80' // Placeholder image
   },
   {
     id: 'interior',
     label: 'Interior',
-    icon: '🛋️',
+    //icon: '🛋️',
     imageUrl: 'https://images.unsplash.com/photo-1505691938895-1758d7feb511?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80' // Placeholder image
   },
   {
     id: 'exterior',
     label: 'Exterior',
-    icon: '🌳',
+    //icon: '🌳',
     imageUrl: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1374&q=80' // Placeholder image
   },
   {
     id: 'video',
     label: 'Videos',
-    icon: '🎬',
+    //icon: '🎬',
     imageUrl: 'https://images.unsplash.com/photo-1513106580091-1d82408b8cd6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80' // Placeholder image
   },
 ];
@@ -88,8 +88,7 @@ export default function TabGallery({ title, subtitle, images }: TabGalleryProps)
                 className="object-cover transition-transform duration-500 group-hover:scale-105"
               />
               <div className="absolute inset-0 z-10 backdrop-blur-[4px] bg-black/30"></div>
-              <div className="absolute inset-0 flex flex-col items-center justify-center p-6 z-20 text-center">
-                <span className="text-5xl mb-3 opacity-90 group-hover:opacity-100 transition-opacity">{category.icon}</span>
+              <div className="absolute inset-0 flex items-center justify-center p-6 z-20 text-center">
                 <h3 className="text-2xl md:text-3xl font-semibold text-white drop-shadow-lg">{category.label}</h3>
               </div>
             </div>
