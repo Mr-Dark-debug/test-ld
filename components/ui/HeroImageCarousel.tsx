@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { motion, PanInfo } from "framer-motion";
+import { useTheme } from "@/lib/theme-context";
 
 interface HeroImageCarouselProps {
   images: { src: string; alt: string }[];
@@ -13,20 +14,33 @@ const HeroImageCarousel: React.FC<HeroImageCarouselProps> = ({
   images,
   interval = 3000,
 }) => {
+  const { theme } = useTheme();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Process images to use dark mode versions when available
+  const processedImages = images.map(image => {
+    // Check if this is the hero image and we're in dark mode
+    if (theme === 'dark' && image.src.includes('/hero/hero.jpg')) {
+      return {
+        ...image,
+        src: '/images/hero/hero-dark.jpg'
+      };
+    }
+    return image;
+  });
+
   const nextSlide = () => {
     if (isDragging) return;
-    setCurrentIndex((prev) => (prev + 1) % images.length);
+    setCurrentIndex((prev) => (prev + 1) % processedImages.length);
   };
 
   const prevSlide = () => {
     if (isDragging) return;
-    setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
+    setCurrentIndex((prev) => (prev - 1 + processedImages.length) % processedImages.length);
   };
 
   const handleDragEnd = (event: any, info: PanInfo) => {
@@ -45,13 +59,13 @@ const HeroImageCarousel: React.FC<HeroImageCarouselProps> = ({
   };
 
   useEffect(() => {
-    if (images.length > 1 && isAutoPlaying && !isDragging) {
+    if (processedImages.length > 1 && isAutoPlaying && !isDragging) {
       const slideInterval = setInterval(nextSlide, interval);
       return () => clearInterval(slideInterval);
     }
-  }, [images.length, interval, currentIndex, isAutoPlaying, isDragging]);
+  }, [processedImages.length, interval, currentIndex, isAutoPlaying, isDragging]);
 
-  if (!images || images.length === 0) {
+  if (!processedImages || processedImages.length === 0) {
     return null;
   }
 
@@ -70,11 +84,11 @@ const HeroImageCarousel: React.FC<HeroImageCarouselProps> = ({
         <motion.div
           className="flex w-full h-full cursor-grab active:cursor-grabbing"
           style={{
-            width: `${images.length * 100}%`,
+            width: `${processedImages.length * 100}%`,
             transform: getTransformX(),
           }}
           animate={{
-            x: `${-currentIndex * (100 / images.length)}%`,
+            x: `${-currentIndex * (100 / processedImages.length)}%`,
           }}
           transition={{
             type: "tween",
@@ -93,18 +107,18 @@ const HeroImageCarousel: React.FC<HeroImageCarouselProps> = ({
           }}
           onDragEnd={handleDragEnd}
         >
-          {images.map((image, index) => (
+          {processedImages.map((image, index) => (
             <div
               key={index}
               className="relative flex-shrink-0"
-              style={{ width: `${100 / images.length}%` }}
+              style={{ width: `${100 / processedImages.length}%` }}
             >
               <Image
                 src={image.src}
                 alt={image.alt}
                 fill
                 sizes="100vw"
-                className="object-cover"
+                className="object-cover object-top"
                 priority={index === 0}
                 quality={90}
               />
@@ -116,10 +130,10 @@ const HeroImageCarousel: React.FC<HeroImageCarouselProps> = ({
       </div>
 
       {/* Navigation Line Indicators - Below Image */}
-      {images.length > 1 && (
-        <div className="flex justify-center items-center py-4 bg-white">
+      {processedImages.length > 1 && (
+        <div className={`flex justify-center items-center py-4 ${theme === 'dark' ? 'bg-black' : 'bg-white'}`}>
           <div className="flex space-x-2">
-            {images.map((_, index) => (
+            {processedImages.map((_, index) => (
               <button
                 key={index}
                 onClick={() => {

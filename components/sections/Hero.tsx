@@ -3,6 +3,8 @@ import SplitText from "@/components/reactbits/SplitText/SplitText";
 import HeroImageCarousel from "@/components/ui/HeroImageCarousel";
 import AnimatedContent from "@/components/reactbits/AnimatedContent/AnimatedContent";
 import TiltedCard from "@/components/reactbits/TiltedCard/TiltedCard";
+import { useTheme } from "@/lib/theme-context";
+import Image from "next/image";
 
 // Define your theme color
 const THEME_COLOR_HEX = "#324189";
@@ -10,7 +12,7 @@ const EXCELLENCE_COLOR_HEX = "#FFBF00"; // Amber/Gold for excellence
 
 // Property items for the TiltedCards - now 5 items
 const propertyItems = [
-  { imageSrc: "/images/hero/hero-1.jpg", alt: "Hero 1", title: "Hero 1" },
+  { imageSrc: "/images/hero/hero.jpg", alt: "Hero 1", title: "Hero 1" },
   { imageSrc: "/images/projects/Aleta.jpg", alt: "Aleta", title: "Aleta" },
   { imageSrc: "/images/projects/Millennium Park.jpg", alt: "Millennium Park", title: "Millennium Park" },
   { imageSrc: "/images/projects/Laxmi Nova.jpg", alt: "Laxmi Nova", title: "Laxmi Nova" },
@@ -24,7 +26,7 @@ export default function Hero() {
   const titleLine2 = `Building Excellence`;
   const titleLine3 = `Brick By Brick`;
   const baseDelaySplitText = 70;
-  const overallTextAnimationDelay = 500; // ms, delay for the whole text block fade-in
+  const overallTextAnimationDelay = 400; // ms, delay for the whole text block fade-in
 
   const carouselImages = propertyItems.map(item => ({ src: item.imageSrc, alt: item.alt }));
 

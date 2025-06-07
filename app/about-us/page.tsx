@@ -244,7 +244,7 @@ export default function AboutUsPage() {
 
       {/* CTA Banner */}
       <CtaBanner
-        title={content.ctaSection.title}
+        title={<>Ready to Start Your<br className="sm:hidden" /> Journey?</>}
         description={content.ctaSection.description}
         buttons={[
           {

@@ -510,7 +510,8 @@ laxmidev/
 │   │   ├── 📁 projects/             # Property Management APIs
 │   │   │   ├── route.ts             # CRUD operations
 │   │   │   ├── [id]/route.ts        # Individual project operations
-│   │   │   └── featured/route.ts    # Featured projects
+│   │   │   ├── featured/route.ts    # Featured projects
+│   │   │   └── [slug]/route.ts      # Project by slug
 │   │   ├── 📁 leads/                # Lead Management System
 │   │   │   ├── route.ts             # Lead CRUD operations
 │   │   │   ├── contact/route.ts     # Contact form submissions
@@ -702,6 +703,9 @@ laxmidev/
 - Write tests for new features
 - Update documentation for API changes
 - Follow conventional commit messages
+
+### **Developer Credits**
+- **Mr-Dark-debug** - Lead Developer
 
 ## 📝 License
 

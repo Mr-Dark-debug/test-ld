@@ -61,9 +61,9 @@ export default function CtaBanner({
       <div className="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center">
         <div className={`flex flex-col w-full max-w-3xl items-center text-center mx-auto`}>
           <div className="w-full">
-            <AnimatedTitle 
-              as="h2" 
-              className="text-foreground mb-6 text-3xl md:text-4xl lg:text-5xl"
+            <AnimatedTitle
+              as="h2"
+              className="text-foreground mb-6 text-3xl md:text-4xl lg:text-5xl leading-tight break-words hyphens-auto"
             >
               {title}
             </AnimatedTitle>

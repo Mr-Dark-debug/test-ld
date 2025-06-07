@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import AboutUs from '@/models/AboutUs';
+import User from '@/models/User'; // Import User model to ensure it's registered
 import { withAuth, withErrorHandling, withCors, AuthenticatedRequest, withOptionalAuth } from '@/middleware/auth';
 import { logActivity } from '@/lib/activity';
 
@@ -70,7 +71,7 @@ async function getAboutUsHandler(req: AuthenticatedRequest) {
             {
               title: "Business Hub",
               category: "Commercial",
-              image: "/images/projects/MillenniumBusinessHub.jpg"
+              image: "/images/projects/Millennium Business Hub.jpg"
             },
             {
               title: "Laxmi Nova",
@@ -80,7 +81,7 @@ async function getAboutUsHandler(req: AuthenticatedRequest) {
           ]
         },
         ctaSection: {
-          title: "Ready to Start Your Journey",
+          title: "Ready to Start Your Journey?",
           description: "Let us help you find your perfect space or investment opportunity.",
           primaryButton: {
             text: "Contact Us",
@@ -101,7 +102,7 @@ async function getAboutUsHandler(req: AuthenticatedRequest) {
 
     return NextResponse.json({
       success: true,
-      data: aboutUs.toSafeObject()
+      data: aboutUs.toObject()
     });
 
   } catch (error) {
@@ -147,7 +148,7 @@ async function updateAboutUsHandler(req: AuthenticatedRequest) {
 
     // Log activity
     await logActivity({
-      type: 'content',
+      type: 'system',
       action: 'update',
       title: 'Updated About Us content',
       userId: req.user!.userId,
@@ -159,7 +160,7 @@ async function updateAboutUsHandler(req: AuthenticatedRequest) {
     return NextResponse.json({
       success: true,
       message: 'About us content updated successfully',
-      data: aboutUs.toSafeObject()
+      data: aboutUs.toObject()
     });
 
   } catch (error) {
