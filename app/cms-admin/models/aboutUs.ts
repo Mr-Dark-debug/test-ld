@@ -25,17 +25,6 @@ export interface AboutUsContent {
       description: string
     }[]
   }
-  achievementsSection: {
-    sectionTagline: string
-    sectionTitle: string
-    sectionDescription: string
-    achievements: {
-      title: string
-      description: string
-      image: string
-      year: string
-    }[]
-  }
   portfolioSection: {
     tagline: string
     title: string
@@ -64,85 +53,72 @@ export interface AboutUsContent {
 // Default content for the About Us page
 export const defaultAboutUsContent: AboutUsContent = {
   heroSection: {
-    tagline: 'Everything about us at Laxmi Developers 👋',
+    tagline: 'Laxmi Developers',
     title: 'Brick by Brick ',
     titleHighlight: 'Building Excellence',
-    description: 'Laxmi Developers - Creating exceptional living and commercial spaces in Surat since 1995.',
-    buttonText: 'Explore Careers →',
+    description: 'With over a decade of excellence in real estate development, we transform visions into reality through innovative design and uncompromising quality.',
+    buttonText: 'Our Projects',
     backgroundImage: '/images/hero/hero-1.jpg'
   },
   companySection: {
     tagline: 'Our Story',
-    title: "We're Building Landmarks That Define Surat's Skyline",
-    description1: 'For over 25 years, Laxmi Developers has been crafting exceptional residential and commercial spaces that blend innovative design with superior construction quality.',
-    description2: 'We take pride in our attention to detail, commitment to timely delivery, and creating spaces that enhance the quality of life for our customers.',
+    title: 'Pioneering Excellence in Real Estate',
+    description1: 'Excellence in Real Estate Development',
+    description2: 'Our Foundation',
     image: '/images/homepage/about.jpg'
   },
   missionVisionValues: {
-    sectionTagline: 'Our Principles',
-    sectionTitle: 'Guided by Strong Principles',
-    sectionDescription: 'Our core values that drive everything we do',
+    sectionTagline: 'Mission, Vision & Values',
+    sectionTitle: 'The principles that guide everything we do',
+    sectionDescription: '',
     items: [
       {
-        title: 'Our Mission',
-        description: 'Creating exceptional living spaces that enrich lives while maintaining the highest standards of quality and sustainability.'
+        title: 'Mission',
+        description: 'To create exceptional living and working spaces that enhance the quality of life for our customers while contributing to sustainable urban development.'
       },
       {
-        title: 'Our Vision',
-        description: "To be recognized as Surat's premier developer, known for innovative design and properties that stand the test of time."
+        title: 'Vision',
+        description: 'To be the most trusted and innovative real estate developer, setting new standards for quality, design, and customer experience.'
       },
       {
-        title: 'Our Values',
-        description: 'Integrity, excellence, customer focus, innovation, sustainability, and community engagement form our foundation.'
-      }
-    ]
-  },
-  achievementsSection: {
-    sectionTagline: 'Our Recognition',
-    sectionTitle: 'Awards & Achievements',
-    sectionDescription: 'Recognition for our commitment to excellence and innovation in real estate development',
-    achievements: [
-      {
-        title: 'Best Developer Award 2023',
-        description: 'Recognized for outstanding contribution to residential development in Surat',
-        image: '/images/awards/award-1.jpg',
-        year: '2023'
+        title: 'Values',
+        description: 'Integrity, Innovation, Quality, Customer Focus, and Sustainability drive every decision we make and every project we undertake.'
       }
     ]
   },
   portfolioSection: {
-    tagline: 'Our Portfolio',
-    title: 'Our Landmark Projects',
-    description: 'A showcase of our diverse real estate portfolio',
+    tagline: 'Our Work',
+    title: 'Featured Projects',
+    description: 'Discover some of our most prestigious developments',
     buttonText: 'View All Projects',
     projects: [
       {
-        title: 'Laxmi Villa Township',
-        category: 'Residential Project',
+        title: 'Millennium Park',
+        category: 'Residential',
         image: '/images/projects/Millennium Park.jpg'
       },
       {
-        title: 'Millennium Textile Market',
-        category: 'Commercial Project',
-        image: '/images/projects/Millennium Textile Market 3.jpg'
+        title: 'Business Hub',
+        category: 'Commercial',
+        image: '/images/projects/MillenniumBusinessHub.jpg'
       },
       {
-        title: 'Laxmi Enclave',
-        category: 'Residential Complex',
+        title: 'Laxmi Nova',
+        category: 'Residential',
         image: '/images/projects/Laxmi Nova.jpg'
       }
     ]
   },
   ctaSection: {
-    title: 'Ready to Work With Us?',
-    description: 'Explore our projects or get in touch to discuss your real estate needs.',
+    title: 'Ready to Start Your Journey',
+    description: 'Let us help you find your perfect space or investment opportunity.',
     primaryButton: {
-      text: 'Explore Projects',
-      href: '/projects'
-    },
-    secondaryButton: {
       text: 'Contact Us',
       href: '/contact'
+    },
+    secondaryButton: {
+      text: 'View Projects',
+      href: '/projects'
     }
   }
 }

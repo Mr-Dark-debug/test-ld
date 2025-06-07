@@ -40,6 +40,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# documentation (except README.md)
+/docs/
+
 # Added by Task Master AI
 # Logs
 logs

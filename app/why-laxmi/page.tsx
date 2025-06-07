@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/Button";
 import ScrollingFeatureCards from "@/components/ui/ScrollingFeatureCards";
 import { TestimonialCarouselDemo } from "@/components/ui/testimonial-carousel-demo";
 import AwardsSection from "@/components/sections/AwardsSection";
+import CtaBanner from "@/components/sections/CtaBanner";
 import Link from "next/link";
 
 export const metadata: Metadata = {
@@ -267,29 +268,23 @@ export default function WhyLaxmiPage() {
       {/* Testimonials */}
       <TestimonialCarouselDemo />
 
-      {/* CTA */}
-      <section className="py-20 bg-primary">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <AnimatedTitle as="h2" className="text-foreground mb-6">
-            <>Ready to Experience <br className="sm:hidden" />Excellence?</>
-          </AnimatedTitle>
-          <p className="text-xl text-foreground/80 max-w-3xl mx-auto mb-8">
-            Explore our projects or get in touch with our team to discuss your real estate needs.
-          </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <Link href="/projects" className="no-underline">
-              <Button variant="default" size="lg" className="min-w-[150px]">
-                Explore Projects
-              </Button>
-            </Link>
-            <Link href="/contact" className="no-underline">
-              <Button variant="default" size="lg" className="min-w-[150px]">
-                Contact Us
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
+      {/* CTA Banner */}
+      <CtaBanner
+        title={<>Ready to Experience <br className="sm:hidden" />Excellence?</>}
+        description="Explore our projects or get in touch with our team to discuss your real estate needs."
+        buttons={[
+          {
+            text: "Explore Projects",
+            href: "/projects",
+            variant: "default",
+          },
+          {
+            text: "Contact Us",
+            href: "/contact",
+            variant: "outline",
+          },
+        ]}
+      />
     </main>
   );
 }

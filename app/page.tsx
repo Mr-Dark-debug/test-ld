@@ -35,7 +35,7 @@ export default function Home() {
   const [stackCardDimensions, setStackCardDimensions] = useState({ width: 350, height: 350 });
 
   // Fetch featured projects from API
-  const { projects: featuredProjectsData, loading: projectsLoading, error: projectsError } = useFeaturedProjects();
+  const { projects: featuredProjectsData, loading: projectsLoading, error: projectsError, refetch: refetchProjects } = useFeaturedProjects();
 
   useEffect(() => {
     const calculateDimensions = () => {
@@ -152,7 +152,19 @@ export default function Home() {
         <section className="py-16 sm:py-20 bg-background dark:bg-black">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center">
-              <p className="text-red-600 dark:text-red-400">Error loading projects: {projectsError}</p>
+              <h2 className="text-2xl font-semibold text-red-600 dark:text-red-400 mb-2">
+                Unable to Load Featured Projects
+              </h2>
+              <p className="text-foreground/70 mb-4">
+                We're having trouble loading our featured projects. Please try again.
+              </p>
+              <button
+                type="button"
+                onClick={refetchProjects}
+                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Try Again
+              </button>
             </div>
           </div>
         </section>

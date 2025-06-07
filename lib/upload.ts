@@ -28,7 +28,7 @@ export async function ensureUploadDirs() {
 export const FILE_CONFIGS = {
   image: {
     allowedTypes: ['image/jpeg', 'image/png', 'image/webp'],
-    maxSize: 10 * 1024 * 1024, // 10MB
+    maxSize: 2 * 1024 * 1024, // 2MB limit as requested
     directory: UPLOAD_DIRS.images
   },
   brochure: {

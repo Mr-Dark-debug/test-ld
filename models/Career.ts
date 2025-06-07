@@ -251,7 +251,7 @@ const JobApplicationSchema = new Schema<IJobApplication>({
 
 // Create indexes
 JobOpeningSchema.index({ isActive: 1, postedDate: -1 });
-JobOpeningSchema.index({ slug: 1 });
+// Note: slug index is already created by unique: true in schema definition
 JobOpeningSchema.index({ department: 1 });
 JobOpeningSchema.index({ type: 1 });
 

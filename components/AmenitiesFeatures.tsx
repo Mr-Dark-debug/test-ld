@@ -7,7 +7,6 @@ import GlassIcons from "@/components/reactbits/GlassIcons/GlassIcons";
 import { useTheme } from "@/lib/theme-context";
 import { enhancedIconMap } from "@/components/ui/EnhancedAmenityIcons";
 import { BrochureDownloadForm } from "@/components/BrochureDownloadForm";
-import { HelpCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface AmenityProps {

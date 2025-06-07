@@ -26,17 +26,7 @@ export interface IAboutUs extends Document {
       description: string;
     }[];
   };
-  achievementsSection: {
-    sectionTagline: string;
-    sectionTitle: string;
-    sectionDescription: string;
-    achievements: {
-      title: string;
-      description: string;
-      image: string;
-      year: string;
-    }[];
-  };
+
   portfolioSection: {
     tagline: string;
     title: string;
@@ -156,45 +146,7 @@ const AboutUsSchema = new Schema<IAboutUs>({
       }
     }]
   },
-  achievementsSection: {
-    sectionTagline: {
-      type: String,
-      required: [true, 'Achievements section tagline is required'],
-      trim: true
-    },
-    sectionTitle: {
-      type: String,
-      required: [true, 'Achievements section title is required'],
-      trim: true
-    },
-    sectionDescription: {
-      type: String,
-      required: [true, 'Achievements section description is required'],
-      trim: true
-    },
-    achievements: [{
-      title: {
-        type: String,
-        required: [true, 'Achievement title is required'],
-        trim: true
-      },
-      description: {
-        type: String,
-        required: [true, 'Achievement description is required'],
-        trim: true
-      },
-      image: {
-        type: String,
-        required: [true, 'Achievement image is required'],
-        trim: true
-      },
-      year: {
-        type: String,
-        required: [true, 'Achievement year is required'],
-        trim: true
-      }
-    }]
-  },
+
   portfolioSection: {
     tagline: {
       type: String,

@@ -32,7 +32,7 @@ const navItems = [
   },
   { 
     title: "Our Story",
-    href: "/about",
+    href: "/about-us",
     submenu: [
       { title: "About Us", href: "/about-us" },
       { title: "Why Laxmi?", href: "/why-laxmi" },
@@ -200,10 +200,11 @@ export default function Header() {
                 <Link href="/" className="flex items-center">
                   <Image
                     src="/images/logo/logo.png"
-                    alt="Logo"
+                    alt="Laxmi Developers Logo"
                     width={120}
                     height={40}
                     className="h-10 w-auto"
+                    priority
                   />
                   <span className="ml-3 font-display text-xl font-semibold text-black dark:text-white">Laxmi Developers</span>
                 </Link>
@@ -249,10 +250,11 @@ export default function Header() {
               <Link href="/" className="flex items-center">
                 <Image
                   src="/images/logo/logo.png"
-                  alt="Logo"
+                  alt="Laxmi Developers Logo"
                   width={100}
                   height={40}
                   className="h-8 w-auto"
+                  priority
                 />
                 {!isScrolled && (
                   <span className="ml-2 font-display text-lg font-semibold text-black dark:text-white">

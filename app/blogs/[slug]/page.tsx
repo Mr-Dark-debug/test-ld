@@ -158,7 +158,8 @@ export default function BlogPostPage() {
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
             <AnimatedTitle
               as="h1"
-              className="text-3xl md:text-4xl lg:text-5xl font-display mb-4 text-white shadow-text"
+              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-display mb-4 text-white shadow-text leading-tight break-words hyphens-auto max-w-5xl mx-auto"
+              style={{ wordWrap: 'break-word', overflowWrap: 'break-word' }}
             >
               {post.title}
             </AnimatedTitle>
@@ -218,7 +219,7 @@ export default function BlogPostPage() {
             </button>
           </div>
 
-          <article className="prose prose-lg dark:prose-invert max-w-none prose-img:rounded-lg prose-img:shadow-md prose-headings:font-display prose-a:text-highlight dark:prose-a:text-highlight-dark hover:prose-a:underline prose-blockquote:border-l-highlight dark:prose-blockquote:border-l-highlight-dark prose-blockquote:text-foreground/80 dark:prose-blockquote:text-foreground-dark/80">
+          <article className="prose prose-lg dark:prose-invert max-w-none prose-img:rounded-lg prose-img:shadow-md prose-headings:font-display prose-a:text-highlight dark:prose-a:text-highlight-dark hover:prose-a:underline prose-blockquote:border-l-highlight dark:prose-blockquote:border-l-highlight-dark prose-blockquote:text-foreground/80 dark:prose-blockquote:text-foreground-dark/80 prose-p:leading-relaxed prose-p:mb-6 prose-li:mb-2 prose-ul:mb-6 prose-ol:mb-6 prose-h1:mb-8 prose-h2:mb-6 prose-h3:mb-4 prose-h4:mb-4 prose-h5:mb-3 prose-h6:mb-3 prose-pre:bg-gray-900 prose-pre:text-gray-100 prose-code:bg-gray-100 dark:prose-code:bg-gray-800 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-sm">
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
               components={{
@@ -228,9 +229,88 @@ export default function BlogPostPage() {
                     alt={alt || 'Blog post image'}
                     width={1200}
                     height={800}
-                    className="rounded-lg shadow-md"
+                    className="rounded-lg shadow-md my-8"
                     loading="lazy"
                   />
+                ),
+                h1: ({ children }) => (
+                  <h1 className="text-4xl font-bold mb-8 mt-12 text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 pb-4">
+                    {children}
+                  </h1>
+                ),
+                h2: ({ children }) => (
+                  <h2 className="text-3xl font-semibold mb-6 mt-10 text-gray-900 dark:text-gray-100">
+                    {children}
+                  </h2>
+                ),
+                h3: ({ children }) => (
+                  <h3 className="text-2xl font-semibold mb-4 mt-8 text-gray-900 dark:text-gray-100">
+                    {children}
+                  </h3>
+                ),
+                p: ({ children }) => (
+                  <p className="text-lg leading-relaxed mb-6 text-gray-700 dark:text-gray-300">
+                    {children}
+                  </p>
+                ),
+                ul: ({ children }) => (
+                  <ul className="list-disc list-inside mb-6 space-y-2 text-gray-700 dark:text-gray-300">
+                    {children}
+                  </ul>
+                ),
+                ol: ({ children }) => (
+                  <ol className="list-decimal list-inside mb-6 space-y-2 text-gray-700 dark:text-gray-300">
+                    {children}
+                  </ol>
+                ),
+                li: ({ children }) => (
+                  <li className="mb-2 text-lg leading-relaxed">
+                    {children}
+                  </li>
+                ),
+                blockquote: ({ children }) => (
+                  <blockquote className="border-l-4 border-highlight dark:border-highlight-dark pl-6 py-4 my-8 bg-gray-50 dark:bg-gray-800 rounded-r-lg italic text-gray-700 dark:text-gray-300">
+                    {children}
+                  </blockquote>
+                ),
+                code: ({ inline, children }) => {
+                  if (inline) {
+                    return (
+                      <code className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded text-sm font-mono text-gray-800 dark:text-gray-200">
+                        {children}
+                      </code>
+                    );
+                  }
+                  return (
+                    <code className="block bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-sm font-mono my-6">
+                      {children}
+                    </code>
+                  );
+                },
+                pre: ({ children }) => (
+                  <pre className="bg-gray-900 text-gray-100 p-6 rounded-lg overflow-x-auto my-8 border border-gray-700">
+                    {children}
+                  </pre>
+                ),
+                strong: ({ children }) => (
+                  <strong className="font-bold text-gray-900 dark:text-gray-100">
+                    {children}
+                  </strong>
+                ),
+                em: ({ children }) => (
+                  <em className="italic text-gray-700 dark:text-gray-300">
+                    {children}
+                  </em>
+                ),
+                a: ({ href, children }) => (
+                  <a
+                    href={href}
+                    className="text-highlight dark:text-highlight-dark hover:underline font-medium"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {children}
+                  </a>
                 ),
               }}
             >

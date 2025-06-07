@@ -163,18 +163,20 @@ export default function TabGallery({ title, subtitle, images }: TabGalleryProps)
                 </svg>
               </div>
             </div>
-            <Image 
-              src={image.src} 
-              alt={image.alt} 
+            <Image
+              src={image.src}
+              alt={image.alt}
               fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               className="object-cover opacity-60"
             />
           </div>
         ) : (
-          <Image 
-            src={image.src} 
-            alt={image.alt} 
+          <Image
+            src={image.src}
+            alt={image.alt}
             fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             className="object-cover transition-transform duration-500 group-hover:scale-110"
           />
         )}

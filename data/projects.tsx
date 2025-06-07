@@ -91,93 +91,107 @@ export const commercialSpecs: Specification[] = [
   { name: "Flooring", value: "Granite/Vitrified Tiles" },
 ];
 
-// Mock Featured Projects
+// Featured Projects with Real Images
 export const featuredProjects: Project[] = [
   {
     id: "project-1",
-    title: "Laxmi Heights",
+    title: "Millennium Park",
     type: "residential",
     status: "ongoing",
     location: "Vesu, Surat",
-    imageSrc: "https://images.unsplash.com/photo-1523217582562-09d0def993a6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
-    href: "/residential/on-going/laxmi-heights",
+    imageSrc: "/images/projects/Millennium Park.jpg",
+    href: "/residential/on-going/millennium-park",
   },
   {
     id: "project-2",
-    title: "Laxmi Arcade",
+    title: "Millennium Business Hub",
     type: "commercial",
     status: "completed",
     location: "Ring Road, Surat",
-    imageSrc: "https://images.unsplash.com/photo-1579632652768-6cb9dcf85912?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
-    href: "/commercial/completed/laxmi-arcade",
+    imageSrc: "/images/projects/Millennium Business Hub.jpg",
+    href: "/commercial/completed/millennium-business-hub",
   },
   {
     id: "project-3",
-    title: "Laxmi Paradise",
+    title: "Laxmi Nova",
     type: "residential",
     status: "ongoing",
     location: "Adajan, Surat",
-    imageSrc: "https://images.unsplash.com/photo-1568605114967-8130f3a36994?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
-    href: "/residential/on-going/laxmi-paradise",
+    imageSrc: "/images/projects/Laxmi Nova.jpg",
+    href: "/residential/on-going/laxmi-nova",
   },
   {
     id: "project-4",
-    title: "Laxmi Business Hub",
+    title: "Millennium City Central",
     type: "commercial",
     status: "upcoming",
     location: "Citylight, Surat",
-    imageSrc: "https://images.unsplash.com/photo-1582407947304-fd86f028f716?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
-    href: "/commercial/upcoming/laxmi-business-hub",
+    imageSrc: "/images/projects/Millennium City Central.jpg",
+    href: "/commercial/upcoming/millennium-city-central",
   },
   {
     id: "project-5",
-    title: "Laxmi Royal Residency",
+    title: "Alexa",
     type: "residential",
     status: "completed",
     location: "Piplod, Surat",
-    imageSrc: "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
-    href: "/residential/completed/laxmi-royal-residency",
+    imageSrc: "/images/projects/Alexa.jpg",
+    href: "/residential/completed/alexa",
   },
   {
     id: "project-6",
-    title: "Laxmi Trade Center",
+    title: "Millennium Textile Market",
     type: "commercial",
     status: "ongoing",
     location: "Pal, Surat",
-    imageSrc: "https://images.unsplash.com/photo-1497366858526-0766cadbe8fa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
-    href: "/commercial/on-going/laxmi-trade-center",
+    imageSrc: "/images/projects/Millennium Textile Market 3.jpg",
+    href: "/commercial/on-going/millennium-textile-market",
   },
 ];
 
-// Mock Project Details for individual project pages
+// Project Details for individual project pages
 export const projectDetails = {
-  "laxmi-heights": {
-    title: "Laxmi Heights",
+  "millennium-park": {
+    title: "Millennium Park",
     description:
-      "Laxmi Heights is a premium residential project offering luxury living spaces designed for modern families. Located in the heart of Vesu, Surat, these apartments offer a perfect blend of comfort, convenience, and sophisticated living. With spacious 2 & 3 BHK options, each apartment is thoughtfully designed to maximize natural light and ventilation.",
+      "Millennium Park is a premium residential project offering luxury living spaces designed for modern families. Located in the heart of Vesu, Surat, these apartments offer a perfect blend of comfort, convenience, and sophisticated living. With spacious 2 & 3 BHK options, each apartment is thoughtfully designed to maximize natural light and ventilation.",
     location: "Vesu, Surat",
     status: "ongoing",
     type: "residential",
-    imageSrc: "https://images.unsplash.com/photo-1523217582562-09d0def993a6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
+    imageSrc: "/images/projects/Millennium Park.jpg",
     specifications: residentialSpecs,
     amenities: projectAmenities,
-    brochureUrl: "/brochures/laxmi-heights.pdf",
+    brochureUrl: "/brochures/millennium-park.pdf",
     contactPhone: "+91 9978600222",
     reraNumber: "PR/GJ/SURAT/SURAT CITY/LAXMI/CAA00612/130222",
   },
-  "laxmi-arcade": {
-    title: "Laxmi Arcade",
+  "millennium-business-hub": {
+    title: "Millennium Business Hub",
     description:
-      "Laxmi Arcade is a state-of-the-art commercial complex offering premium retail and office spaces. Strategically located on Ring Road, Surat, it features modern amenities and excellent connectivity, making it an ideal investment opportunity. The complex is designed to provide a conducive environment for businesses to thrive.",
+      "Millennium Business Hub is a state-of-the-art commercial complex offering premium retail and office spaces. Strategically located on Ring Road, Surat, it features modern amenities and excellent connectivity, making it an ideal investment opportunity. The complex is designed to provide a conducive environment for businesses to thrive.",
     location: "Ring Road, Surat",
     status: "completed",
     type: "commercial",
-    imageSrc: "https://images.unsplash.com/photo-1579632652768-6cb9dcf85912?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
+    imageSrc: "/images/projects/Millennium Business Hub.jpg",
     specifications: commercialSpecs,
     amenities: projectAmenities.slice(0, 6),
-    brochureUrl: "/brochures/laxmi-arcade.pdf",
+    brochureUrl: "/brochures/millennium-business-hub.pdf",
     contactPhone: "+91 9978600222",
     reraNumber: "PR/GJ/SURAT/SURAT CITY/LAXMI/CAA00498/260621",
+  },
+  "laxmi-nova": {
+    title: "Laxmi Nova",
+    description:
+      "Laxmi Nova represents the pinnacle of modern residential living in Surat. This premium project combines contemporary architecture with thoughtful amenities to create an exceptional living experience. Located in Adajan, it offers excellent connectivity and a vibrant community atmosphere.",
+    location: "Adajan, Surat",
+    status: "ongoing",
+    type: "residential",
+    imageSrc: "/images/projects/Laxmi Nova.jpg",
+    specifications: residentialSpecs,
+    amenities: projectAmenities,
+    brochureUrl: "/brochures/laxmi-nova.pdf",
+    contactPhone: "+91 9978600222",
+    reraNumber: "PR/GJ/SURAT/SURAT CITY/LAXMI/CAA00613/140222",
   },
 };
 

@@ -153,26 +153,6 @@ export default function AwardsSection() {
             </div>
           ))}
         </div>
-
-        {/* Achievement Stats */}
-        <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-          <div className="space-y-2">
-            <div className="text-3xl font-bold text-primary">25+</div>
-            <div className="text-sm text-foreground/70">Years of Excellence</div>
-          </div>
-          <div className="space-y-2">
-            <div className="text-3xl font-bold text-primary">500+</div>
-            <div className="text-sm text-foreground/70">Happy Families</div>
-          </div>
-          <div className="space-y-2">
-            <div className="text-3xl font-bold text-primary">50+</div>
-            <div className="text-sm text-foreground/70">Projects Completed</div>
-          </div>
-          <div className="space-y-2">
-            <div className="text-3xl font-bold text-primary">1000+</div>
-            <div className="text-sm text-foreground/70">Units Delivered</div>
-          </div>
-        </div>
       </div>
     </section>
   );

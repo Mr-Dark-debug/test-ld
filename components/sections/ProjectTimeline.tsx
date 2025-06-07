@@ -147,7 +147,7 @@ const ProjectTimeline = () => {
     fullDescription: project.description,
   }));
 
-  const titleText = "Our Projects";
+  const titleText = "Our Milestones";
   const descriptionText = "Explore our portfolio of exceptional developments that have shaped communities and redefined living experiences";
 
   // Determine text color based on theme
@@ -170,12 +170,56 @@ const ProjectTimeline = () => {
         </div>
 
         <div className="relative w-full">
-          {/* Left fade overlay */}
+          {/* Left fade overlay - Light mode - Extended height coverage */}
           <div
-            className="absolute left-0 top-0 bottom-0 z-10 w-12 sm:w-16 md:w-20 pointer-events-none
-                       bg-gradient-to-r from-white via-white/50 to-transparent
-                       dark:from-gray-900 dark:via-gray-900/50 dark:to-transparent"
-            style={{ backdropFilter: 'blur(2px)' }}
+            className="absolute left-0 z-10 w-12 sm:w-16 md:w-20 lg:w-24 pointer-events-none dark:hidden"
+            style={{
+              top: '-20px',
+              bottom: '-100px', // Extended further below the container (from -40px to -100px)
+              height: 'calc(100% + 120px)', // Increased total height (from 60px to 120px)
+              minHeight: '550px', // Increased minimum height for mobile
+              background: 'linear-gradient(to right, white 0%, rgba(255,255,255,0.95) 25%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0.4) 75%, transparent 100%)',
+              backdropFilter: 'blur(6px)'
+            }}
+          ></div>
+
+          {/* Right fade overlay - Light mode - Extended height coverage */}
+          <div
+            className="absolute right-0 z-10 w-12 sm:w-16 md:w-20 lg:w-24 pointer-events-none dark:hidden"
+            style={{
+              top: '-20px',
+              bottom: '-100px', // Extended further below the container (from -40px to -100px)
+              height: 'calc(100% + 120px)', // Increased total height (from 60px to 120px)
+              minHeight: '550px', // Increased minimum height for mobile
+              background: 'linear-gradient(to left, white 0%, rgba(255,255,255,0.95) 25%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0.4) 75%, transparent 100%)',
+              backdropFilter: 'blur(6px)'
+            }}
+          ></div>
+
+          {/* Left fade overlay - Dark mode - Extended height coverage */}
+          <div
+            className="absolute left-0 z-10 w-12 sm:w-16 md:w-20 lg:w-24 pointer-events-none hidden dark:block"
+            style={{
+              top: '-20px',
+              bottom: '-100px', // Extended further below the container (from -40px to -100px)
+              height: 'calc(100% + 120px)', // Increased total height (from 60px to 120px)
+              minHeight: '550px', // Increased minimum height for mobile
+              background: 'linear-gradient(to right, rgb(17,24,39) 0%, rgba(17,24,39,0.95) 25%, rgba(17,24,39,0.8) 50%, rgba(17,24,39,0.4) 75%, transparent 100%)',
+              backdropFilter: 'blur(6px)'
+            }}
+          ></div>
+
+          {/* Right fade overlay - Dark mode - Extended height coverage */}
+          <div
+            className="absolute right-0 z-10 w-12 sm:w-16 md:w-20 lg:w-24 pointer-events-none hidden dark:block"
+            style={{
+              top: '-20px',
+              bottom: '-100px', // Extended further below the container (from -40px to -100px)
+              height: 'calc(100% + 120px)', // Increased total height (from 60px to 120px)
+              minHeight: '550px', // Increased minimum height for mobile
+              background: 'linear-gradient(to left, rgb(17,24,39) 0%, rgba(17,24,39,0.95) 25%, rgba(17,24,39,0.8) 50%, rgba(17,24,39,0.4) 75%, transparent 100%)',
+              backdropFilter: 'blur(6px)'
+            }}
           ></div>
 
           <div className="w-full mx-auto relative h-[400px] sm:h-[500px] md:h-[600px]">
@@ -187,14 +231,6 @@ const ProjectTimeline = () => {
               font={typeof window !== 'undefined' && window.innerWidth < 768 ? "bold 20px DM Sans" : "bold 26px DM Sans"}
             />
           </div>
-
-          {/* Right fade overlay */}
-          <div
-            className="absolute right-0 top-0 bottom-0 z-10 w-12 sm:w-16 md:w-20 pointer-events-none
-                       bg-gradient-to-l from-white via-white/50 to-transparent
-                       dark:from-gray-900 dark:via-gray-900/50 dark:to-transparent"
-            style={{ backdropFilter: 'blur(2px)' }}
-          ></div>
         </div>
       </div>
     </section>

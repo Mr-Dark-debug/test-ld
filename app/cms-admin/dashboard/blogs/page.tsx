@@ -41,8 +41,8 @@ export default function BlogsList() {
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
 
-  // Fetch blogs from API
-  const fetchBlogs = async () => {
+  // Fetch blogs from API with retry logic
+  const fetchBlogs = async (retryCount = 0) => {
     try {
       setLoading(true);
       setError(null);
@@ -69,11 +69,23 @@ export default function BlogsList() {
       if (response.success && response.data) {
         setBlogs(response.data);
       } else {
-        setError(response.error || 'Failed to fetch blogs');
+        throw new Error(response.error || 'Failed to fetch blogs');
       }
     } catch (err: any) {
-      setError(err.message || 'Failed to fetch blogs');
       console.error('Error fetching blogs:', err);
+
+      // Retry logic for database connection issues
+      if (retryCount < 2 && (
+        err.message?.includes('Database connection') ||
+        err.message?.includes('ECONNREFUSED') ||
+        err.message?.includes('timeout')
+      )) {
+        console.log(`Retrying fetch blogs... Attempt ${retryCount + 1}`);
+        setTimeout(() => fetchBlogs(retryCount + 1), 1000 * (retryCount + 1));
+        return;
+      }
+
+      setError(err.message || 'Failed to fetch blogs. Please check your connection and try again.');
     } finally {
       setLoading(false);
     }
@@ -209,7 +221,7 @@ export default function BlogsList() {
 
             {/* Refresh Button */}
             <button
-              onClick={fetchBlogs}
+              onClick={() => fetchBlogs()}
               className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
             >
               <Filter className="w-4 h-4 mr-2 inline" />
@@ -229,7 +241,7 @@ export default function BlogsList() {
             <div className="p-8 text-center">
               <p className="text-red-500">{error}</p>
               <button
-                onClick={fetchBlogs}
+                onClick={() => fetchBlogs()}
                 className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
               >
                 Try Again

@@ -33,6 +33,8 @@ interface NewAward {
   title: string;
   description: string;
   image: string;
+  imageUrl: string;
+  imageType: 'upload' | 'url';
   isActive: boolean;
 }
 
@@ -46,6 +48,8 @@ export default function AwardsPage() {
     title: '',
     description: '',
     image: '',
+    imageUrl: '',
+    imageType: 'upload',
     isActive: true
   });
 
@@ -97,16 +101,83 @@ export default function AwardsPage() {
     fetchAwards();
   }, []);
 
+  // Handle file upload with size validation
+  const handleFileUpload = async (file: File) => {
+    // Validate file size (2MB limit)
+    const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+    if (file.size > maxSize) {
+      toast.error('File size must be less than 2MB. Please compress the image and try again.');
+      return;
+    }
+
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      toast.error('Please upload a valid image file (JPEG, PNG, or WebP).');
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append('files', file);
+      formData.append('type', 'image');
+      formData.append('thumbnails', 'true');
+
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success && result.data.length > 0) {
+          const uploadedImagePath = result.data[0].path;
+          setNewAward(prev => ({
+            ...prev,
+            image: uploadedImagePath,
+            imageType: 'upload'
+          }));
+          toast.success('Image uploaded successfully!');
+        } else {
+          toast.error('Failed to upload image');
+        }
+      } else {
+        toast.error('Failed to upload image');
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+      toast.error('Failed to upload image');
+    }
+  };
+
+  // Handle URL validation and setting
+  const handleImageUrlChange = (url: string) => {
+    setNewAward(prev => ({
+      ...prev,
+      imageUrl: url,
+      image: url, // Set image to URL for API compatibility
+      imageType: 'url'
+    }));
+  };
+
   // Handle creating new award
   const handleCreateAward = async () => {
+    console.log('Creating award with data:', newAward);
+
     if (!newAward.title || !newAward.description) {
       toast.error('Please fill in all required fields');
+      return;
+    }
+
+    if (!newAward.image && !newAward.imageUrl) {
+      toast.error('Please provide an image (upload or URL)');
       return;
     }
 
     setIsSaving(true);
 
     try {
+      console.log('Sending POST request to /api/awards');
       const response = await fetch('/api/awards', {
         method: 'POST',
         headers: {
@@ -115,7 +186,11 @@ export default function AwardsPage() {
         body: JSON.stringify(newAward),
       });
 
+      console.log('Response status:', response.status);
+      console.log('Response headers:', response.headers);
+
       const data = await response.json();
+      console.log('Response data:', data);
 
       if (data.success) {
         toast.success('Award created successfully');
@@ -125,14 +200,17 @@ export default function AwardsPage() {
           title: '',
           description: '',
           image: '',
+          imageUrl: '',
+          imageType: 'upload',
           isActive: true
         });
       } else {
+        console.error('API returned error:', data.error);
         toast.error(data.error || 'Failed to create award');
       }
     } catch (error) {
       console.error('Error creating award:', error);
-      toast.error('Failed to create award');
+      toast.error('Failed to create award: ' + (error as Error).message);
     } finally {
       setIsSaving(false);
     }
@@ -247,7 +325,7 @@ export default function AwardsPage() {
         {!editingAward && !isAddingAward && (
           <Button
             onClick={() => setIsAddingAward(true)}
-            className="w-full sm:w-auto flex items-center justify-center gap-2"
+            className="w-full sm:w-auto flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
           >
             <Plus className="w-4 h-4" />
             Add New Award
@@ -258,7 +336,7 @@ export default function AwardsPage() {
             <Button
               onClick={editingAward ? handleUpdateAward : handleCreateAward}
               disabled={isSaving}
-              className="flex-1 flex items-center justify-center gap-2"
+              className="flex-1 flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-semibold px-6 py-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
             >
               {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
               {isSaving ? 'Saving...' : (editingAward ? 'Update Award' : 'Create Award')}
@@ -272,10 +350,12 @@ export default function AwardsPage() {
                   title: '',
                   description: '',
                   image: '',
+                  imageUrl: '',
+                  imageType: 'upload',
                   isActive: true
                 });
               }}
-              className="flex-1"
+              className="flex-1 border-2 border-gray-300 text-gray-700 hover:bg-gray-50 font-semibold px-6 py-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
             >
               Cancel
             </Button>
@@ -323,21 +403,98 @@ export default function AwardsPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Award Image URL</label>
-              <Input
-                value={isAddingAward ? newAward.image : editingAward?.image || ''}
-                onChange={(e) => {
-                  if (isAddingAward) {
-                    setNewAward({...newAward, image: e.target.value});
-                  } else if (editingAward) {
-                    setEditingAward({...editingAward, image: e.target.value});
-                  }
-                }}
-                placeholder="/images/awards/award-name.jpg"
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                Upload the image to /public/images/awards/ folder and enter the path here
-              </p>
+              <label className="block text-sm font-medium mb-2">Award Image</label>
+
+              {/* Image Type Selection */}
+              <div className="flex gap-4 mb-3">
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name="imageType"
+                    value="upload"
+                    checked={(isAddingAward ? newAward.imageType : 'upload') === 'upload'}
+                    onChange={() => {
+                      if (isAddingAward) {
+                        setNewAward({...newAward, imageType: 'upload', imageUrl: '', image: ''});
+                      }
+                    }}
+                    className="mr-2"
+                  />
+                  Upload Image
+                </label>
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name="imageType"
+                    value="url"
+                    checked={(isAddingAward ? newAward.imageType : 'upload') === 'url'}
+                    onChange={() => {
+                      if (isAddingAward) {
+                        setNewAward({...newAward, imageType: 'url', image: ''});
+                      }
+                    }}
+                    className="mr-2"
+                  />
+                  Image URL
+                </label>
+              </div>
+
+              {/* File Upload */}
+              {(isAddingAward ? newAward.imageType : 'upload') === 'upload' && (
+                <div>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        handleFileUpload(file);
+                      }
+                    }}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Maximum file size: 2MB. Supported formats: JPEG, PNG, WebP
+                  </p>
+                </div>
+              )}
+
+              {/* URL Input */}
+              {(isAddingAward ? newAward.imageType : 'upload') === 'url' && (
+                <div>
+                  <Input
+                    value={isAddingAward ? newAward.imageUrl : editingAward?.image || ''}
+                    onChange={(e) => {
+                      if (isAddingAward) {
+                        handleImageUrlChange(e.target.value);
+                      } else if (editingAward) {
+                        setEditingAward({...editingAward, image: e.target.value});
+                      }
+                    }}
+                    placeholder="https://example.com/award-image.jpg"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Enter a direct URL to an image (must be publicly accessible)
+                  </p>
+                </div>
+              )}
+
+              {/* Image Preview */}
+              {(isAddingAward ? newAward.image : editingAward?.image) && (
+                <div className="mt-3">
+                  <p className="text-sm font-medium mb-2">Preview:</p>
+                  <div className="w-32 h-32 bg-gray-100 rounded-lg overflow-hidden">
+                    <img
+                      src={isAddingAward ? newAward.image : editingAward?.image || ''}
+                      alt="Award preview"
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = '/images/placeholder-award.jpg';
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="flex items-center">

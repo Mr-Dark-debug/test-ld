@@ -11,7 +11,6 @@ import {
   Building, Users, Laptop,
   Bus, KeyRound, BatteryCharging,
   Bed, Dog, Theater, Film, Palette,
-  HelpCircle
 } from "lucide-react";
 
 // Comprehensive amenity icon mapping using Lucide React icons

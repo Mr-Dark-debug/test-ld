@@ -88,6 +88,14 @@ async function apiRequest<T = any>(
     const data = await response.json();
 
     if (!response.ok) {
+      // Handle token expiration specifically
+      if (response.status === 401 && data.error?.includes('Authentication')) {
+        removeAuthToken();
+        // Don't throw for auth failures on optional endpoints
+        if (endpoint.includes('/auth/me') || endpoint.includes('/testimonials')) {
+          return { success: false, error: data.error, data: null };
+        }
+      }
       throw new ApiError(data.error || 'Request failed', response.status);
     }
 
@@ -166,6 +174,17 @@ export const projectsApi = {
   },
 
   getById: async (id: string) => {
+    // First try to get by ID directly from the main projects endpoint
+    try {
+      const response = await apiRequest<any[]>(`/projects?id=${id}`);
+      if (response.success && response.data && response.data.length > 0) {
+        return { success: true, data: response.data[0] };
+      }
+    } catch (error) {
+      console.log('Failed to get by ID, trying by slug...');
+    }
+
+    // Fallback to slug-based endpoint
     return apiRequest<any>(`/projects/${id}`);
   },
 
@@ -177,9 +196,9 @@ export const projectsApi = {
   },
 
   update: async (id: string, projectData: any) => {
-    return apiRequest<any>(`/projects/${id}`, {
+    return apiRequest<any>('/projects', {
       method: 'PUT',
-      body: JSON.stringify(projectData),
+      body: JSON.stringify({ id, ...projectData }),
     });
   },
 
@@ -191,8 +210,9 @@ export const projectsApi = {
   },
 
   delete: async (id: string) => {
-    return apiRequest(`/projects/${id}`, {
+    return apiRequest('/projects', {
       method: 'DELETE',
+      body: JSON.stringify({ id }),
     });
   },
 };

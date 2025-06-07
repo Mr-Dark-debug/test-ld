@@ -27,32 +27,46 @@ async function getProjectsHandler(req: AuthenticatedRequest) {
     const limit = parseInt(searchParams.get('limit') || '10');
     const page = parseInt(searchParams.get('page') || '1');
     const search = searchParams.get('search');
+    const id = searchParams.get('id'); // Add support for getting by ID
 
     // Build query
     const query: any = {};
 
-    if (type && ['residential', 'commercial'].includes(type)) {
-      query.type = type;
-    }
+    // If ID is provided, search by ID only
+    if (id) {
+      try {
+        query._id = id;
+      } catch (error) {
+        return NextResponse.json(
+          { error: 'Invalid project ID' },
+          { status: 400 }
+        );
+      }
+    } else {
+      // Apply other filters only if not searching by ID
+      if (type && ['residential', 'commercial'].includes(type)) {
+        query.type = type;
+      }
 
-    if (status && ['ongoing', 'completed', 'upcoming'].includes(status)) {
-      query.status = status;
-    }
+      if (status && ['ongoing', 'completed', 'upcoming'].includes(status)) {
+        query.status = status;
+      }
 
-    if (featured === 'true') {
-      query.featured = true;
-    }
+      if (featured === 'true') {
+        query.featured = true;
+      }
 
-    if (city) {
-      query['location.city'] = new RegExp(city, 'i');
-    }
+      if (city) {
+        query['location.city'] = new RegExp(city, 'i');
+      }
 
-    if (search) {
-      query.$or = [
-        { title: new RegExp(search, 'i') },
-        { description: new RegExp(search, 'i') },
-        { 'location.address': new RegExp(search, 'i') }
-      ];
+      if (search) {
+        query.$or = [
+          { title: new RegExp(search, 'i') },
+          { description: new RegExp(search, 'i') },
+          { 'location.address': new RegExp(search, 'i') }
+        ];
+      }
     }
 
     // Calculate pagination
@@ -118,8 +132,54 @@ async function createProjectHandler(req: AuthenticatedRequest) {
       );
     }
 
+    const validatedData = validation.value as any;
+
+    // Transform the data to match the database schema
     const projectData = {
-      ...validation.value as object,
+      title: validatedData.title,
+      category: validatedData.category,
+      status: validatedData.status,
+      description: validatedData.description,
+      location: {
+        address: validatedData.location?.address || '',
+        lat: validatedData.location?.lat || '',
+        lng: validatedData.location?.lng || '',
+        mapEmbedUrl: validatedData.location?.mapEmbedUrl || ''
+      },
+      images: {
+        coverImage: validatedData.coverImage || validatedData.images?.coverImage || '',
+        gallery: {
+          promotional: validatedData.images?.gallery?.promotional || [],
+          exterior: validatedData.images?.gallery?.exterior || [],
+          interior: validatedData.images?.gallery?.interior || [],
+          videos: validatedData.images?.gallery?.videos || []
+        }
+      },
+      specifications: {
+        totalUnits: validatedData.specifications?.totalUnits || '',
+        unitTypes: validatedData.specifications?.unitTypes || '',
+        unitArea: validatedData.specifications?.unitArea || '',
+        possession: validatedData.specifications?.possession || '',
+        structure: validatedData.specifications?.structure || '',
+        flooring: validatedData.specifications?.flooring || ''
+      },
+      floorPlans: {
+        '1bhk': [],
+        '2bhk': [],
+        '3bhk': validatedData.floorPlans?.['3bhk'] || [],
+        '4bhk': validatedData.floorPlans?.['4bhk'] || [],
+        '5bhk': validatedData.floorPlans?.['5bhk'] || []
+      },
+      amenities: validatedData.amenities || [],
+      reraNumber: validatedData.reraNumber || '',
+      reraQrImage: validatedData.reraQrImage || '',
+      brochureUrl: validatedData.brochureUrl || '',
+      brochureFile: validatedData.brochureFile || '',
+      modelView: validatedData.modelView || '',
+      coverImage: validatedData.coverImage || '',
+      contactSales: validatedData.contactSales || '',
+      featured: validatedData.featured || false,
+      seoMeta: validatedData.seoMeta || {},
       createdBy: req.user!.userId
     };
 
@@ -183,6 +243,16 @@ async function updateProjectHandler(req: AuthenticatedRequest) {
     // Extract id from validated data and use the rest for update
     const { id: validatedId, ...updateFields } = validation.value;
 
+    // If title is being updated, generate new slug
+    if (updateFields.title) {
+      updateFields.slug = updateFields.title
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-')
+        .trim();
+    }
+
     const project = await Project.findByIdAndUpdate(
       id,
       {
@@ -222,6 +292,44 @@ async function updateProjectHandler(req: AuthenticatedRequest) {
   }
 }
 
+// DELETE /api/projects - Delete project (admin only)
+async function deleteProjectHandler(req: AuthenticatedRequest) {
+  await connectDB();
+
+  try {
+    const body = await req.json();
+    const { id } = body;
+
+    if (!id) {
+      return NextResponse.json(
+        { error: 'Project ID is required' },
+        { status: 400 }
+      );
+    }
+
+    const project = await Project.findByIdAndDelete(id);
+
+    if (!project) {
+      return NextResponse.json(
+        { error: 'Project not found' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: 'Project deleted successfully'
+    });
+
+  } catch (error) {
+    console.error('Delete project error:', error);
+    return NextResponse.json(
+      { error: 'Failed to delete project' },
+      { status: 500 }
+    );
+  }
+}
+
 // Route handlers
 export const GET = withMiddleware(
   withCors,
@@ -240,6 +348,12 @@ export const PUT = withMiddleware(
   withAuth,
   withErrorHandling
 )(updateProjectHandler);
+
+export const DELETE = withMiddleware(
+  withCors,
+  withAuth,
+  withErrorHandling
+)(deleteProjectHandler);
 
 // Helper function to combine middlewares
 function withMiddleware(...middlewares: Array<(handler: any) => any>) {

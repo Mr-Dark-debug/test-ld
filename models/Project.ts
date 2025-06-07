@@ -4,17 +4,13 @@ export interface IProject extends Document {
   _id: string;
   title: string;
   slug: string;
-  type: 'residential' | 'commercial';
+  category: 'residential' | 'commercial';
   status: 'ongoing' | 'completed' | 'upcoming';
   description: string;
   location: {
-    address: string;
-    city: string;
-    state: string;
-    coordinates: {
-      lat: number;
-      lng: number;
-    };
+    address?: string;
+    lat?: string;
+    lng?: string;
     mapEmbedUrl?: string;
   };
   images: {
@@ -35,10 +31,13 @@ export interface IProject extends Document {
     flooring: string;
   };
   amenities: mongoose.Types.ObjectId[];
-  reraNumber: string;
+  reraNumber?: string;
   reraQrImage?: string;
   brochureUrl?: string;
-  contactSales: string;
+  brochureFile?: string;
+  modelView?: string;
+  coverImage?: string;
+  contactSales?: string;
   floorPlans: {
     '1bhk': string[];
     '2bhk': string[];
@@ -71,10 +70,10 @@ const ProjectSchema = new Schema<IProject>({
     lowercase: true,
     trim: true
   },
-  type: {
+  category: {
     type: String,
     enum: ['residential', 'commercial'],
-    required: [true, 'Project type is required']
+    required: [true, 'Project category is required']
   },
   status: {
     type: String,
@@ -90,32 +89,15 @@ const ProjectSchema = new Schema<IProject>({
   location: {
     address: {
       type: String,
-      required: [true, 'Address is required'],
       trim: true
     },
-    city: {
+    lat: {
       type: String,
-      required: [true, 'City is required'],
       trim: true
     },
-    state: {
+    lng: {
       type: String,
-      required: [true, 'State is required'],
       trim: true
-    },
-    coordinates: {
-      lat: {
-        type: Number,
-        required: [true, 'Latitude is required'],
-        min: [-90, 'Latitude must be between -90 and 90'],
-        max: [90, 'Latitude must be between -90 and 90']
-      },
-      lng: {
-        type: Number,
-        required: [true, 'Longitude is required'],
-        min: [-180, 'Longitude must be between -180 and 180'],
-        max: [180, 'Longitude must be between -180 and 180']
-      }
     },
     mapEmbedUrl: {
       type: String,
@@ -134,27 +116,27 @@ const ProjectSchema = new Schema<IProject>({
   specifications: {
     totalUnits: {
       type: String,
-      required: [true, 'Total units is required']
+      default: ''
     },
     unitTypes: {
       type: String,
-      required: [true, 'Unit types is required']
+      default: ''
     },
     unitArea: {
       type: String,
-      required: [true, 'Unit area is required']
+      default: ''
     },
     possession: {
       type: String,
-      required: [true, 'Possession date is required']
+      default: ''
     },
     structure: {
       type: String,
-      required: [true, 'Structure type is required']
+      default: ''
     },
     flooring: {
       type: String,
-      required: [true, 'Flooring type is required']
+      default: ''
     }
   },
   amenities: [{
@@ -163,15 +145,18 @@ const ProjectSchema = new Schema<IProject>({
   }],
   reraNumber: {
     type: String,
-    required: [true, 'RERA number is required'],
-    trim: true
+    trim: true,
+    default: ''
   },
   reraQrImage: String,
   brochureUrl: String,
+  brochureFile: String,
+  modelView: String,
+  coverImage: String,
   contactSales: {
     type: String,
-    required: [true, 'Contact sales information is required'],
-    trim: true
+    trim: true,
+    default: ''
   },
   floorPlans: {
     '1bhk': [String],
@@ -205,17 +190,17 @@ const ProjectSchema = new Schema<IProject>({
 });
 
 // Indexes (slug index is already created by unique: true)
-ProjectSchema.index({ type: 1 });
+ProjectSchema.index({ category: 1 });
 ProjectSchema.index({ status: 1 });
 ProjectSchema.index({ featured: 1 });
-ProjectSchema.index({ type: 1, status: 1 });
-ProjectSchema.index({ 'location.city': 1 });
+ProjectSchema.index({ category: 1, status: 1 });
+ProjectSchema.index({ 'location.address': 1 });
 ProjectSchema.index({ createdAt: -1 });
 
 // Pre-save middleware to generate slug
 ProjectSchema.pre('save', function(next) {
   if (this.isModified('title') || this.isNew) {
-    this.slug = this.title
+    (this as any).slug = (this as any).title
       .toLowerCase()
       .replace(/[^a-z0-9\s-]/g, '')
       .replace(/\s+/g, '-')
@@ -226,8 +211,8 @@ ProjectSchema.pre('save', function(next) {
 });
 
 // Static methods
-ProjectSchema.statics.findByType = function(type: string) {
-  return this.find({ type }).sort({ createdAt: -1 });
+ProjectSchema.statics.findByCategory = function(category: string) {
+  return this.find({ category }).sort({ createdAt: -1 });
 };
 
 ProjectSchema.statics.findByStatus = function(status: string) {
@@ -238,12 +223,12 @@ ProjectSchema.statics.findFeatured = function() {
   return this.find({ featured: true }).sort({ createdAt: -1 });
 };
 
-ProjectSchema.statics.findByTypeAndStatus = function(type: string, status: string) {
-  return this.find({ type, status }).sort({ createdAt: -1 });
+ProjectSchema.statics.findByCategoryAndStatus = function(category: string, status: string) {
+  return this.find({ category, status }).sort({ createdAt: -1 });
 };
 
-ProjectSchema.statics.findByCity = function(city: string) {
-  return this.find({ 'location.city': new RegExp(city, 'i') }).sort({ createdAt: -1 });
+ProjectSchema.statics.findByAddress = function(address: string) {
+  return this.find({ 'location.address': new RegExp(address, 'i') }).sort({ createdAt: -1 });
 };
 
 // Ensure model is not re-compiled in development

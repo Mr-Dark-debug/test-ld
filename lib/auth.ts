@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken';
+import jwt, { SignOptions } from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { NextRequest } from 'next/server';
 
@@ -39,9 +39,12 @@ export function generateToken(payload: Omit<JWTPayload, 'iat' | 'exp'>): string 
   if (!JWT_SECRET) {
     throw new Error('JWT_SECRET is not defined');
   }
-  // Type assertion to fix TypeScript error
-  const secretKey = JWT_SECRET as string;
-  return jwt.sign(payload, secretKey, { expiresIn: JWT_EXPIRES_IN });
+
+  const options: SignOptions = {
+    expiresIn: JWT_EXPIRES_IN || '7d'
+  };
+
+  return jwt.sign(payload, JWT_SECRET, options);
 }
 
 /**
@@ -51,7 +54,12 @@ export function verifyToken(token: string): JWTPayload | null {
   try {
     return jwt.verify(token, JWT_SECRET!) as JWTPayload;
   } catch (error) {
-    console.error('Token verification failed:', error);
+    // Only log token expired errors in development
+    if (process.env.NODE_ENV === 'development' && error instanceof Error && error.name === 'TokenExpiredError') {
+      console.log('Token expired - this is normal behavior');
+    } else if (!(error instanceof Error && error.name === 'TokenExpiredError')) {
+      console.error('Token verification failed:', error);
+    }
     return null;
   }
 }

@@ -23,24 +23,24 @@ async function getAboutUsHandler(req: AuthenticatedRequest) {
       // Return default content if none exists
       const defaultContent = {
         heroSection: {
-          tagline: "About Laxmi Developers",
-          title: "Building Dreams, Creating",
-          titleHighlight: "Legacies",
+          tagline: "Laxmi Developers",
+          title: "Brick by Brick ",
+          titleHighlight: "Building Excellence",
           description: "With over a decade of excellence in real estate development, we transform visions into reality through innovative design and uncompromising quality.",
           buttonText: "Our Projects",
-          backgroundImage: "/images/about-hero-bg.jpg"
+          backgroundImage: "/images/hero/hero-1.jpg"
         },
         companySection: {
           tagline: "Our Story",
           title: "Pioneering Excellence in Real Estate",
-          description1: "Founded with a vision to redefine urban living, Laxmi Developers has been at the forefront of creating exceptional residential and commercial spaces that blend modern amenities with timeless design.",
-          description2: "Our commitment to quality, innovation, and customer satisfaction has made us a trusted name in the real estate industry, with a portfolio that speaks to our dedication to excellence.",
-          image: "/images/about-company.jpg"
+          description1: "Excellence in Real Estate Development",
+          description2: "Our Foundation",
+          image: "/images/homepage/about.jpg"
         },
         missionVisionValues: {
-          sectionTagline: "Our Foundation",
-          sectionTitle: "Mission, Vision & Values",
-          sectionDescription: "The principles that guide everything we do",
+          sectionTagline: "Mission, Vision & Values",
+          sectionTitle: "The principles that guide everything we do",
+          sectionDescription: "",
           items: [
             {
               title: "Mission",
@@ -65,7 +65,7 @@ async function getAboutUsHandler(req: AuthenticatedRequest) {
             {
               title: "Millennium Park",
               category: "Residential",
-              image: "/images/projects/MillenniumPark.jpg"
+              image: "/images/projects/Millennium Park.jpg"
             },
             {
               title: "Business Hub",
@@ -75,12 +75,12 @@ async function getAboutUsHandler(req: AuthenticatedRequest) {
             {
               title: "Laxmi Nova",
               category: "Residential",
-              image: "/images/projects/LaxmiNova.jpg"
+              image: "/images/projects/Laxmi Nova.jpg"
             }
           ]
         },
         ctaSection: {
-          title: "Ready to Start Your Journey?",
+          title: "Ready to Start Your Journey",
           description: "Let us help you find your perfect space or investment opportunity.",
           primaryButton: {
             text: "Contact Us",

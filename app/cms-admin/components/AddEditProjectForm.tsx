@@ -21,6 +21,7 @@ import {
   Phone,
   HelpCircle,
   Star,
+  Loader2,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { enhancedIconMap } from "@/components/ui/EnhancedAmenityIcons";
@@ -173,14 +174,14 @@ export function AddEditProjectForm({ projectId, onClose }: AddEditProjectFormPro
             const project = response.data;
             setFormData({
               title: project.title,
-              category: project.type,
+              category: project.category || project.type, // Handle both field names
               status: project.status,
               description: project.description,
               location: {
-                address: project.location.address,
-                lat: project.location.coordinates.lat.toString(),
-                lng: project.location.coordinates.lng.toString(),
-                mapEmbedUrl: project.location.mapEmbedUrl || '',
+                address: project.location?.address || '',
+                lat: project.location?.lat?.toString() || project.location?.coordinates?.lat?.toString() || '',
+                lng: project.location?.lng?.toString() || project.location?.coordinates?.lng?.toString() || '',
+                mapEmbedUrl: project.location?.mapEmbedUrl || '',
               },
               specifications: {
                 totalUnits: project.specifications.totalUnits || '0',
@@ -192,7 +193,9 @@ export function AddEditProjectForm({ projectId, onClose }: AddEditProjectFormPro
               },
               reraNumber: project.reraNumber || '',
               contactSales: project.contactSales || '',
-              amenities: project.amenities.map((a: string | { _id: string }) => a._id || a),
+              amenities: project.amenities.map((a: string | { _id: string }) =>
+                typeof a === 'string' ? a : a._id
+              ),
               featured: project.featured || false,
               coverImage: project.images?.coverImage || '',
               gallery: {
@@ -251,8 +254,29 @@ export function AddEditProjectForm({ projectId, onClose }: AddEditProjectFormPro
   const handleFileUpload = async (field: keyof Pick<FormData, 'gallery' | 'floorPlans'> | 'coverImage' | 'modelView' | 'reraQrImage', files: FileList | null, category: string | null = null) => {
     if (!files || files.length === 0) return;
 
+    // Validate file sizes (2MB limit for images)
+    const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+    const oversizedFiles = Array.from(files).filter(file => file.size > maxSize);
+
+    if (oversizedFiles.length > 0) {
+      toast.error(`The following files exceed the 2MB limit: ${oversizedFiles.map(f => f.name).join(', ')}. Please compress them and try again.`);
+      return;
+    }
+
+    // Validate file types for images
+    const allowedImageTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    const invalidFiles = Array.from(files).filter(file =>
+      (field === 'coverImage' || field === 'reraQrImage' || field === 'gallery') &&
+      !allowedImageTypes.includes(file.type)
+    );
+
+    if (invalidFiles.length > 0) {
+      toast.error(`Invalid file types: ${invalidFiles.map(f => f.name).join(', ')}. Please upload JPEG, PNG, or WebP images only.`);
+      return;
+    }
+
     const fileObjects: FileObject[] = Array.from(files).map((file) => ({
-      id: Math.random().toString(36).substr(2, 9),
+      id: Math.random().toString(36).substring(2, 11),
       name: file.name,
       url: URL.createObjectURL(file),
       file,
@@ -369,34 +393,25 @@ export function AddEditProjectForm({ projectId, onClose }: AddEditProjectFormPro
       if (!formData.description.trim()) {
         throw new Error('Project description is required');
       }
-      if (!formData.location.address.trim()) {
-        throw new Error('Project address is required');
-      }
-      if (!formData.contactSales.trim()) {
-        throw new Error('Contact sales number is required');
+      if (!formData.coverImage) {
+        throw new Error('Project cover image is required');
       }
 
-      // Extract city and state from address (basic parsing)
-      const addressParts = formData.location.address.split(',').map(part => part.trim());
-      const city = addressParts.length > 1 ? addressParts[addressParts.length - 2] : 'Surat';
-      const state = addressParts.length > 2 ? addressParts[addressParts.length - 1] : 'Gujarat';
+      // Validate required fields before submission
 
       // Prepare the project data for API submission
       const projectData = {
         title: formData.title.trim(),
-        type: formData.category, // API expects 'type' not 'category'
+        category: formData.category, // API now expects 'category'
         status: formData.status,
         description: formData.description.trim(),
         location: {
-          address: formData.location.address.trim(),
-          city: city,
-          state: state,
-          coordinates: {
-            lat: parseFloat(formData.location.lat) || 21.1702,
-            lng: parseFloat(formData.location.lng) || 72.8311
-          },
+          address: formData.location.address.trim() || '',
+          lat: formData.location.lat.trim() || '',
+          lng: formData.location.lng.trim() || '',
           mapEmbedUrl: formData.location.mapEmbedUrl.trim() || ''
         },
+        coverImage: formData.coverImage || '',
         images: {
           coverImage: formData.coverImage || '',
           gallery: {
@@ -407,16 +422,14 @@ export function AddEditProjectForm({ projectId, onClose }: AddEditProjectFormPro
           }
         },
         specifications: {
-          totalUnits: formData.specifications.totalUnits || '0',
-          unitTypes: formData.specifications.unitTypes || 'N/A',
-          unitArea: formData.specifications.unitArea || 'N/A',
-          possession: formData.specifications.possession || 'TBD',
-          structure: formData.specifications.structure || 'N/A',
-          flooring: formData.specifications.flooring || 'N/A'
+          totalUnits: formData.specifications.totalUnits || '',
+          unitTypes: formData.specifications.unitTypes || '',
+          unitArea: formData.specifications.unitArea || '',
+          possession: formData.specifications.possession || '',
+          structure: formData.specifications.structure || '',
+          flooring: formData.specifications.flooring || ''
         },
         floorPlans: {
-          '1bhk': [],
-          '2bhk': [],
           '3bhk': formData.floorPlans['3bhk'].map(item => item.url).filter(Boolean),
           '4bhk': formData.floorPlans['4bhk'].map(item => item.url).filter(Boolean),
           '5bhk': formData.floorPlans['5bhk'].map(item => item.url).filter(Boolean)
@@ -424,7 +437,9 @@ export function AddEditProjectForm({ projectId, onClose }: AddEditProjectFormPro
         reraNumber: formData.reraNumber.trim() || '',
         reraQrImage: formData.reraQrImage || '',
         brochureUrl: formData.brochureUrl || '',
-        contactSales: formData.contactSales.trim(),
+        brochureFile: formData.brochureFile || '',
+        modelView: formData.modelView || '',
+        contactSales: formData.contactSales.trim() || '',
         amenities: formData.amenities,
         featured: formData.featured
       };
@@ -503,8 +518,53 @@ export function AddEditProjectForm({ projectId, onClose }: AddEditProjectFormPro
     }
   };
 
-  const [activeFloorPlanTab, setActiveFloorPlanTab] = useState<string>('3bhk');
-  const floorPlanTypes = ['3bhk', '4bhk', '5bhk'];
+  // Floor plan types for the gallery section
+  const floorPlanTypes = ['3bhk', '4bhk', '5bhk'] as const;
+
+  // Show loading screen when editing and data is being fetched
+  if (isEditing && loading) {
+    return (
+      <div className="space-y-6 p-4 md:p-6 bg-gray-50 min-h-screen">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            {onClose && (
+              <button
+                type="button"
+                onClick={onClose}
+                className="p-2 rounded-lg hover:bg-gray-100"
+                aria-label="Close form"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+            )}
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Edit Project</h1>
+              <p className="text-gray-600">Loading project data...</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Loading Screen */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+          <div className="p-12 text-center">
+            <Loader2 className="h-12 w-12 animate-spin text-blue-600 mx-auto mb-6" />
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Loading Project Data</h3>
+            <p className="text-gray-600 mb-4">
+              Please wait while we fetch the project information...
+            </p>
+            <div className="max-w-md mx-auto">
+              <div className="bg-gray-200 rounded-full h-2 overflow-hidden">
+                <div className="bg-blue-600 h-2 rounded-full animate-pulse" style={{ width: '60%' }}></div>
+              </div>
+              <p className="text-sm text-gray-500 mt-2">
+                This may take a few seconds depending on the project size
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 p-4 md:p-6 bg-gray-50 min-h-screen">
@@ -536,18 +596,36 @@ export function AddEditProjectForm({ projectId, onClose }: AddEditProjectFormPro
          {onClose && ( // Cancel button in header if onClose is provided
             <button
               type="button"
-              onClick={onClose} 
+              onClick={onClose}
               className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm font-medium"
             >
               Cancel
             </button>
           )}
-          {/* The main save/create button is now part of the form element itself for proper submission */}
+          {/* Top Update/Create Button */}
+          <button
+            type="submit"
+            form="project-form"
+            disabled={loading}
+            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                {isEditing ? 'Updating...' : 'Creating...'}
+              </>
+            ) : (
+              <>
+                <Save className="w-4 h-4 mr-2" />
+                {isEditing ? 'Update Project' : 'Create Project'}
+              </>
+            )}
+          </button>
         </div>
       </div>
 
       {/* Form Element */}
-      <form onSubmit={handleSubmit} className="space-y-8">
+      <form id="project-form" onSubmit={handleSubmit} className="space-y-8">
         
         {/* Basic Information Section */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
@@ -574,7 +652,7 @@ export function AddEditProjectForm({ projectId, onClose }: AddEditProjectFormPro
                 </select>
               </div>
               <div className="space-y-1.5">
-                <label htmlFor="reraNumber" className="block text-sm font-medium text-gray-700">RERA Number</label>
+                <label htmlFor="reraNumber" className="block text-sm font-medium text-gray-700">RERA Number (Optional)</label>
                 <input id="reraNumber" type="text" name="reraNumber" value={formData.reraNumber} onChange={handleInputChange} placeholder="e.g. RERA123456" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
               </div>
             </div>
@@ -607,7 +685,7 @@ export function AddEditProjectForm({ projectId, onClose }: AddEditProjectFormPro
                         </label>
                         <p className="pl-1">or drag and drop</p>
                       </div>
-                      <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
+                      <p className="text-xs text-gray-500">PNG, JPG, WebP up to 2MB</p>
                     </div>
                   )}
                 </div>
@@ -665,7 +743,7 @@ export function AddEditProjectForm({ projectId, onClose }: AddEditProjectFormPro
                         </label>
                         <p className="pl-1">or drag and drop</p>
                       </div>
-                      <p className="text-xs text-gray-500">PNG, JPG up to 5MB</p>
+                      <p className="text-xs text-gray-500">PNG, JPG, WebP up to 2MB</p>
                     </div>
                   )}
                 </div>
@@ -746,16 +824,16 @@ export function AddEditProjectForm({ projectId, onClose }: AddEditProjectFormPro
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-1.5">
-                  <label htmlFor="address" className="block text-sm font-medium text-gray-700">Address</label>
+                  <label htmlFor="address" className="block text-sm font-medium text-gray-700">Address (Optional)</label>
                   <input id="address" type="text" name="address" value={formData.location.address} onChange={(e) => setFormData(prev => ({...prev, location: {...prev.location, address: e.target.value }}))} placeholder="e.g. Vesu, Surat, Gujarat" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"/>
                 </div>
                 <div className="flex space-x-4">
                   <div className="space-y-1.5 flex-1">
-                    <label htmlFor="latitude" className="block text-sm font-medium text-gray-700">Latitude</label>
+                    <label htmlFor="latitude" className="block text-sm font-medium text-gray-700">Latitude (Optional)</label>
                     <input id="latitude" type="text" name="latitude" value={formData.location.lat} onChange={(e) => setFormData(prev => ({...prev, location: {...prev.location, lat: e.target.value }}))} placeholder="e.g. 21.1702" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"/>
                   </div>
                   <div className="space-y-1.5 flex-1">
-                    <label htmlFor="longitude" className="block text-sm font-medium text-gray-700">Longitude</label>
+                    <label htmlFor="longitude" className="block text-sm font-medium text-gray-700">Longitude (Optional)</label>
                     <input id="longitude" type="text" name="longitude" value={formData.location.lng} onChange={(e) => setFormData(prev => ({...prev, location: {...prev.location, lng: e.target.value }}))} placeholder="e.g. 72.8311" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"/>
                   </div>
                 </div>
@@ -836,7 +914,7 @@ export function AddEditProjectForm({ projectId, onClose }: AddEditProjectFormPro
             <div className="mt-6 space-y-1.5">
               <div className="flex items-center">
                 <Phone className="w-4 h-4 mr-2 text-gray-500" />
-                <label htmlFor="contactSales" className="block text-sm font-medium text-gray-700">Contact Sales Number</label>
+                <label htmlFor="contactSales" className="block text-sm font-medium text-gray-700">Contact Sales Number (Optional)</label>
               </div>
               <input id="contactSales" type="text" name="contactSales" value={formData.contactSales} onChange={handleInputChange} placeholder="e.g. +91 98765 43210" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"/>
             </div>
@@ -881,7 +959,7 @@ export function AddEditProjectForm({ projectId, onClose }: AddEditProjectFormPro
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
               {amenitiesLoading ? (
                 <div className="col-span-full text-center py-8">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                  <Loader2 className="h-8 w-8 animate-spin text-blue-600 mx-auto" />
                   <p className="text-gray-500 mt-2">Loading amenities...</p>
                 </div>
               ) : (
@@ -1063,7 +1141,7 @@ export function AddEditProjectForm({ projectId, onClose }: AddEditProjectFormPro
           >
             {loading ? (
               <>
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
                 {isEditing ? 'Updating...' : 'Creating...'}
               </>
             ) : (

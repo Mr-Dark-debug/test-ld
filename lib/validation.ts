@@ -23,58 +23,13 @@ export const createUserSchema = Joi.object({
 // Project validation schemas
 export const createProjectSchema = Joi.object({
   title: Joi.string().min(2).max(100).required(),
-  type: Joi.string().valid('residential', 'commercial').required(),
+  category: Joi.string().valid('residential', 'commercial').required(),
   status: Joi.string().valid('ongoing', 'completed', 'upcoming').required(),
   description: Joi.string().min(10).required(),
   location: Joi.object({
-    address: Joi.string().required(),
-    city: Joi.string().required(),
-    state: Joi.string().required(),
-    coordinates: Joi.object({
-      lat: Joi.number().min(-90).max(90).required(),
-      lng: Joi.number().min(-180).max(180).required()
-    }).required(),
-    mapEmbedUrl: Joi.string().uri().allow('').optional()
-  }).required(),
-  specifications: Joi.object({
-    totalUnits: Joi.string().allow('').default('0'),
-    unitTypes: Joi.string().allow('').default('N/A'),
-    unitArea: Joi.string().allow('').default('N/A'),
-    possession: Joi.string().allow('').default('TBD'),
-    structure: Joi.string().allow('').default('N/A'),
-    flooring: Joi.string().allow('').default('N/A')
-  }).required(),
-  reraNumber: Joi.string().allow('').default(''),
-  contactSales: Joi.string().required(),
-  amenities: Joi.array().items(Joi.string().hex().length(24)).default([]),
-  featured: Joi.boolean().default(false),
-  seoMeta: Joi.object({
-    title: Joi.string().max(60),
-    description: Joi.string().max(160),
-    keywords: Joi.array().items(Joi.string())
-  }).optional()
-});
-
-export const updateProjectSchema = createProjectSchema.fork(
-  ['title', 'type', 'status', 'description', 'location', 'specifications', 'reraNumber', 'contactSales', 'amenities', 'featured'],
-  (schema) => schema.optional()
-);
-
-// Schema for partial project updates (like featured toggle)
-export const partialUpdateProjectSchema = Joi.object({
-  id: Joi.string().required(),
-  title: Joi.string().min(2).max(100).optional(),
-  type: Joi.string().valid('residential', 'commercial').optional(),
-  status: Joi.string().valid('upcoming', 'ongoing', 'completed').optional(),
-  description: Joi.string().min(10).max(1000).optional(),
-  location: Joi.object({
-    address: Joi.string().optional(),
-    city: Joi.string().optional(),
-    state: Joi.string().optional(),
-    coordinates: Joi.object({
-      lat: Joi.number().min(-90).max(90).optional(),
-      lng: Joi.number().min(-180).max(180).optional()
-    }).optional(),
+    address: Joi.string().allow('').optional(),
+    lat: Joi.string().allow('').optional(),
+    lng: Joi.string().allow('').optional(),
     mapEmbedUrl: Joi.string().uri().allow('').optional()
   }).optional(),
   specifications: Joi.object({
@@ -86,9 +41,86 @@ export const partialUpdateProjectSchema = Joi.object({
     flooring: Joi.string().allow('').optional()
   }).optional(),
   reraNumber: Joi.string().allow('').optional(),
-  contactSales: Joi.string().optional(),
+  contactSales: Joi.string().allow('').optional(),
+  amenities: Joi.array().items(Joi.string()).default([]),
+  featured: Joi.boolean().default(false),
+  // Image and file fields
+  coverImage: Joi.string().allow('').optional(),
+  images: Joi.object({
+    coverImage: Joi.string().allow('').optional(),
+    gallery: Joi.object({
+      promotional: Joi.array().items(Joi.string()).default([]),
+      exterior: Joi.array().items(Joi.string()).default([]),
+      interior: Joi.array().items(Joi.string()).default([]),
+      videos: Joi.array().items(Joi.string()).default([])
+    }).optional()
+  }).optional(),
+  floorPlans: Joi.object({
+    '3bhk': Joi.array().items(Joi.string()).default([]),
+    '4bhk': Joi.array().items(Joi.string()).default([]),
+    '5bhk': Joi.array().items(Joi.string()).default([])
+  }).optional(),
+  reraQrImage: Joi.string().allow('').optional(),
+  brochureUrl: Joi.string().uri().allow('').optional(),
+  brochureFile: Joi.string().allow('').optional(),
+  modelView: Joi.string().allow('').optional(),
+  seoMeta: Joi.object({
+    title: Joi.string().max(60),
+    description: Joi.string().max(160),
+    keywords: Joi.array().items(Joi.string())
+  }).optional()
+});
+
+export const updateProjectSchema = createProjectSchema.fork(
+  ['title', 'category', 'status', 'description', 'location', 'specifications', 'reraNumber', 'contactSales', 'amenities', 'featured', 'coverImage', 'images', 'floorPlans', 'reraQrImage', 'brochureUrl', 'brochureFile', 'modelView'],
+  (schema) => schema.optional()
+);
+
+// Schema for partial project updates (like featured toggle)
+export const partialUpdateProjectSchema = Joi.object({
+  id: Joi.string().required(),
+  title: Joi.string().min(2).max(100).optional(),
+  category: Joi.string().valid('residential', 'commercial').optional(),
+  status: Joi.string().valid('upcoming', 'ongoing', 'completed').optional(),
+  description: Joi.string().min(10).optional(),
+  location: Joi.object({
+    address: Joi.string().allow('').optional(),
+    lat: Joi.string().allow('').optional(),
+    lng: Joi.string().allow('').optional(),
+    mapEmbedUrl: Joi.string().uri().allow('').optional()
+  }).optional(),
+  specifications: Joi.object({
+    totalUnits: Joi.string().allow('').optional(),
+    unitTypes: Joi.string().allow('').optional(),
+    unitArea: Joi.string().allow('').optional(),
+    possession: Joi.string().allow('').optional(),
+    structure: Joi.string().allow('').optional(),
+    flooring: Joi.string().allow('').optional()
+  }).optional(),
+  reraNumber: Joi.string().allow('').optional(),
+  contactSales: Joi.string().allow('').optional(),
   amenities: Joi.array().items(Joi.string()).optional(),
-  featured: Joi.boolean().optional()
+  featured: Joi.boolean().optional(),
+  // Image and file fields
+  coverImage: Joi.string().allow('').optional(),
+  images: Joi.object({
+    coverImage: Joi.string().allow('').optional(),
+    gallery: Joi.object({
+      promotional: Joi.array().items(Joi.string()).optional(),
+      exterior: Joi.array().items(Joi.string()).optional(),
+      interior: Joi.array().items(Joi.string()).optional(),
+      videos: Joi.array().items(Joi.string()).optional()
+    }).optional()
+  }).optional(),
+  floorPlans: Joi.object({
+    '3bhk': Joi.array().items(Joi.string()).optional(),
+    '4bhk': Joi.array().items(Joi.string()).optional(),
+    '5bhk': Joi.array().items(Joi.string()).optional()
+  }).optional(),
+  reraQrImage: Joi.string().allow('').optional(),
+  brochureUrl: Joi.string().uri().allow('').optional(),
+  brochureFile: Joi.string().allow('').optional(),
+  modelView: Joi.string().allow('').optional()
 });
 
 // Amenity validation schemas
@@ -129,12 +161,17 @@ export const updateTestimonialSchema = createTestimonialSchema.fork(
 // Blog post validation schemas
 export const createBlogSchema = Joi.object({
   title: Joi.string().min(5).max(100).required(),
+  slug: Joi.string().optional(),
   excerpt: Joi.string().min(10).max(200).required(),
   content: Joi.string().min(50).required(),
   category: Joi.string().required(),
   tags: Joi.array().items(Joi.string()).default([]),
   status: Joi.string().valid('draft', 'published', 'archived').default('draft'),
   coverImage: Joi.string().allow('').optional(),
+  publishDate: Joi.alternatives().try(
+    Joi.date(),
+    Joi.string().allow('').optional()
+  ).optional(),
   author: Joi.object({
     name: Joi.string().required(),
     avatar: Joi.string().allow('').optional()
@@ -143,11 +180,12 @@ export const createBlogSchema = Joi.object({
     title: Joi.string().max(60),
     description: Joi.string().max(160),
     keywords: Joi.array().items(Joi.string())
-  }).optional()
+  }).optional(),
+  readingTime: Joi.number().optional()
 });
 
 export const updateBlogSchema = createBlogSchema.fork(
-  ['title', 'excerpt', 'content', 'category', 'author'],
+  ['title', 'slug', 'excerpt', 'content', 'category', 'author', 'tags', 'status', 'coverImage', 'publishDate', 'seoMeta', 'readingTime'],
   (schema) => schema.optional()
 );
 

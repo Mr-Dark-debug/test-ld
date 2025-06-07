@@ -9,28 +9,28 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
   const { theme } = useTheme();
 
-  // Use white text for headings instead of golden
-  const headingClass = "text-xl font-display text-white mb-6";
+  // Increased font size for headings
+  const headingClass = "text-2xl sm:text-3xl font-display text-white mb-8 font-medium";
 
   return (
-    <footer className={`${theme === "dark" ? "bg-primary" : "bg-gray-900"} text-foreground p-8 rounded-xl mx-4 my-8 relative overflow-hidden`}>
+    <footer className={`${theme === "dark" ? "bg-primary" : "bg-gray-900"} text-foreground p-8 py-12 sm:py-16 rounded-xl mx-4 my-8 relative overflow-hidden`}>
       <div className="absolute inset-0 z-0">
         <Aurora colorStops={["#2939FF", "#4A29FF", "#7029FF"]} blend={0.5} amplitude={0.6} speed={0.3} />
       </div>
       <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 items-start">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 items-start">
           {/* Company Logo & Address */}
           <div className="mb-8 md:mb-0">
-            <div className="mb-6">
+            <div className="mb-8">
               <Image
                 src="/images/logo/logo.png"
                 alt="Laxmi Developers Logo"
-                width={160}
-                height={45}
+                width={200}
+                height={56}
                 className="h-auto w-auto"
               />
             </div>
-            <address className="not-italic text-gray-300 space-y-2">
+            <address className="not-italic text-gray-300 space-y-3 text-base">
               <p>
                 Millennium Textile Market 3, <br />
                 395002, Surat – Gujarat, India
@@ -54,7 +54,7 @@ export default function Footer() {
           {/* Quick Links */}
           <div className="mb-8 md:mb-0">
             <h3 className={headingClass}>Quick Links</h3>
-            <ul className="space-y-3 text-gray-300">
+            <ul className="space-y-3 text-gray-300 text-base">
               <li>
                 <Link href="/" className="hover:text-white hover:opacity-75 transition-colors duration-300">Home</Link>
               </li>
@@ -76,29 +76,29 @@ export default function Footer() {
           {/* Projects */}
           <div className="mb-8 md:mb-0">
             <h3 className={headingClass}>Projects</h3>
-            <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+            <div className="grid grid-cols-2 gap-x-4 gap-y-4">
               <div>
-                <h4 className="font-semibold mb-2 text-gray-200">Residential</h4>
-                <ul className="space-y-2">
+                <h4 className="font-semibold mb-4 text-gray-100 text-xl">Residential</h4>
+                <ul className="space-y-3">
                   <li>
-                    <Link href="/residential/on-going" className="text-sm text-gray-300 hover:text-white hover:opacity-75 transition-colors duration-300">On-Going</Link>
+                    <Link href="/residential/on-going" className="text-base text-gray-300 hover:text-white hover:opacity-75 transition-colors duration-300">On-Going</Link>
                   </li>
                   <li>
-                    <Link href="/residential/completed" className="text-sm text-gray-300 hover:text-white hover:opacity-75 transition-colors duration-300">Completed</Link>
+                    <Link href="/residential/completed" className="text-base text-gray-300 hover:text-white hover:opacity-75 transition-colors duration-300">Completed</Link>
                   </li>
                 </ul>
               </div>
               <div>
-                <h4 className="font-semibold mb-2 text-gray-200">Commercial</h4>
-                <ul className="space-y-2">
+                <h4 className="font-semibold mb-4 text-gray-100 text-xl">Commercial</h4>
+                <ul className="space-y-3">
                   <li>
-                    <Link href="/commercial/on-going" className="text-sm text-gray-300 hover:text-white hover:opacity-75 transition-colors duration-300">On-Going</Link>
+                    <Link href="/commercial/on-going" className="text-base text-gray-300 hover:text-white hover:opacity-75 transition-colors duration-300">On-Going</Link>
                   </li>
                   <li>
-                    <Link href="/commercial/completed" className="text-sm text-gray-300 hover:text-white hover:opacity-75 transition-colors duration-300">Completed</Link>
+                    <Link href="/commercial/completed" className="text-base text-gray-300 hover:text-white hover:opacity-75 transition-colors duration-300">Completed</Link>
                   </li>
                   <li>
-                    <Link href="/commercial/upcoming" className="text-sm text-gray-300 hover:text-white hover:opacity-75 transition-colors duration-300">Upcoming</Link>
+                    <Link href="/commercial/upcoming" className="text-base text-gray-300 hover:text-white hover:opacity-75 transition-colors duration-300">Upcoming</Link>
                   </li>
                 </ul>
               </div>
@@ -108,19 +108,19 @@ export default function Footer() {
           {/* Newsletter */}
           <div className="md:max-w-xs">
             <h3 className={headingClass}>Subscribe</h3>
-            <p className="mb-4 text-gray-300">Stay updated with our latest projects and offers.</p>
-            <form className="space-y-3" onSubmit={(e) => e.preventDefault()}>
+            <p className="mb-5 text-gray-300 text-base">Stay updated with our latest projects and offers.</p>
+            <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
               <input
                 type="email"
                 placeholder="Your email address"
-                className="w-full px-4 py-2.5 bg-gray-800/70 border border-gray-700 text-gray-300 rounded-md focus:ring-highlight focus:border-highlight placeholder-gray-500"
+                className="w-full px-4 py-3 bg-gray-800/70 border border-gray-700 text-gray-300 rounded-md focus:ring-highlight focus:border-highlight placeholder-gray-500"
                 required
                 autoComplete="email"
                 suppressHydrationWarning
               />
               <button
                 type="submit"
-                className="w-full px-4 py-2.5 bg-[#2528c0] text-white font-medium rounded-md hover:bg-[#2528c0]/90 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-highlight"
+                className="w-full px-4 py-3 bg-[#2528c0] text-white font-medium rounded-md hover:bg-[#2528c0]/90 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-highlight"
               >
                 Subscribe
               </button>
@@ -128,24 +128,24 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Trust Badges */}
-        <div className="mt-16 border-t border-gray-700/50 pt-8 flex flex-col items-center">
-          <div className="flex space-x-6 mb-6">
-            <div className="flex items-center justify-center border border-gray-600 rounded-full w-16 h-16 hover:border-gray-500 transition-colors duration-300">
-              <span className="text-white font-bold">RERA</span>
+        {/* Bottom Section with RERA and Copyright */}
+        <div className="mt-16 border-t border-gray-700/50 pt-8">
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            {/* RERA Badge - Left */}
+            <div className="mb-4 md:mb-0 flex items-center">
+              <div className="flex items-center justify-center border border-gray-600 rounded-full w-12 h-12 mr-2 hover:border-gray-500 transition-colors duration-300">
+                <span className="text-white font-bold text-sm">RERA</span>
+              </div>
+              <div>
+                <p className="text-white font-medium text-sm">Registered Projects</p>
+                <p className="text-gray-300 text-xs">Gujarat RERA Approved</p>
+              </div>
             </div>
-            <div className="flex items-center justify-center border border-gray-600 rounded-full w-16 h-16 hover:border-gray-500 transition-colors duration-300">
-              <span className="text-white font-bold">ISO</span>
+
+            {/* Copyright Text - Right */}
+            <div className="text-right">
+              <p className="text-gray-400 text-sm">&copy; {currentYear} Laxmi Developers. All rights reserved.</p>
             </div>
-          </div>
-          <div className="text-center space-y-1">
-            <p className="text-gray-400">
-              <span className="text-white font-bold">RERA</span> Registered Projects
-            </p>
-            <p className="text-gray-400">
-              <span className="text-white font-bold">ISO</span> 9001:2015 Certified
-            </p>
-            <p className="text-gray-400">&copy; {currentYear} Laxmi Developers. All rights reserved.</p>
           </div>
         </div>
       </div>

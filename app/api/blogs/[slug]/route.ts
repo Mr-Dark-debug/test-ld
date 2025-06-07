@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import BlogPost from '@/models/BlogPost';
 import { validateRequest, updateBlogSchema } from '@/lib/validation';
+import { withAuth, withErrorHandling, withCors, AuthenticatedRequest } from '@/middleware/auth';
 import mongoose from 'mongoose';
 
 // GET /api/blogs/[slug] - Get single blog post by slug or ID
@@ -56,12 +57,40 @@ async function getBlogHandler(req: NextRequest, { params }: { params: Promise<{ 
   }
 }
 
-// PUT /api/blogs/[slug] - Update blog post (admin only)
-async function updateBlogHandler(req: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
+
+
+// Export the handlers
+export async function GET(req: NextRequest, context: { params: Promise<{ slug: string }> }) {
+  return getBlogHandler(req, context);
+}
+
+export async function PUT(req: NextRequest, context: { params: Promise<{ slug: string }> }) {
   await connectDB();
 
   try {
-    const { slug } = await params;
+    // Check authentication
+    const authHeader = req.headers.get('authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      );
+    }
+
+    const token = authHeader.substring(7);
+    const { verifyToken } = await import('@/lib/auth');
+
+    try {
+      const decoded = verifyToken(token);
+      (req as any).user = decoded;
+    } catch (error) {
+      return NextResponse.json(
+        { error: 'Invalid token' },
+        { status: 401 }
+      );
+    }
+
+    const { slug } = await context.params;
     const body = await req.json();
 
     // Validate request body
@@ -109,12 +138,33 @@ async function updateBlogHandler(req: NextRequest, { params }: { params: Promise
   }
 }
 
-// DELETE /api/blogs/[slug] - Delete blog post (admin only)
-async function deleteBlogHandler(req: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
+export async function DELETE(req: NextRequest, context: { params: Promise<{ slug: string }> }) {
   await connectDB();
 
   try {
-    const { slug } = await params;
+    // Check authentication
+    const authHeader = req.headers.get('authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      );
+    }
+
+    const token = authHeader.substring(7);
+    const { verifyToken } = await import('@/lib/auth');
+
+    try {
+      const decoded = verifyToken(token);
+      (req as any).user = decoded;
+    } catch (error) {
+      return NextResponse.json(
+        { error: 'Invalid token' },
+        { status: 401 }
+      );
+    }
+
+    const { slug } = await context.params;
 
     const blog = await BlogPost.findOneAndDelete({ slug });
 
@@ -137,17 +187,4 @@ async function deleteBlogHandler(req: NextRequest, { params }: { params: Promise
       { status: 500 }
     );
   }
-}
-
-// Export the handlers
-export async function GET(req: NextRequest, context: { params: Promise<{ slug: string }> }) {
-  return getBlogHandler(req, context);
-}
-
-export async function PUT(req: NextRequest, context: { params: Promise<{ slug: string }> }) {
-  return updateBlogHandler(req, context);
-}
-
-export async function DELETE(req: NextRequest, context: { params: Promise<{ slug: string }> }) {
-  return deleteBlogHandler(req, context);
 }

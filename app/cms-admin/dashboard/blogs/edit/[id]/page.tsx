@@ -136,10 +136,26 @@ export default function EditBlogPage() {
     loadBlogData();
   }, [params.id, router]);
 
-  // Handle image upload
+  // Handle image upload with size validation
   const handleImageUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    // Validate file size (2MB limit)
+    const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+    if (file.size > maxSize) {
+      toast.error('Image size must be less than 2MB. Please compress the image and try again.');
+      e.target.value = ''; // Clear the input
+      return;
+    }
+
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      toast.error('Please upload a valid image file (JPEG, PNG, or WebP).');
+      e.target.value = ''; // Clear the input
+      return;
+    }
 
     // Preview image
     const reader = new FileReader();
@@ -172,11 +188,12 @@ export default function EditBlogPage() {
           toast.success('Image uploaded successfully!');
         }
       } else {
-        toast.error('Failed to upload image');
+        const errorData = await response.json();
+        toast.error(errorData.error || 'Failed to upload image');
       }
     } catch (error) {
       console.error('Image upload error:', error);
-      toast.error('Failed to upload image');
+      toast.error('Failed to upload image. Please try again.');
     }
   };
 
@@ -445,14 +462,23 @@ export default function EditBlogPage() {
 
                   <TabsContent value="write" className="space-y-4 mt-0">
                     <div className="space-y-2">
-                      <Label htmlFor="title">Title</Label>
+                      <Label htmlFor="title">Title *</Label>
                       <Input
                         id="title"
                         placeholder="Enter blog post title"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
-                        className="text-lg font-medium"
+                        className={`text-lg font-medium ${title.length < 5 ? 'border-red-300' : ''}`}
                       />
+                      <p className="text-xs text-gray-500">
+                        {title.length} / 100 characters
+                        {title.length < 5 && (
+                          <span className="text-red-500"> (minimum 5 characters required)</span>
+                        )}
+                        {title.length > 100 && (
+                          <span className="text-red-500"> (too long)</span>
+                        )}
+                      </p>
                     </div>
 
                     <div className="space-y-2">
@@ -478,25 +504,40 @@ export default function EditBlogPage() {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="excerpt">Excerpt</Label>
+                      <Label htmlFor="excerpt">Excerpt *</Label>
                       <Textarea
                         id="excerpt"
-                        placeholder="Brief summary of your post (optional)"
+                        placeholder="Brief summary of your post (10-200 characters)"
                         value={excerpt}
                         onChange={(e) => setExcerpt(e.target.value)}
-                        className="resize-none h-20"
+                        className={`resize-none h-20 ${excerpt.length < 10 ? 'border-red-300' : ''}`}
                       />
+                      <p className="text-xs text-gray-500">
+                        {excerpt.length} / 200 characters
+                        {excerpt.length < 10 && (
+                          <span className="text-red-500"> (minimum 10 characters required)</span>
+                        )}
+                        {excerpt.length > 200 && (
+                          <span className="text-red-500"> (too long)</span>
+                        )}
+                      </p>
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="content">Content (Markdown)</Label>
+                      <Label htmlFor="content">Content (Markdown) *</Label>
                       <Textarea
                         id="content"
                         placeholder="Write your blog post content here using Markdown..."
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
-                        className="font-mono resize-none h-80 lg:h-96"
+                        className={`font-mono resize-none h-80 lg:h-96 ${content.length < 50 ? 'border-red-300' : ''}`}
                       />
+                      <p className="text-xs text-gray-500">
+                        {content.length} characters
+                        {content.length < 50 && (
+                          <span className="text-red-500"> (minimum 50 characters required)</span>
+                        )}
+                      </p>
                     </div>
                   </TabsContent>
 
@@ -617,7 +658,7 @@ export default function EditBlogPage() {
                               Upload an image
                             </Label>
                             <p className="text-xs text-gray-500 mt-1">
-                              Recommended: 1200 x 630 pixels
+                              Recommended: 1200 x 630 pixels. Maximum file size: 2MB. Supported formats: JPEG, PNG, WebP.
                             </p>
                           </div>
                         )}
@@ -635,12 +676,12 @@ export default function EditBlogPage() {
 
                     {/* Category */}
                     <div className="space-y-2">
-                      <Label htmlFor="category">Category</Label>
+                      <Label htmlFor="category">Category *</Label>
                       <select
                         id="category"
                         value={category}
                         onChange={(e) => setCategory(e.target.value)}
-                        className="w-full rounded-md border border-gray-300 p-2 text-sm focus:ring-2 focus:ring-primary"
+                        className={`w-full rounded-md border p-2 text-sm focus:ring-2 focus:ring-primary ${!category ? 'border-red-300' : 'border-gray-300'}`}
                         aria-label="Select blog category"
                         title="Select blog category"
                       >
@@ -653,6 +694,9 @@ export default function EditBlogPage() {
                           </option>
                         ))}
                       </select>
+                      {!category && (
+                        <p className="text-xs text-red-500">Category is required</p>
+                      )}
                     </div>
 
                     {/* Author */}

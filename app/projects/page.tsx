@@ -52,6 +52,7 @@ const ProjectCard = ({ project }: { project: Project }) => {
           src={project.imageSrc}
           alt={project.title}
           fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
         />
         <div className={cn("absolute top-3 left-3 px-2.5 py-1 rounded-md text-xs font-semibold shadow", getTypeColor(project.type))}>

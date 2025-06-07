@@ -31,7 +31,7 @@ async function getCareersHandler(req: AuthenticatedRequest) {
     if (department) query.department = new RegExp(department, 'i');
     if (type) query.type = type;
     if (location) query.location = new RegExp(location, 'i');
-    if (isActive !== null) query.isActive = isActive !== 'false';
+    if (isActive !== null) query.isActive = isActive === 'true';
 
     // Calculate pagination
     const skip = (page - 1) * limit;

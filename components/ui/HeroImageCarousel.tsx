@@ -1,117 +1,144 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion, PanInfo } from "framer-motion";
 
 interface HeroImageCarouselProps {
   images: { src: string; alt: string }[];
   interval?: number;
 }
 
-// Updated slide variants for smoother transitions
-const slideVariants = {
-  enter: (direction: number) => {
-    return {
-      x: direction > 0 ? "5%" : "-5%",
-      opacity: 0,
-      scale: 1.05,
-    };
-  },
-  center: {
-    zIndex: 1,
-    x: 0,
-    opacity: 1,
-    scale: 1,
-  },
-  exit: (direction: number) => {
-    return {
-      zIndex: 0,
-      x: direction < 0 ? "-5%" : "5%",
-      opacity: 0,
-      scale: 0.95,
-    };
-  },
-};
-
 const HeroImageCarousel: React.FC<HeroImageCarouselProps> = ({
   images,
-  interval = 5000, // Increased interval for smoother experience
+  interval = 3000,
 }) => {
-  const [[page, direction], setPage] = useState([0, 0]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  const paginate = (newDirection: number) => {
-    setPage([page + newDirection, newDirection]);
+  const nextSlide = () => {
+    if (isDragging) return;
+    setCurrentIndex((prev) => (prev + 1) % images.length);
   };
 
-  const currentIndex = ((page % images.length) + images.length) % images.length; // Handles positive and negative modulo
+  const prevSlide = () => {
+    if (isDragging) return;
+    setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
+  };
+
+  const handleDragEnd = (event: any, info: PanInfo) => {
+    setIsDragging(false);
+    setDragOffset(0);
+    const threshold = 50;
+
+    if (Math.abs(info.offset.x) > threshold) {
+      if (info.offset.x > 0) {
+        prevSlide();
+      } else {
+        nextSlide();
+      }
+      setIsAutoPlaying(false);
+    }
+  };
 
   useEffect(() => {
-    if (images.length > 1) {
-      const slideInterval = setInterval(() => {
-        paginate(1); // Move to the next slide (right to left visually)
-      }, interval);
+    if (images.length > 1 && isAutoPlaying && !isDragging) {
+      const slideInterval = setInterval(nextSlide, interval);
       return () => clearInterval(slideInterval);
     }
-  }, [images.length, interval, page]); // Added page to dependencies to reset interval if manually paginated
+  }, [images.length, interval, currentIndex, isAutoPlaying, isDragging]);
 
   if (!images || images.length === 0) {
     return null;
   }
 
+  // Calculate transform position for infinite loop
+  const getTransformX = () => {
+    return `translateX(${(-currentIndex * 100) + dragOffset}%)`;
+  };
+
   return (
-    <div className="relative w-full h-full overflow-hidden">
-      <AnimatePresence initial={false} custom={direction} mode="popLayout">
+    <div className="flex flex-col w-full h-full">
+      {/* Image Carousel Container */}
+      <div
+        ref={containerRef}
+        className="relative w-full h-full overflow-hidden"
+      >
         <motion.div
-          key={page} // Use page for key to ensure re-render on direction change for exit/enter
-          custom={direction}
-          variants={slideVariants}
-          initial="enter"
-          animate="center"
-          exit="exit"
-          transition={{
-            x: { type: "tween", ease: "easeInOut", duration: 1.2 },
-            opacity: { duration: 1.5 },
-            scale: { duration: 1.5, ease: "easeOut" }
+          className="flex w-full h-full cursor-grab active:cursor-grabbing"
+          style={{
+            width: `${images.length * 100}%`,
+            transform: getTransformX(),
           }}
-          className="absolute inset-0 w-full h-full"
+          animate={{
+            x: `${-currentIndex * (100 / images.length)}%`,
+          }}
+          transition={{
+            type: "tween",
+            ease: "easeInOut",
+            duration: isDragging ? 0 : 0.6,
+          }}
+          drag="x"
+          dragConstraints={{ left: 0, right: 0 }}
+          dragElastic={0.1}
+          onDragStart={() => {
+            setIsDragging(true);
+            setIsAutoPlaying(false);
+          }}
+          onDrag={(event, info) => {
+            setDragOffset(info.offset.x / (containerRef.current?.offsetWidth || 1) * 100);
+          }}
+          onDragEnd={handleDragEnd}
         >
-          <Image
-            src={images[currentIndex].src}
-            alt={images[currentIndex].alt}
-            fill
-            className="object-cover"
-            priority={currentIndex === 0}
-          />
-          {/* Gradient overlay for better text visibility */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-50"></div>
-        </motion.div>
-      </AnimatePresence>
-      {images.length > 1 && (
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 z-10">
-          {images.map((_, index) => (
-            <button
+          {images.map((image, index) => (
+            <div
               key={index}
-              onClick={() => {
-                // Determine direction for pagination based on current and target index
-                const diff = index - currentIndex;
-                // Check for wrap-around cases for smoother pagination
-                if (Math.abs(diff) > images.length / 2) {
-                  setPage([index, diff > 0 ? -1 : 1]);
-                } else {
-                  setPage([index, diff]);
-                }
-              }}
-              className={`w-3 h-3 rounded-full transition-all duration-300 hover:bg-white/90 ${
-                index === currentIndex ? "bg-white scale-125" : "bg-white/50"
-              }`}
-              aria-label={`Go to slide ${index + 1}`}
-            />
+              className="relative flex-shrink-0"
+              style={{ width: `${100 / images.length}%` }}
+            >
+              <Image
+                src={image.src}
+                alt={image.alt}
+                fill
+                sizes="100vw"
+                className="object-cover"
+                priority={index === 0}
+                quality={90}
+              />
+              {/* Subtle content overlay for better text visibility */}
+              <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/30"></div>
+            </div>
           ))}
+        </motion.div>
+      </div>
+
+      {/* Navigation Line Indicators - Below Image */}
+      {images.length > 1 && (
+        <div className="flex justify-center items-center py-4 bg-white">
+          <div className="flex space-x-2">
+            {images.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => {
+                  setCurrentIndex(index);
+                  setIsAutoPlaying(false);
+                }}
+                className={`transition-all duration-300 hover:scale-105 ${
+                  index === currentIndex
+                    ? "w-8 h-1 bg-blue-900 rounded-full"
+                    : "w-4 h-1 bg-blue-300 rounded-full hover:bg-blue-500"
+                }`}
+                aria-label={`Go to slide ${index + 1}`}
+              />
+            ))}
+          </div>
         </div>
       )}
     </div>
   );
 };
 
-export default HeroImageCarousel; 
+export default HeroImageCarousel;

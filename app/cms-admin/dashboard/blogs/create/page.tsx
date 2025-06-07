@@ -62,10 +62,26 @@ export default function CreateBlogPage() {
     'Lifestyle'
   ]
 
-  // Handle image upload
+  // Handle image upload with size validation
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
+
+    // Validate file size (2MB limit)
+    const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+    if (file.size > maxSize) {
+      toast.error('Image size must be less than 2MB. Please compress the image and try again.');
+      e.target.value = ''; // Clear the input
+      return;
+    }
+
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      toast.error('Please upload a valid image file (JPEG, PNG, or WebP).');
+      e.target.value = ''; // Clear the input
+      return;
+    }
 
     // Preview image
     const reader = new FileReader()
@@ -97,11 +113,12 @@ export default function CreateBlogPage() {
           toast.success('Image uploaded successfully!')
         }
       } else {
-        toast.error('Failed to upload image')
+        const errorData = await response.json()
+        toast.error(errorData.error || 'Failed to upload image')
       }
     } catch (error) {
       console.error('Image upload error:', error)
-      toast.error('Failed to upload image')
+      toast.error('Failed to upload image. Please try again.')
     }
   }
 
@@ -685,7 +702,7 @@ export default function CreateBlogPage() {
                     className="mt-1"
                   />
                   <p className="text-xs text-gray-500 mt-1">
-                    Recommended size: 1200x630 pixels
+                    Recommended size: 1200x630 pixels. Maximum file size: 2MB. Supported formats: JPEG, PNG, WebP.
                   </p>
                 </div>
               </div>

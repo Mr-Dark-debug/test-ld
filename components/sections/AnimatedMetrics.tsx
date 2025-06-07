@@ -6,6 +6,8 @@ import { cn } from "@/lib/utils";
 
 interface MetricProps {
   value: string;
+  unit?: string;
+  subLabel?: string;
   label: string;
   icon: React.ReactNode;
 }
@@ -14,8 +16,9 @@ interface AnimatedMetricsProps {
   metrics: MetricProps[];
 }
 
-const Metric = ({ value, label, icon }: MetricProps) => {
+const Metric = ({ value, unit, subLabel, label, icon }: MetricProps) => {
   const [animatedValue, setAnimatedValue] = useState("0");
+  const [isAnimating, setIsAnimating] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const hasAnimated = useRef(false);
 
@@ -25,26 +28,80 @@ const Metric = ({ value, label, icon }: MetricProps) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting && !hasAnimated.current) {
             hasAnimated.current = true;
-            
-            // Strip non-numeric characters for animation
-            const numericValue = value.replace(/\D/g, "");
-            const duration = 2000; // 2 seconds
-            const steps = 50;
-            const stepValue = parseInt(numericValue) / steps;
-            
-            let currentStep = 0;
-            
-            const interval = setInterval(() => {
-              currentStep++;
-              
-              if (currentStep >= steps) {
-                setAnimatedValue(value);
-                clearInterval(interval);
+
+            setIsAnimating(true);
+
+            // Extract numeric value for animation
+            const numericValue = value.replace(/[^\d]/g, '');
+            const targetNumber = parseInt(numericValue, 10);
+
+            if (targetNumber > 0) {
+              const duration = 2000; // 2 seconds for smoother animation
+              const steps = 60; // More steps for smoother animation
+
+              // For the first card (1 Cr+), show a cleaner counting animation
+              if (value === "1" && unit === "Cr+") {
+                // Show a smooth counting animation from higher numbers down to 1
+                let currentStep = 0;
+                const totalSteps = 50;
+
+                const interval = setInterval(() => {
+                  currentStep++;
+
+                  if (currentStep <= 15) {
+                    // Show decreasing numbers from 999 to 100
+                    const startNum = 999;
+                    const endNum = 100;
+                    const progress = currentStep / 15;
+                    const currentNum = Math.floor(startNum - (startNum - endNum) * progress);
+                    setAnimatedValue(currentNum.toString());
+                  } else if (currentStep <= 35) {
+                    // Show decreasing numbers from 100 to 10
+                    const startNum = 100;
+                    const endNum = 10;
+                    const progress = (currentStep - 15) / 20;
+                    const currentNum = Math.floor(startNum - (startNum - endNum) * progress);
+                    setAnimatedValue(currentNum.toString());
+                  } else if (currentStep <= 45) {
+                    // Show decreasing numbers from 10 to 1
+                    const startNum = 10;
+                    const endNum = 1;
+                    const progress = (currentStep - 35) / 10;
+                    const currentNum = Math.floor(startNum - (startNum - endNum) * progress);
+                    setAnimatedValue(currentNum.toString());
+                  } else {
+                    // Final phase - show 1
+                    setAnimatedValue("1");
+                    if (currentStep >= totalSteps) {
+                      clearInterval(interval);
+                      setIsAnimating(false);
+                    }
+                  }
+                }, duration / totalSteps);
               } else {
-                const current = Math.floor(stepValue * currentStep);
-                setAnimatedValue(current.toString());
+                // Regular animation for other cards
+                const stepValue = targetNumber / steps;
+                let currentStep = 0;
+
+                const interval = setInterval(() => {
+                  currentStep++;
+
+                  if (currentStep >= steps) {
+                    setAnimatedValue(value);
+                    clearInterval(interval);
+                    setIsAnimating(false);
+                  } else {
+                    const current = Math.floor(stepValue * currentStep);
+                    const displayValue = current.toString() + (value.includes('+') ? '+' : '');
+                    setAnimatedValue(displayValue);
+                  }
+                }, duration / steps);
               }
-            }, duration / steps);
+            } else {
+              // Fallback for non-numeric values
+              setAnimatedValue(value);
+              setIsAnimating(false);
+            }
           }
         });
       },
@@ -60,7 +117,7 @@ const Metric = ({ value, label, icon }: MetricProps) => {
         observer.unobserve(ref.current);
       }
     };
-  }, [value]);
+  }, [value, unit]);
 
   return (
     <div ref={ref} className="relative flex flex-col items-center text-center h-full group">
@@ -84,16 +141,38 @@ const Metric = ({ value, label, icon }: MetricProps) => {
         {/* Number with proper alignment and underline */}
         <div className="text-5xl sm:text-5xl lg:text-6xl font-display font-bold mt-2 mb-1 text-center">
           <div className="inline-block relative">
-            <span className="bg-gradient-to-r from-accent to-accent/80 bg-clip-text text-transparent group-hover:from-accent/90 group-hover:to-accent transition-all duration-300 dark:from-blue-400 dark:to-blue-500">
-              {animatedValue.replace(/\+$/, '')}
-            </span>
-            <span className="text-2xl sm:text-3xl text-accent align-top ml-0.5 group-hover:text-accent/90 dark:text-blue-400">
-              {animatedValue.includes('+') ? '+' : ''}
-            </span>
+            {/* Show animated value and unit */}
+            <>
+              <span className="bg-gradient-to-r from-accent to-accent/80 bg-clip-text text-transparent group-hover:from-accent/90 group-hover:to-accent transition-all duration-300 dark:from-blue-400 dark:to-blue-500">
+                {animatedValue.replace(/\+$/, '')}
+              </span>
+              {unit && (
+                <span className="text-4xl sm:text-4xl lg:text-5xl text-accent ml-1 group-hover:text-accent/90 dark:text-blue-400 font-display font-bold">
+                  {unit}
+                  {subLabel && unit === "Cr+" && (
+                    <span className="text-lg sm:text-xl text-accent/80 ml-1 align-middle">
+                      {subLabel}
+                    </span>
+                  )}
+                </span>
+              )}
+              {animatedValue.includes('+') && !unit && (
+                <span className="text-2xl sm:text-3xl text-accent align-top ml-0.5 group-hover:text-accent/90 dark:text-blue-400">
+                  +
+                </span>
+              )}
+            </>
             {/* Properly centered underline */}
             <div className="absolute -bottom-1 left-0 right-0 mx-auto h-[2px] w-3/4 bg-accent/30 group-hover:bg-accent/50 rounded-full transition-colors duration-300 dark:bg-blue-500/50 dark:group-hover:bg-blue-300/80"></div>
           </div>
         </div>
+
+        {/* Sub-label for construction area - only show if not displayed with unit */}
+        {subLabel && !(unit === "Cr+" && subLabel) && (
+          <div className="text-sm sm:text-base text-accent/80 dark:text-blue-400/80 -mt-1 mb-1 font-semibold tracking-wide">
+            {subLabel}
+          </div>
+        )}
         
         {/* Decorative dots with proper spacing */}
         <div className="flex space-x-2 my-2 justify-center">
@@ -140,6 +219,8 @@ export default function AnimatedMetrics({ metrics }: AnimatedMetricsProps) {
             <div key={index} className="h-44 sm:h-48 lg:h-52">
               <Metric
                 value={metric.value}
+                unit={metric.unit}
+                subLabel={metric.subLabel}
                 label={metric.label}
                 icon={metric.icon}
               />

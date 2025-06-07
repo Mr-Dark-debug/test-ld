@@ -50,11 +50,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(null);
       }
     } catch (error) {
-      console.error('Auth check failed:', error);
-      // Only remove token if it's actually invalid, not just a network error
-      if (error instanceof Error && error.message.includes('401')) {
-        removeAuthToken();
+      // Only log non-401 errors to avoid spam from expired tokens
+      if (!(error instanceof Error && error.message.includes('401'))) {
+        console.error('Auth check failed:', error);
       }
+      // Remove token on any auth failure (including expired tokens)
+      removeAuthToken();
       setUser(null);
     } finally {
       setLoading(false);

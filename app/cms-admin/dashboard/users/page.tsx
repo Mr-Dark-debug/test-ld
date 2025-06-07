@@ -95,12 +95,24 @@ export default function UsersList() {
   // Toggle user status
   const toggleUserStatus = async (userId: string, currentStatus: boolean) => {
     try {
+      // Find the user data to get required fields
+      const targetUser = users.find(u => u._id === userId);
+      if (!targetUser) {
+        toast.error('User not found');
+        return;
+      }
+
       const response = await fetch(`/api/users/manage/${userId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          name: targetUser.name,
+          email: targetUser.email,
+          role: targetUser.role,
+          phone: targetUser.phone || '',
+          bio: '',
           isActive: !currentStatus
         }),
       });
@@ -158,6 +170,30 @@ export default function UsersList() {
     const targetUserLevel = roleHierarchy[targetUser.role as keyof typeof roleHierarchy] || 0;
 
     return targetUserLevel < currentUserLevel;
+  };
+
+  const canToggleUserStatus = (targetUser: any) => {
+    if (!user) return false;
+
+    // Both admin and super_admin can activate/deactivate users
+    if (user.role !== 'admin' && user.role !== 'super_admin') {
+      return false;
+    }
+
+    // No one can deactivate super admin
+    if (targetUser.role === 'super_admin') {
+      return false;
+    }
+
+    // Admin can only toggle users with lower roles
+    if (user.role === 'admin') {
+      const currentUserLevel = roleHierarchy[user.role as keyof typeof roleHierarchy] || 0;
+      const targetUserLevel = roleHierarchy[targetUser.role as keyof typeof roleHierarchy] || 0;
+      return targetUserLevel < currentUserLevel;
+    }
+
+    // Super admin can toggle anyone except other super admins
+    return true;
   };
 
   const canDeleteUser = (targetUser: any) => {
@@ -372,8 +408,8 @@ export default function UsersList() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <div className="flex items-center justify-end space-x-2">
-                          {/* Only super admin can activate/deactivate users (with role hierarchy) */}
-                          {canDeleteUser(userData) && (
+                          {/* Admin and super admin can activate/deactivate users (with role hierarchy) */}
+                          {canToggleUserStatus(userData) && (
                             <Button
                               variant="outline"
                               size="sm"
