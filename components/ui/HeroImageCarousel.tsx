@@ -12,7 +12,7 @@ interface HeroImageCarouselProps {
 
 const HeroImageCarousel: React.FC<HeroImageCarouselProps> = ({
   images,
-  interval = 3000,
+  interval = 2000,
 }) => {
   const { theme } = useTheme();
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -20,11 +20,12 @@ const HeroImageCarousel: React.FC<HeroImageCarouselProps> = ({
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
+  const autoPlayTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Process images to use dark mode versions when available
   const processedImages = images.map(image => {
-    // Check if this is the hero image and we're in dark mode
-    if (theme === 'dark' && image.src.includes('/hero/hero.jpg')) {
+    // Check if this is the first hero image and we're in dark mode
+    if (theme === 'dark' && image.src.includes('/hero/hero0.jpg')) {
       return {
         ...image,
         src: '/images/hero/hero-dark.jpg'
@@ -43,7 +44,17 @@ const HeroImageCarousel: React.FC<HeroImageCarouselProps> = ({
     setCurrentIndex((prev) => (prev - 1 + processedImages.length) % processedImages.length);
   };
 
-  const handleDragEnd = (event: any, info: PanInfo) => {
+  // Function to restart auto-playing after manual interaction
+  const restartAutoPlay = () => {
+    if (autoPlayTimeoutRef.current) {
+      clearTimeout(autoPlayTimeoutRef.current);
+    }
+    autoPlayTimeoutRef.current = setTimeout(() => {
+      setIsAutoPlaying(true);
+    }, 3000); // Resume auto-play after 3 seconds of inactivity
+  };
+
+  const handleDragEnd = (_: any, info: PanInfo) => {
     setIsDragging(false);
     setDragOffset(0);
     const threshold = 50;
@@ -55,6 +66,7 @@ const HeroImageCarousel: React.FC<HeroImageCarouselProps> = ({
         nextSlide();
       }
       setIsAutoPlaying(false);
+      restartAutoPlay();
     }
   };
 
@@ -64,6 +76,15 @@ const HeroImageCarousel: React.FC<HeroImageCarouselProps> = ({
       return () => clearInterval(slideInterval);
     }
   }, [processedImages.length, interval, currentIndex, isAutoPlaying, isDragging]);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (autoPlayTimeoutRef.current) {
+        clearTimeout(autoPlayTimeoutRef.current);
+      }
+    };
+  }, []);
 
   if (!processedImages || processedImages.length === 0) {
     return null;
@@ -102,7 +123,7 @@ const HeroImageCarousel: React.FC<HeroImageCarouselProps> = ({
             setIsDragging(true);
             setIsAutoPlaying(false);
           }}
-          onDrag={(event, info) => {
+          onDrag={(_, info) => {
             setDragOffset(info.offset.x / (containerRef.current?.offsetWidth || 1) * 100);
           }}
           onDragEnd={handleDragEnd}
@@ -139,6 +160,7 @@ const HeroImageCarousel: React.FC<HeroImageCarouselProps> = ({
                 onClick={() => {
                   setCurrentIndex(index);
                   setIsAutoPlaying(false);
+                  restartAutoPlay();
                 }}
                 className={`transition-all duration-300 hover:scale-105 ${
                   index === currentIndex

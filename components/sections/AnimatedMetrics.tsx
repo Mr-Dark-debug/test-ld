@@ -150,7 +150,7 @@ const Metric = ({ value, unit, subLabel, label, icon }: MetricProps) => {
                 <span className="text-4xl sm:text-4xl lg:text-5xl text-accent ml-1 group-hover:text-accent/90 dark:text-blue-400 font-display font-bold">
                   {unit}
                   {subLabel && unit === "Cr+" && (
-                    <span className="text-lg sm:text-xl text-accent/80 ml-1 align-middle">
+                    <span className="hidden sm:inline text-lg sm:text-xl text-accent/80 ml-1 align-middle">
                       {subLabel}
                     </span>
                   )}
@@ -167,7 +167,14 @@ const Metric = ({ value, unit, subLabel, label, icon }: MetricProps) => {
           </div>
         </div>
 
-        {/* Sub-label for construction area - only show if not displayed with unit */}
+        {/* Sub-label for construction area - mobile version (separate line for Cr+ Sq. Ft.) */}
+        {subLabel && unit === "Cr+" && (
+          <div className="sm:hidden text-sm text-accent/80 dark:text-blue-400/80 -mt-1 mb-1 font-semibold tracking-wide text-center">
+            {subLabel}
+          </div>
+        )}
+
+        {/* Sub-label for other cases - only show if not displayed with unit */}
         {subLabel && !(unit === "Cr+" && subLabel) && (
           <div className="text-sm sm:text-base text-accent/80 dark:text-blue-400/80 -mt-1 mb-1 font-semibold tracking-wide">
             {subLabel}
