@@ -8,7 +8,7 @@ interface Project {
   _id: string;
   title: string;
   slug: string;
-  type: 'residential' | 'commercial';
+  category: 'residential' | 'commercial';
   status: 'ongoing' | 'completed' | 'upcoming';
   description: string;
   location: {
@@ -82,7 +82,7 @@ export default function ProjectDetailClient({ project }: ProjectDetailClientProp
     description: project.description,
     location: `${project.location.address}, ${project.location.city}, ${project.location.state}`,
     status: project.status,
-    type: project.type,
+    type: project.category, // Fix: use category field from the model
     imageSrc: project.images.coverImage || project.images.gallery.promotional[0] || project.images.gallery.exterior[0] || project.images.gallery.interior[0] || '/images/placeholder-project.jpg',
     specifications: [
       { name: 'Total Units', value: project.specifications.totalUnits },
@@ -150,7 +150,9 @@ export default function ProjectDetailClient({ project }: ProjectDetailClientProp
         alt: `${project.title} - ${type.toUpperCase()} Floor Plan ${index + 1}`,
         width: 800,
         height: 600,
-        floorType: type === '3bhk' ? '3bhk' as const : type === '4bhk' ? '4bhk' as const : undefined
+        floorType: type === '2bhk' ? '2bhk' as const :
+                  type === '3bhk' ? '3bhk' as const :
+                  type === '4bhk' ? '4bhk' as const : undefined
       }))
     )
   ].filter(Boolean);

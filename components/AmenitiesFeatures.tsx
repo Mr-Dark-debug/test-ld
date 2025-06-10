@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { DotPattern } from "@/components/ui/dot-pattern";
 import GlassIcons from "@/components/reactbits/GlassIcons/GlassIcons";
@@ -29,7 +29,8 @@ interface ValidGlassIconItem {
   label: string;
 }
 
-export function AmenitiesFeatures({ amenities, projectName = "Project", brochureUrl = "" }: AmenitiesFeaturesProps) {
+// Internal component that uses theme
+function AmenitiesFeaturesInternal({ amenities, projectName = "Project", brochureUrl = "" }: AmenitiesFeaturesProps) {
   const { theme } = useTheme();
   const [showBrochureForm, setShowBrochureForm] = useState(false);
   
@@ -138,4 +139,77 @@ export function AmenitiesFeatures({ amenities, projectName = "Project", brochure
       </div>
     </section>
   );
-} 
+}
+
+// Main export with error boundary and hydration safety
+export function AmenitiesFeatures({ amenities, projectName = "Project", brochureUrl = "" }: AmenitiesFeaturesProps) {
+  const [isMounted, setIsMounted] = useState(false);
+  const [hasError, setHasError] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // Don't render until component is mounted to avoid hydration issues
+  if (!isMounted) {
+    return (
+      <section id="amenities" className="relative py-20 text-foreground overflow-hidden bg-gradient-to-b from-background to-muted">
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            <div className="lg:col-span-2">
+              <div className="text-center lg:text-left mb-6 md:mb-12">
+                <h2 className="text-3xl md:text-4xl font-serif mb-2">
+                  Amenities & Features
+                </h2>
+                <div className="w-24 h-1 bg-highlight mx-auto lg:mx-0 rounded-full"></div>
+                <p className="text-foreground/70 mt-3 max-w-2xl mx-auto lg:mx-0">
+                  Loading amenities...
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // Error fallback
+  if (hasError) {
+    return (
+      <section id="amenities" className="relative py-20 text-foreground overflow-hidden bg-gradient-to-b from-background to-muted">
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            <div className="lg:col-span-2">
+              <div className="text-center lg:text-left mb-6 md:mb-12">
+                <h2 className="text-3xl md:text-4xl font-serif mb-2">
+                  Amenities & Features
+                </h2>
+                <div className="w-24 h-1 bg-highlight mx-auto lg:mx-0 rounded-full"></div>
+                <p className="text-foreground/70 mt-3 max-w-2xl mx-auto lg:mx-0">
+                  Experience luxury living with our premium amenities designed for your comfort and convenience.
+                </p>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {amenities.map((amenity, index) => (
+                  <div key={index} className="text-center p-4 bg-card rounded-lg">
+                    <div className="text-2xl mb-2">{amenity.icon}</div>
+                    <p className="text-sm">{amenity.title}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // Try to render the main component, catch any errors
+  try {
+    return <AmenitiesFeaturesInternal amenities={amenities} projectName={projectName} brochureUrl={brochureUrl} />;
+  } catch (error) {
+    console.error('Error rendering AmenitiesFeatures:', error);
+    setHasError(true);
+    return null;
+  }
+}

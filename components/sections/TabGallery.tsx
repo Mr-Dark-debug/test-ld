@@ -12,7 +12,7 @@ export interface GalleryImage {
   width: number;
   height: number;
   category?: 'promotional' | 'interior' | 'exterior' | 'video';
-  floorType?: '3bhk' | '4bhk';
+  floorType?: '2bhk' | '3bhk' | '4bhk';
 }
 
 interface TabGalleryProps {
@@ -49,10 +49,11 @@ const categories = [
 ];
 
 export default function TabGallery({ title, subtitle, images }: TabGalleryProps) {
-  const [activeTab, setActiveTab] = useState<'gallery' | '3bhk' | '4bhk'>('gallery');
+  const [activeTab, setActiveTab] = useState<'gallery' | '2bhk' | '3bhk' | '4bhk'>('gallery');
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
-  // Filter images for 3BHK and 4BHK tabs
+  // Filter images for 2BHK, 3BHK and 4BHK tabs
+  const bhk2Images = images.filter(img => img.floorType === '2bhk');
   const bhk3Images = images.filter(img => img.floorType === '3bhk');
   const bhk4Images = images.filter(img => img.floorType === '4bhk');
   
@@ -61,7 +62,7 @@ export default function TabGallery({ title, subtitle, images }: TabGalleryProps)
     ? images.filter(img => img.category === activeCategory)
     : images.filter(img => img.category);
 
-  const handleTabClick = (tab: 'gallery' | '3bhk' | '4bhk') => {
+  const handleTabClick = (tab: 'gallery' | '2bhk' | '3bhk' | '4bhk') => {
     setActiveTab(tab);
     setActiveCategory(null); // Reset category selection when changing tabs
   };
@@ -111,6 +112,13 @@ export default function TabGallery({ title, subtitle, images }: TabGalleryProps)
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {renderImageGrid(galleryImages)}
           </div>
+        </div>
+      );
+    } else if (activeTab === '2bhk') {
+      // Show 2BHK floor plans
+      return (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mt-8">
+          {renderImageGrid(bhk2Images)}
         </div>
       );
     } else if (activeTab === '3bhk') {
@@ -223,17 +231,35 @@ export default function TabGallery({ title, subtitle, images }: TabGalleryProps)
               )}
             </button>
             <button
+              onClick={() => handleTabClick('2bhk')}
+              className={cn(
+                "py-2.5 sm:py-3 px-3 sm:px-4 text-sm sm:text-base font-medium transition-colors duration-200 relative whitespace-nowrap focus:outline-none group",
+                activeTab === '2bhk'
+                  ? "text-highlight"
+                  : "text-foreground/60 hover:text-foreground/90"
+              )}
+            >
+              2BHK Plans
+              {activeTab === '2bhk' && (
+                <motion.div
+                  layoutId="activeTabIndicator"
+                  className="absolute bottom-[-1px] left-0 right-0 h-[2.5px] bg-highlight rounded-t-full"
+                  transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                />
+              )}
+            </button>
+            <button
               onClick={() => handleTabClick('3bhk')}
               className={cn(
                 "py-2.5 sm:py-3 px-3 sm:px-4 text-sm sm:text-base font-medium transition-colors duration-200 relative whitespace-nowrap focus:outline-none group",
-                activeTab === '3bhk' 
-                  ? "text-highlight" 
+                activeTab === '3bhk'
+                  ? "text-highlight"
                   : "text-foreground/60 hover:text-foreground/90"
               )}
             >
               3BHK Plans
               {activeTab === '3bhk' && (
-                <motion.div 
+                <motion.div
                   layoutId="activeTabIndicator"
                   className="absolute bottom-[-1px] left-0 right-0 h-[2.5px] bg-highlight rounded-t-full"
                   transition={{ type: "spring", stiffness: 350, damping: 30 }}
@@ -244,14 +270,14 @@ export default function TabGallery({ title, subtitle, images }: TabGalleryProps)
               onClick={() => handleTabClick('4bhk')}
               className={cn(
                 "py-2.5 sm:py-3 px-3 sm:px-4 text-sm sm:text-base font-medium transition-colors duration-200 relative whitespace-nowrap focus:outline-none group",
-                activeTab === '4bhk' 
-                  ? "text-highlight" 
+                activeTab === '4bhk'
+                  ? "text-highlight"
                   : "text-foreground/60 hover:text-foreground/90"
               )}
             >
               4BHK Plans
               {activeTab === '4bhk' && (
-                <motion.div 
+                <motion.div
                   layoutId="activeTabIndicator"
                   className="absolute bottom-[-1px] left-0 right-0 h-[2.5px] bg-highlight rounded-t-full"
                   transition={{ type: "spring", stiffness: 350, damping: 30 }}

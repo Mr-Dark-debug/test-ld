@@ -239,12 +239,16 @@ export default function ProjectDetails({
             {/* Project Info */}
             <div className="flex flex-col justify-center pt-12 lg:pt-0">
               <div className="flex flex-wrap gap-2 mb-3">
-                <span className={cn("px-3 py-1.5 rounded-md text-xs sm:text-sm font-medium shadow-md transition-colors duration-300", getTypeColor())}>
-                  {type.charAt(0).toUpperCase() + type.slice(1)}
-                </span>
-                <span className={cn("px-3 py-1.5 rounded-md text-xs sm:text-sm font-medium shadow-md transition-colors duration-300", getStatusColor())}>
-                  {status.charAt(0).toUpperCase() + status.slice(1)}
-                </span>
+                {type && (
+                  <span className={cn("px-3 py-1.5 rounded-md text-xs sm:text-sm font-medium shadow-md transition-colors duration-300", getTypeColor())}>
+                    {type.charAt(0).toUpperCase() + type.slice(1)}
+                  </span>
+                )}
+                {status && (
+                  <span className={cn("px-3 py-1.5 rounded-md text-xs sm:text-sm font-medium shadow-md transition-colors duration-300", getStatusColor())}>
+                    {status.charAt(0).toUpperCase() + status.slice(1)}
+                  </span>
+                )}
               </div>
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-display mb-3">{title}</h1>
               

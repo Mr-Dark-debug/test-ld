@@ -49,6 +49,9 @@ async function getProjectHandler(req: NextRequest, { params }: { params: Promise
       );
     }
 
+    // Debug: Log floor plans structure
+    console.log('Project floor plans:', JSON.stringify(project.floorPlans, null, 2));
+
     return NextResponse.json({
       success: true,
       data: project

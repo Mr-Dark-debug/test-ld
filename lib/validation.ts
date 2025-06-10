@@ -56,9 +56,9 @@ export const createProjectSchema = Joi.object({
     }).optional()
   }).optional(),
   floorPlans: Joi.object({
+    '2bhk': Joi.array().items(Joi.string()).default([]),
     '3bhk': Joi.array().items(Joi.string()).default([]),
-    '4bhk': Joi.array().items(Joi.string()).default([]),
-    '5bhk': Joi.array().items(Joi.string()).default([])
+    '4bhk': Joi.array().items(Joi.string()).default([])
   }).optional(),
   reraQrImage: Joi.string().allow('').optional(),
   brochureUrl: Joi.string().uri().allow('').optional(),
@@ -113,9 +113,9 @@ export const partialUpdateProjectSchema = Joi.object({
     }).optional()
   }).optional(),
   floorPlans: Joi.object({
+    '2bhk': Joi.array().items(Joi.string()).optional(),
     '3bhk': Joi.array().items(Joi.string()).optional(),
-    '4bhk': Joi.array().items(Joi.string()).optional(),
-    '5bhk': Joi.array().items(Joi.string()).optional()
+    '4bhk': Joi.array().items(Joi.string()).optional()
   }).optional(),
   reraQrImage: Joi.string().allow('').optional(),
   brochureUrl: Joi.string().uri().allow('').optional(),

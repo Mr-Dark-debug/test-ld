@@ -13,6 +13,7 @@ import AboutUs from '@/models/AboutUs';
 import Amenity from '@/models/Amenity';
 import { JobOpening, JobApplication } from '@/models/Career';
 import Lead from '@/models/Lead';
+import Image from '@/models/Image';
 
 /**
  * Ensures all models are registered with Mongoose
@@ -32,6 +33,7 @@ export function ensureModelsRegistered() {
     JobOpening,
     JobApplication,
     Lead,
+    Image,
   };
 
   // Log registered models in development

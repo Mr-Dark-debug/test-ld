@@ -391,10 +391,10 @@ export const uploadApi = {
     }).then(res => res.json());
   },
 
-  deleteFile: async (filePath: string) => {
+  deleteFile: async (imageId: string) => {
     return apiRequest('/upload', {
       method: 'DELETE',
-      body: JSON.stringify({ filePath }),
+      body: JSON.stringify({ imageId }),
     });
   },
 };

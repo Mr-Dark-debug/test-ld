@@ -455,10 +455,13 @@ export default function CreateBlogPage() {
                         value={metaTitle}
                         onChange={(e) => setMetaTitle(e.target.value)}
                         placeholder="SEO title (defaults to post title if empty)"
-                        className="mt-1"
+                        className={`mt-1 ${metaTitle.length > 60 ? 'border-red-300 focus:border-red-500' : ''}`}
+                        maxLength={60}
                       />
-                      <div className="text-xs text-gray-500 mt-1">
+                      <div className={`text-xs mt-1 ${metaTitle.length > 60 ? 'text-red-500' : metaTitle.length > 50 ? 'text-orange-500' : 'text-gray-500'}`}>
                         {metaTitle.length} / 60 characters
+                        {metaTitle.length > 60 && <span className="font-medium"> (exceeds limit!)</span>}
+                        {metaTitle.length > 50 && metaTitle.length <= 60 && <span className="text-orange-500"> (approaching limit)</span>}
                       </div>
                     </div>
 
@@ -469,10 +472,13 @@ export default function CreateBlogPage() {
                         value={metaDescription}
                         onChange={(e) => setMetaDescription(e.target.value)}
                         placeholder="SEO description (defaults to excerpt if empty)"
-                        className="mt-1 resize-none h-20"
+                        className={`mt-1 resize-none h-20 ${metaDescription.length > 160 ? 'border-red-300 focus:border-red-500' : ''}`}
+                        maxLength={160}
                       />
-                      <div className="text-xs text-gray-500 mt-1">
+                      <div className={`text-xs mt-1 ${metaDescription.length > 160 ? 'text-red-500' : metaDescription.length > 140 ? 'text-orange-500' : 'text-gray-500'}`}>
                         {metaDescription.length} / 160 characters
+                        {metaDescription.length > 160 && <span className="font-medium"> (exceeds limit!)</span>}
+                        {metaDescription.length > 140 && metaDescription.length <= 160 && <span className="text-orange-500"> (approaching limit)</span>}
                       </div>
                     </div>
                   </div>

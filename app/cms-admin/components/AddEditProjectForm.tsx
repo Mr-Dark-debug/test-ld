@@ -44,8 +44,6 @@ interface FormData {
   modelView: string;
   location: {
     address: string;
-    lat: string;
-    lng: string;
     mapEmbedUrl: string;
   };
   reraNumber: string;
@@ -61,7 +59,6 @@ interface FormData {
   contactSales: string;
   amenities: string[]; // Changed to string[] for MongoDB ObjectIds
   featured: boolean; // Added featured field
-  brochureFile: File | null;
   brochureUrl: string;
   gallery: {
     promotional: FileObject[];
@@ -105,8 +102,6 @@ export function AddEditProjectForm({ projectId, onClose }: AddEditProjectFormPro
     modelView: '',
     location: {
       address: '',
-      lat: '21.1702',
-      lng: '72.8311',
       mapEmbedUrl: '',
     },
     reraNumber: '',
@@ -122,7 +117,6 @@ export function AddEditProjectForm({ projectId, onClose }: AddEditProjectFormPro
     contactSales: '',
     amenities: [],
     featured: false, // Added featured field
-    brochureFile: null,
     brochureUrl: '',
     gallery: {
       promotional: [],
@@ -131,13 +125,13 @@ export function AddEditProjectForm({ projectId, onClose }: AddEditProjectFormPro
       videos: [],
     },
     floorPlans: {
+      '2bhk': [],
       '3bhk': [],
       '4bhk': [],
-      '5bhk': [],
     },
   });
 
-  const [brochureInputMode, setBrochureInputMode] = useState<'upload' | 'url'>('upload');
+  const [mapPreviewLoading, setMapPreviewLoading] = useState(false);
 
   // Fetch amenities from database
   useEffect(() => {
@@ -179,8 +173,6 @@ export function AddEditProjectForm({ projectId, onClose }: AddEditProjectFormPro
               description: project.description,
               location: {
                 address: project.location?.address || '',
-                lat: project.location?.lat?.toString() || project.location?.coordinates?.lat?.toString() || '',
-                lng: project.location?.lng?.toString() || project.location?.coordinates?.lng?.toString() || '',
                 mapEmbedUrl: project.location?.mapEmbedUrl || '',
               },
               specifications: {
@@ -205,15 +197,12 @@ export function AddEditProjectForm({ projectId, onClose }: AddEditProjectFormPro
                 videos: project.images?.gallery?.videos?.map((url: string) => ({ id: Math.random().toString(), name: 'existing', url, file: null })) || []
               },
               floorPlans: {
-                '1bhk': project.floorPlans?.['1bhk']?.map((url: string) => ({ id: Math.random().toString(), name: 'existing', url, file: null })) || [],
                 '2bhk': project.floorPlans?.['2bhk']?.map((url: string) => ({ id: Math.random().toString(), name: 'existing', url, file: null })) || [],
                 '3bhk': project.floorPlans?.['3bhk']?.map((url: string) => ({ id: Math.random().toString(), name: 'existing', url, file: null })) || [],
-                '4bhk': project.floorPlans?.['4bhk']?.map((url: string) => ({ id: Math.random().toString(), name: 'existing', url, file: null })) || [],
-                '5bhk': project.floorPlans?.['5bhk']?.map((url: string) => ({ id: Math.random().toString(), name: 'existing', url, file: null })) || []
+                '4bhk': project.floorPlans?.['4bhk']?.map((url: string) => ({ id: Math.random().toString(), name: 'existing', url, file: null })) || []
               },
               modelView: '',
               reraQrImage: project.reraQrImage || '',
-              brochureFile: null,
               brochureUrl: project.brochureUrl || ''
             });
             toast.success('Project data loaded successfully');
@@ -335,26 +324,70 @@ export function AddEditProjectForm({ projectId, onClose }: AddEditProjectFormPro
     }
   };
 
- const handleBrochureUpload = (files: FileList | null) => {
-    if (files && files[0]) {
-        setFormData(prev => ({
-            ...prev,
-            brochureFile: files[0],
-            brochureUrl: '',
-        }));
-        toast.success('Brochure uploaded successfully (preview).');
-    }  
-  };
-
   const handleBrochureUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({
       ...prev,
       brochureUrl: e.target.value,
-      brochureFile: null,
     }));
   };
 
-  const handleRemoveFile = (field: keyof Pick<FormData, 'gallery' | 'floorPlans'> | 'coverImage' | 'modelView' | 'reraQrImage' | 'brochureFile', fileIdOrField: string | null, category: string | null = null) => {
+  // Function to extract Google Maps embed URL from iframe
+  const extractGoogleMapsUrl = (iframeHtml: string): string | null => {
+    try {
+      // Extract src attribute from iframe
+      const srcMatch = iframeHtml.match(/src="([^"]+)"/);
+      if (srcMatch && srcMatch[1]) {
+        const url = srcMatch[1];
+        // Validate that it's a Google Maps embed URL
+        if (url.includes('google.com/maps/embed')) {
+          return url;
+        }
+      }
+      return null;
+    } catch (error) {
+      console.error('Error extracting Google Maps URL:', error);
+      return null;
+    }
+  };
+
+  const handleMapEmbedChange = async (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value;
+
+    // If it looks like an iframe, extract the URL
+    if (value.includes('<iframe') && value.includes('google.com/maps/embed')) {
+      setMapPreviewLoading(true);
+      try {
+        const extractedUrl = extractGoogleMapsUrl(value);
+        if (extractedUrl) {
+          setFormData(prev => ({
+            ...prev,
+            location: {
+              ...prev.location,
+              mapEmbedUrl: extractedUrl
+            }
+          }));
+          toast.success('Google Maps URL extracted successfully!');
+        } else {
+          toast.error('Could not extract Google Maps URL from iframe');
+        }
+      } catch (error) {
+        toast.error('Error processing iframe');
+      } finally {
+        setMapPreviewLoading(false);
+      }
+    } else {
+      // Direct URL input
+      setFormData(prev => ({
+        ...prev,
+        location: {
+          ...prev.location,
+          mapEmbedUrl: value
+        }
+      }));
+    }
+  };
+
+  const handleRemoveFile = (field: keyof Pick<FormData, 'gallery' | 'floorPlans'> | 'coverImage' | 'modelView' | 'reraQrImage', fileIdOrField: string | null, category: string | null = null) => {
     if (category && (field === 'gallery' || field === 'floorPlans')) {
       setFormData((prev) => ({
         ...prev,
@@ -368,13 +401,7 @@ export function AddEditProjectForm({ projectId, onClose }: AddEditProjectFormPro
     } else if (field === 'coverImage' || field === 'modelView' || field === 'reraQrImage') {
       setFormData((prev) => ({
         ...prev,
-        [field]: '', 
-      }));
-    } else if (field === 'brochureFile') {
-      setFormData(prev => ({
-        ...prev,
-        brochureFile: null,
-        brochureUrl: '',
+        [field]: '',
       }));
     }
     toast.info('File removed.');
@@ -397,7 +424,77 @@ export function AddEditProjectForm({ projectId, onClose }: AddEditProjectFormPro
         throw new Error('Project cover image is required');
       }
 
-      // Validate required fields before submission
+      // Upload all gallery and floor plan images that are still blob URLs
+      const uploadedGallery = {
+        promotional: [],
+        exterior: [],
+        interior: [],
+        videos: []
+      };
+
+      const uploadedFloorPlans = {
+        '2bhk': [],
+        '3bhk': [],
+        '4bhk': []
+      };
+
+      // Upload gallery images
+      for (const [category, items] of Object.entries(formData.gallery)) {
+        for (const item of items) {
+          if (item.file && item.url.startsWith('blob:')) {
+            // Upload the file
+            const formDataUpload = new FormData();
+            formDataUpload.append('files', item.file);
+            formDataUpload.append('type', 'image');
+
+            const response = await fetch('/api/upload', {
+              method: 'POST',
+              body: formDataUpload,
+            });
+
+            if (response.ok) {
+              const result = await response.json();
+              if (result.success && result.data.length > 0) {
+                uploadedGallery[category].push(result.data[0].path);
+              }
+            } else {
+              throw new Error(`Failed to upload ${category} image: ${item.name}`);
+            }
+          } else {
+            // Use existing URL
+            uploadedGallery[category].push(item.url);
+          }
+        }
+      }
+
+      // Upload floor plan images
+      for (const [type, items] of Object.entries(formData.floorPlans)) {
+        for (const item of items) {
+          if (item.file && item.url.startsWith('blob:')) {
+            // Upload the file
+            const formDataUpload = new FormData();
+            formDataUpload.append('files', item.file);
+            formDataUpload.append('type', 'image');
+
+            const response = await fetch('/api/upload', {
+              method: 'POST',
+              body: formDataUpload,
+            });
+
+            if (response.ok) {
+              const result = await response.json();
+              if (result.success && result.data.length > 0) {
+                uploadedFloorPlans[type].push(result.data[0].path);
+              }
+            } else {
+              throw new Error(`Failed to upload ${type} floor plan: ${item.name}`);
+            }
+          } else {
+            // Use existing URL
+            uploadedFloorPlans[type].push(item.url);
+          }
+        }
+      }
 
       // Prepare the project data for API submission
       const projectData = {
@@ -407,19 +504,12 @@ export function AddEditProjectForm({ projectId, onClose }: AddEditProjectFormPro
         description: formData.description.trim(),
         location: {
           address: formData.location.address.trim() || '',
-          lat: formData.location.lat.trim() || '',
-          lng: formData.location.lng.trim() || '',
           mapEmbedUrl: formData.location.mapEmbedUrl.trim() || ''
         },
         coverImage: formData.coverImage || '',
         images: {
           coverImage: formData.coverImage || '',
-          gallery: {
-            promotional: formData.gallery.promotional.map(item => item.url).filter(Boolean),
-            exterior: formData.gallery.exterior.map(item => item.url).filter(Boolean),
-            interior: formData.gallery.interior.map(item => item.url).filter(Boolean),
-            videos: formData.gallery.videos.map(item => item.url).filter(Boolean)
-          }
+          gallery: uploadedGallery
         },
         specifications: {
           totalUnits: formData.specifications.totalUnits || '',
@@ -429,15 +519,10 @@ export function AddEditProjectForm({ projectId, onClose }: AddEditProjectFormPro
           structure: formData.specifications.structure || '',
           flooring: formData.specifications.flooring || ''
         },
-        floorPlans: {
-          '3bhk': formData.floorPlans['3bhk'].map(item => item.url).filter(Boolean),
-          '4bhk': formData.floorPlans['4bhk'].map(item => item.url).filter(Boolean),
-          '5bhk': formData.floorPlans['5bhk'].map(item => item.url).filter(Boolean)
-        },
+        floorPlans: uploadedFloorPlans,
         reraNumber: formData.reraNumber.trim() || '',
         reraQrImage: formData.reraQrImage || '',
         brochureUrl: formData.brochureUrl || '',
-        brochureFile: formData.brochureFile || '',
         modelView: formData.modelView || '',
         contactSales: formData.contactSales.trim() || '',
         amenities: formData.amenities,
@@ -519,7 +604,7 @@ export function AddEditProjectForm({ projectId, onClose }: AddEditProjectFormPro
   };
 
   // Floor plan types for the gallery section
-  const floorPlanTypes = ['3bhk', '4bhk', '5bhk'] as const;
+  const floorPlanTypes = ['2bhk', '3bhk', '4bhk'] as const;
 
   // Show loading screen when editing and data is being fetched
   if (isEditing && loading) {
@@ -749,69 +834,20 @@ export function AddEditProjectForm({ projectId, onClose }: AddEditProjectFormPro
                 </div>
               </div>
 
-              {/* Brochure Upload */}
+              {/* Brochure URL */}
               <div className="space-y-1.5">
-                <label className="block text-sm font-medium text-gray-700">Project Brochure</label>
-                <div className="flex items-center space-x-2 mb-2">
-                  <button
-                    type="button"
-                    onClick={() => setBrochureInputMode('upload')}
-                    className={`px-3 py-1.5 text-xs rounded-md ${brochureInputMode === 'upload' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
-                  >
-                    Upload PDF
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setBrochureInputMode('url')}
-                    className={`px-3 py-1.5 text-xs rounded-md ${brochureInputMode === 'url' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
-                  >
-                    Enter URL
-                  </button>
-                </div>
-
-                {brochureInputMode === 'upload' && (
-                  <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg min-h-[150px] items-center">
-                    {formData.brochureFile ? (
-                      <div className="relative w-full text-center">
-                        <div className="mx-auto h-40 bg-gray-100 rounded-lg flex flex-col items-center justify-center p-4">
-                          <svg className="w-10 h-10 text-blue-500 mb-2" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clipRule="evenodd"/></svg>
-                          <p className="text-sm font-medium text-gray-900 truncate max-w-xs">{formData.brochureFile.name}</p>
-                          <p className="text-xs text-gray-500">PDF Document</p>
-                        </div>
-                        <button type="button" onClick={() => handleRemoveFile('brochureFile', null)} className="absolute top-2 right-2 p-1 bg-red-100 rounded-full text-red-600 hover:bg-red-200" title="Remove brochure file">
-                          <X className="w-4 h-4" />
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="space-y-1 text-center">
-                        <Upload className="mx-auto h-10 w-10 text-gray-300" />
-                        <div className="flex text-sm text-gray-600 justify-center">
-                          <label htmlFor="brochureFile-upload" className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none">
-                            <span>Upload a PDF</span>
-                            <input id="brochureFile-upload" type="file" className="sr-only" accept=".pdf" onChange={(e) => handleBrochureUpload(e.target.files)} />
-                          </label>
-                          <p className="pl-1">or drag and drop</p>
-                        </div>
-                        <p className="text-xs text-gray-500">PDF up to 20MB</p>
-                      </div>
-                    )}
-                  </div>
+                <label className="block text-sm font-medium text-gray-700">Project Brochure URL</label>
+                <input
+                  type="url"
+                  placeholder="https://example.com/brochure.pdf"
+                  value={formData.brochureUrl}
+                  onChange={handleBrochureUrlChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+                {formData.brochureUrl && (
+                   <p className="text-xs text-gray-500">Linking to: <a href={formData.brochureUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">{formData.brochureUrl}</a></p>
                 )}
-
-                {brochureInputMode === 'url' && (
-                  <div className="space-y-1.5 mt-1">
-                    <input
-                      type="url"
-                      placeholder="https://example.com/brochure.pdf"
-                      value={formData.brochureUrl}
-                      onChange={handleBrochureUrlChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    />
-                    {formData.brochureUrl && (
-                       <p className="text-xs text-gray-500">Linking to: <a href={formData.brochureUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">{formData.brochureUrl}</a></p>
-                    )}
-                  </div>
-                )}
+                <p className="text-xs text-gray-500">Enter a direct link to the project brochure PDF</p>
               </div>
             </div>
           </div>
@@ -822,34 +858,32 @@ export function AddEditProjectForm({ projectId, onClose }: AddEditProjectFormPro
           <div className="p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Project Location</h2>
             <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-1.5">
-                  <label htmlFor="address" className="block text-sm font-medium text-gray-700">Address (Optional)</label>
-                  <input id="address" type="text" name="address" value={formData.location.address} onChange={(e) => setFormData(prev => ({...prev, location: {...prev.location, address: e.target.value }}))} placeholder="e.g. Vesu, Surat, Gujarat" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"/>
-                </div>
-                <div className="flex space-x-4">
-                  <div className="space-y-1.5 flex-1">
-                    <label htmlFor="latitude" className="block text-sm font-medium text-gray-700">Latitude (Optional)</label>
-                    <input id="latitude" type="text" name="latitude" value={formData.location.lat} onChange={(e) => setFormData(prev => ({...prev, location: {...prev.location, lat: e.target.value }}))} placeholder="e.g. 21.1702" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"/>
-                  </div>
-                  <div className="space-y-1.5 flex-1">
-                    <label htmlFor="longitude" className="block text-sm font-medium text-gray-700">Longitude (Optional)</label>
-                    <input id="longitude" type="text" name="longitude" value={formData.location.lng} onChange={(e) => setFormData(prev => ({...prev, location: {...prev.location, lng: e.target.value }}))} placeholder="e.g. 72.8311" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"/>
-                  </div>
-                </div>
+              <div className="space-y-1.5">
+                <label htmlFor="address" className="block text-sm font-medium text-gray-700">Address (Optional)</label>
+                <input id="address" type="text" name="address" value={formData.location.address} onChange={(e) => setFormData(prev => ({...prev, location: {...prev.location, address: e.target.value }}))} placeholder="e.g. Vesu, Surat, Gujarat" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"/>
               </div>
               <div className="space-y-4">
                 <div className="space-y-1.5">
-                  <label htmlFor="mapEmbedUrl" className="block text-sm font-medium text-gray-700">Google Maps Embed URL (Optional)</label>
-                  <input
+                  <label htmlFor="mapEmbedUrl" className="block text-sm font-medium text-gray-700">Google Maps Embed URL or Iframe</label>
+                  <textarea
                     id="mapEmbedUrl"
-                    type="url"
                     value={formData.location.mapEmbedUrl}
-                    onChange={(e) => setFormData(prev => ({...prev, location: {...prev.location, mapEmbedUrl: e.target.value }}))}
-                    placeholder="e.g. https://www.google.com/maps/embed?pb=..."
+                    onChange={handleMapEmbedChange}
+                    placeholder="Paste either the Google Maps embed URL or the complete iframe code here..."
+                    rows={3}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
-                  <p className="text-xs text-gray-500">Paste the embed URL from Google Maps to show an interactive map</p>
+                  {mapPreviewLoading && (
+                    <div className="flex items-center text-blue-600 text-sm">
+                      <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                      Processing iframe...
+                    </div>
+                  )}
+                  <p className="text-xs text-gray-500">
+                    You can paste either:
+                    <br />• Direct embed URL: https://www.google.com/maps/embed?pb=...
+                    <br />• Complete iframe code from Google Maps (we'll extract the URL automatically)
+                  </p>
                 </div>
                 <div className="h-64 bg-gray-100 rounded-lg flex items-center justify-center border border-gray-300">
                   {formData.location.mapEmbedUrl ? (
@@ -1042,7 +1076,10 @@ export function AddEditProjectForm({ projectId, onClose }: AddEditProjectFormPro
           <div className="p-6">
              <h2 className="text-lg font-semibold text-gray-900 mb-4">Project Gallery & Floor Plans</h2>
             <div className="space-y-6">
-              <h3 className="text-base font-semibold text-gray-800 mb-1">Gallery Images</h3>
+              <div>
+                <h3 className="text-base font-semibold text-gray-800 mb-1">Gallery Images</h3>
+                <p className="text-sm text-gray-600 mb-4">💡 <strong>Tip:</strong> You can select multiple images at once by holding Ctrl (Windows) or Cmd (Mac) while clicking files, or by dragging to select multiple files in the file picker.</p>
+              </div>
               {/* Horizontal layout for gallery types */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {[
@@ -1061,11 +1098,18 @@ export function AddEditProjectForm({ projectId, onClose }: AddEditProjectFormPro
                           </button>
                         </div>
                       ))}
-                      <label htmlFor={`gallery-${galleryType.category}-upload`} className="cursor-pointer aspect-video border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center text-gray-400 hover:bg-gray-50 hover:border-blue-400 transition-colors">
+                      <div
+                        onClick={(e) => {
+                          e.preventDefault();
+                          document.getElementById(`gallery-${galleryType.category}-upload`)?.click();
+                        }}
+                        className="cursor-pointer aspect-video border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center text-gray-400 hover:bg-gray-50 hover:border-blue-400 transition-colors"
+                      >
                         <Plus className="w-6 h-6 mb-1" />
                         <span className="text-xs text-center">Add Image(s)</span>
+                        <span className="text-xs text-center text-gray-500 mt-1">Select multiple files</span>
                         <input id={`gallery-${galleryType.category}-upload`} type="file" className="sr-only" accept="image/*" multiple onChange={(e) => handleFileUpload('gallery', e.target.files, galleryType.category)} />
-                      </label>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -1081,17 +1125,27 @@ export function AddEditProjectForm({ projectId, onClose }: AddEditProjectFormPro
                         </button>
                       </div>
                     ))}
-                    <label htmlFor="gallery-videos-upload" className="cursor-pointer aspect-video border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center text-gray-400 hover:bg-gray-50 hover:border-blue-400 transition-colors">
+                    <div
+                      onClick={(e) => {
+                        e.preventDefault();
+                        document.getElementById('gallery-videos-upload')?.click();
+                      }}
+                      className="cursor-pointer aspect-video border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center text-gray-400 hover:bg-gray-50 hover:border-blue-400 transition-colors"
+                    >
                       <Plus className="w-6 h-6 mb-1" />
                       <span className="text-xs text-center">Add Video(s)</span>
+                      <span className="text-xs text-center text-gray-500 mt-1">Select multiple files</span>
                       <input id="gallery-videos-upload" type="file" className="sr-only" accept="video/*" multiple onChange={(e) => handleFileUpload('gallery', e.target.files, 'videos')} />
-                    </label>
+                    </div>
                   </div>
                 </div>
               </div>
 
               <div className="pt-6 border-t border-gray-200">
-                <h3 className="text-base font-semibold text-gray-800 mb-3">Floor Plans</h3>
+                <div>
+                  <h3 className="text-base font-semibold text-gray-800 mb-1">Floor Plans</h3>
+                  <p className="text-sm text-gray-600 mb-4">💡 <strong>Tip:</strong> Upload floor plan images for different unit types. You can select multiple floor plan images at once.</p>
+                </div>
                 {/* Horizontal layout for floor plans */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                   {floorPlanTypes.map(type => (
@@ -1109,11 +1163,18 @@ export function AddEditProjectForm({ projectId, onClose }: AddEditProjectFormPro
                             </button>
                           </div>
                         ))}
-                        <label htmlFor={`floorPlans-${type}-upload`} className="cursor-pointer aspect-[4/3] border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center text-gray-400 hover:bg-gray-50 hover:border-blue-400 transition-colors">
+                        <div
+                          onClick={(e) => {
+                            e.preventDefault();
+                            document.getElementById(`floorPlans-${type}-upload`)?.click();
+                          }}
+                          className="cursor-pointer aspect-[4/3] border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center text-gray-400 hover:bg-gray-50 hover:border-blue-400 transition-colors"
+                        >
                           <Plus className="w-6 h-6 mb-1" />
                           <span className="text-xs text-center">Add {type.toUpperCase()} Plan(s)</span>
+                          <span className="text-xs text-center text-gray-500 mt-1">Select multiple files</span>
                           <input id={`floorPlans-${type}-upload`} type="file" className="sr-only" accept="image/*" multiple onChange={(e) => handleFileUpload('floorPlans', e.target.files, type)} />
-                        </label>
+                        </div>
                       </div>
                     </div>
                   ))}
