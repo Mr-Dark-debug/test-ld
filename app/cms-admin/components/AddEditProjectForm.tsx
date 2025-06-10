@@ -1099,9 +1099,15 @@ export function AddEditProjectForm({ projectId, onClose }: AddEditProjectFormPro
                         </div>
                       ))}
                       <div
-                        onClick={(e) => {
-                          e.preventDefault();
+                        onClick={() => {
                           document.getElementById(`gallery-${galleryType.category}-upload`)?.click();
+                        }}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            document.getElementById(`gallery-${galleryType.category}-upload`)?.click();
+                          }
                         }}
                         className="cursor-pointer aspect-video border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center text-gray-400 hover:bg-gray-50 hover:border-blue-400 transition-colors"
                       >
@@ -1126,9 +1132,15 @@ export function AddEditProjectForm({ projectId, onClose }: AddEditProjectFormPro
                       </div>
                     ))}
                     <div
-                      onClick={(e) => {
-                        e.preventDefault();
+                      onClick={() => {
                         document.getElementById('gallery-videos-upload')?.click();
+                      }}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          document.getElementById('gallery-videos-upload')?.click();
+                        }
                       }}
                       className="cursor-pointer aspect-video border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center text-gray-400 hover:bg-gray-50 hover:border-blue-400 transition-colors"
                     >
@@ -1164,9 +1176,15 @@ export function AddEditProjectForm({ projectId, onClose }: AddEditProjectFormPro
                           </div>
                         ))}
                         <div
-                          onClick={(e) => {
-                            e.preventDefault();
+                          onClick={() => {
                             document.getElementById(`floorPlans-${type}-upload`)?.click();
+                          }}
+                          role="button"
+                          tabIndex={0}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              document.getElementById(`floorPlans-${type}-upload`)?.click();
+                            }
                           }}
                           className="cursor-pointer aspect-[4/3] border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center text-gray-400 hover:bg-gray-50 hover:border-blue-400 transition-colors"
                         >
