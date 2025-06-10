@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useSearchParams } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/Button'; // Assuming this is your Button component
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"; // Shadcn Select
@@ -84,13 +85,38 @@ const ProjectCard = ({ project }: { project: Project }) => {
 };
 
 
-export default function AllProjectsPage() {
+// Component that uses useSearchParams - needs to be wrapped in Suspense
+function ProjectsContent() {
+  const searchParams = useSearchParams();
+
+  // Initialize filters from URL parameters
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<'all' | 'residential' | 'commercial'>('all');
   const [statusFilter, setStatusFilter] = useState<'all' | 'ongoing' | 'completed' | 'upcoming'>('all');
   const [locationFilter, setLocationFilter] = useState<string>('all');
   const [isFilterVisible, setIsFilterVisible] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+
+  // Set initial filters from URL parameters
+  useEffect(() => {
+    const type = searchParams.get('type');
+    const status = searchParams.get('status');
+    const location = searchParams.get('location');
+    const search = searchParams.get('search');
+
+    if (type && ['residential', 'commercial'].includes(type)) {
+      setCategoryFilter(type as 'residential' | 'commercial');
+    }
+    if (status && ['ongoing', 'completed', 'upcoming'].includes(status)) {
+      setStatusFilter(status as 'ongoing' | 'completed' | 'upcoming');
+    }
+    if (location) {
+      setLocationFilter(location);
+    }
+    if (search) {
+      setSearchTerm(search);
+    }
+  }, [searchParams]);
 
   // Fetch projects from API
   const {
@@ -426,5 +452,41 @@ export default function AllProjectsPage() {
         </div>
       </section>
     </div>
+  );
+}
+
+// Loading component for Suspense fallback
+function ProjectsLoading() {
+  return (
+    <div className="bg-background dark:bg-gray-900 text-foreground dark:text-gray-50 min-h-screen">
+      {/* Header Section */}
+      <section className="pt-16 pb-28 md:pt-20 md:pb-32 bg-muted dark:bg-gray-800/60 relative text-center">
+        <AnimatedTitle as="h1" className="text-4xl md:text-5xl lg:text-6xl font-display mb-3">
+          Explore Our Projects
+        </AnimatedTitle>
+        <p className="text-lg md:text-xl text-foreground/70 dark:text-gray-300/80 max-w-2xl mx-auto">
+          Discover a diverse portfolio of residential and commercial properties tailored to your needs.
+        </p>
+      </section>
+
+      {/* Loading State */}
+      <section className="py-8 mt-4">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center py-16">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-foreground/70">Loading projects...</p>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+// Main export component with Suspense boundary
+export default function AllProjectsPage() {
+  return (
+    <Suspense fallback={<ProjectsLoading />}>
+      <ProjectsContent />
+    </Suspense>
   );
 }

@@ -166,9 +166,13 @@ export const createBlogSchema = Joi.object({
   content: Joi.string().min(50).required(),
   category: Joi.string().required(),
   tags: Joi.array().items(Joi.string()).default([]),
-  status: Joi.string().valid('draft', 'published', 'archived').default('draft'),
+  status: Joi.string().valid('draft', 'published', 'archived', 'scheduled').default('draft'),
   coverImage: Joi.string().allow('').optional(),
   publishDate: Joi.alternatives().try(
+    Joi.date(),
+    Joi.string().allow('').optional()
+  ).optional(),
+  publishedAt: Joi.alternatives().try(
     Joi.date(),
     Joi.string().allow('').optional()
   ).optional(),
@@ -185,7 +189,7 @@ export const createBlogSchema = Joi.object({
 });
 
 export const updateBlogSchema = createBlogSchema.fork(
-  ['title', 'slug', 'excerpt', 'content', 'category', 'author', 'tags', 'status', 'coverImage', 'publishDate', 'seoMeta', 'readingTime'],
+  ['title', 'slug', 'excerpt', 'content', 'category', 'author', 'tags', 'status', 'coverImage', 'publishDate', 'publishedAt', 'seoMeta', 'readingTime'],
   (schema) => schema.optional()
 );
 

@@ -144,7 +144,7 @@ export default function BlogsPage() {
 
         const response = await blogsApi.getAll({
           status: 'published',
-          limit: 50
+          limit: 20 // Reduced limit to prevent large responses
         });
 
         if (response.success && response.data) {

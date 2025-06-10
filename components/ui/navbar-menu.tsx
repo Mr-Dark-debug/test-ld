@@ -47,7 +47,11 @@ export const MenuItem = ({
         setIsHovering(true);
       }}
       onMouseLeave={handleMouseLeave}
-      onClick={() => {
+      onClick={(e) => {
+        // If href is null, prevent navigation and only toggle submenu
+        if (!href) {
+          e.preventDefault();
+        }
         // Toggle submenu on click
         if (active === item) {
           setActive("");
@@ -56,33 +60,63 @@ export const MenuItem = ({
         }
       }}
     >
-      <Link href={href || "#"} className="relative group py-1 block">
-        <div className="flex items-center gap-1">
-          <motion.p
-            transition={{ duration: 0.3 }}
-            className="cursor-pointer text-black hover:opacity-[0.9] dark:text-white font-medium"
-          >
-            {item}
-          </motion.p>
-          {children && (
-            <svg 
-              xmlns="http://www.w3.org/2000/svg" 
-              width="16" 
-              height="16" 
-              viewBox="0 0 24 24" 
-              fill="none" 
-              stroke="currentColor" 
-              strokeWidth="2" 
-              strokeLinecap="round" 
-              strokeLinejoin="round" 
-              className={`transition-transform duration-200 ${active === item ? "rotate-180" : ""}`}
+      {href ? (
+        <Link href={href} className="relative group py-1 block">
+          <div className="flex items-center gap-1">
+            <motion.p
+              transition={{ duration: 0.3 }}
+              className="cursor-pointer text-black hover:opacity-[0.9] dark:text-white font-medium"
             >
-              <path d="m6 9 6 6 6-6"/>
-            </svg>
-          )}
+              {item}
+            </motion.p>
+            {children && (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className={`transition-transform duration-200 ${active === item ? "rotate-180" : ""}`}
+              >
+                <path d="m6 9 6 6 6-6"/>
+              </svg>
+            )}
+          </div>
+          <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent group-hover:w-full transition-all duration-300"></span>
+        </Link>
+      ) : (
+        <div className="relative group py-1 block cursor-pointer">
+          <div className="flex items-center gap-1">
+            <motion.p
+              transition={{ duration: 0.3 }}
+              className="cursor-pointer text-black hover:opacity-[0.9] dark:text-white font-medium"
+            >
+              {item}
+            </motion.p>
+            {children && (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className={`transition-transform duration-200 ${active === item ? "rotate-180" : ""}`}
+              >
+                <path d="m6 9 6 6 6-6"/>
+              </svg>
+            )}
+          </div>
+          <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent group-hover:w-full transition-all duration-300"></span>
         </div>
-        <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent group-hover:w-full transition-all duration-300"></span>
-      </Link>
+      )}
       
       {children && (
         <motion.div

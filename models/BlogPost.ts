@@ -13,7 +13,7 @@ export interface IBlogPost extends Document {
   };
   category: string;
   tags: string[];
-  status: 'draft' | 'published' | 'archived';
+  status: 'draft' | 'published' | 'archived' | 'scheduled';
   readingTime?: number;
   seoMeta?: {
     title?: string;
@@ -79,7 +79,7 @@ const BlogPostSchema = new Schema<IBlogPost>({
   }],
   status: {
     type: String,
-    enum: ['draft', 'published', 'archived'],
+    enum: ['draft', 'published', 'archived', 'scheduled'],
     default: 'draft'
   },
   readingTime: {
