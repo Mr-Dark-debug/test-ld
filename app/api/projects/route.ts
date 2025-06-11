@@ -45,7 +45,7 @@ async function getProjectsHandler(req: AuthenticatedRequest) {
     } else {
       // Apply other filters only if not searching by ID
       if (type && ['residential', 'commercial'].includes(type)) {
-        query.type = type;
+        query.category = type; // Map type parameter to category field in database
       }
 
       if (status && ['ongoing', 'completed', 'upcoming'].includes(status)) {

@@ -57,7 +57,7 @@ const ProjectCard = ({ project }: { project: Project }) => {
           className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
         />
         <div className={cn("absolute top-3 left-3 px-2.5 py-1 rounded-md text-xs font-semibold shadow", getTypeColor(project.type))}>
-          {project.type.charAt(0).toUpperCase() + project.type.slice(1)}
+          {project.type?.charAt(0).toUpperCase() + project.type?.slice(1)}
         </div>
         <div className={cn("absolute top-3 right-3 px-2.5 py-1 rounded-md text-xs font-semibold shadow capitalize", getStatusColor(project.status))}>
           {project.status}

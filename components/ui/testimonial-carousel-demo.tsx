@@ -51,7 +51,7 @@ export function TestimonialCarouselDemo() {
       name: "Meera Joshi",
       role: "Property Investor, Laxmi Heights",
       youtubeUrl: "https://youtu.be/3bmdwCqPiBA",
-      thumbnailSrc: "https://img.youtube.com/vi/3bmdwCqPiBA/maxresdefault.jpg",
+      thumbnailSrc: "https://img.youtube.com/vi/3bmdwCqPiBA/hqdefault.jpg",
     },
   ];
 
@@ -72,7 +72,8 @@ export function TestimonialCarouselDemo() {
       name: testimonial.name,
       role: [testimonial.designation, testimonial.company].filter(Boolean).join(', ') || 'Valued Client',
       youtubeUrl: testimonial.youtubeUrl || '',
-      thumbnailSrc: videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : '',
+      // Use hqdefault instead of maxresdefault as fallback, and provide a default image
+      thumbnailSrc: videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : '/images/testimonial-placeholder.jpg',
     };
   };
 

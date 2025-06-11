@@ -152,9 +152,9 @@ export default function FeaturedProjects({
                   <div className="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent opacity-70 dark:from-black/80"></div>
                   <div className={cn(
                     "absolute top-4 left-4 px-3 py-1 rounded-md text-xs sm:text-sm font-medium shadow-md transition-colors duration-300",
-                    getTypeColor(project.type)
+                    getTypeColor(project.category)
                   )}>
-                    {project.type.charAt(0).toUpperCase() + project.type.slice(1)}
+                    {project.category?.charAt(0).toUpperCase() + project.category?.slice(1)}
                   </div>
                   <div className={cn(
                     "absolute top-4 right-4 px-3 py-1 rounded-md text-xs sm:text-sm font-medium shadow-md transition-colors duration-300 capitalize",
