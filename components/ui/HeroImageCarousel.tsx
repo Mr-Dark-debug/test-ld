@@ -41,21 +41,20 @@ const HeroImageCarousel: React.FC<HeroImageCarouselProps> = ({
 
   // Process images to use dark mode versions when available
   const processedImages = images.map((image, index) => {
-    // Only modify the first image (index 0) for theme adaptation
-    if (index === 0 && image.src.includes('/hero/hero0.jpg')) {
-      // For mobile + dark mode, use the dark version
-      if (isMobile && theme === 'dark') {
-        return {
-          ...image,
-          src: '/images/hero/hero-dark.jpg'
-        };
-      }
-      // For mobile + light mode, ensure we use the original hero0.jpg
-      else if (isMobile && theme === 'light') {
-        return {
-          ...image,
-          src: '/images/hero/hero0.jpg'
-        };
+    // For the first image in mobile view, always use specific images based on theme
+    if (index === 0) {
+      if (isMobile) {
+        if (theme === 'dark') {
+          return {
+            ...image,
+            src: '/images/hero/hero-dark.jpg?v=1', // Added version parameter to prevent caching
+          };
+        } else {
+          return {
+            ...image,
+            src: '/images/hero/hero0.jpg?v=1', // Added version parameter to prevent caching
+          };
+        }
       }
     }
     return image;
@@ -122,6 +121,11 @@ const HeroImageCarousel: React.FC<HeroImageCarouselProps> = ({
     return `translateX(${(-currentIndex * 100) + dragOffset}%)`;
   };
 
+  // Force re-render when mobile status or theme changes
+  useEffect(() => {
+    // This empty dependency array ensures this effect runs only once on mount
+  }, [isMobile, theme]);
+
   return (
     <div className="flex flex-col w-full h-full">
       {/* Image Carousel Container */}
@@ -157,7 +161,7 @@ const HeroImageCarousel: React.FC<HeroImageCarouselProps> = ({
         >
           {processedImages.map((image, index) => (
             <div
-              key={index}
+              key={`${image.src}-${index}-${isMobile}-${theme}`}
               className="relative flex-shrink-0"
               style={{ width: `${100 / processedImages.length}%` }}
             >
