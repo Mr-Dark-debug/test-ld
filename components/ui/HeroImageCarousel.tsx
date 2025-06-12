@@ -39,22 +39,23 @@ const HeroImageCarousel: React.FC<HeroImageCarouselProps> = ({
     return () => window.removeEventListener('resize', checkIsMobile);
   }, []);
 
-  // Process images to use dark mode versions when available
+  // Process images to use specific versions based on device and theme
   const processedImages = images.map((image, index) => {
-    // For the first image in mobile view, always use specific images based on theme
+    // Only modify the first image (index 0)
     if (index === 0) {
+      // For mobile view, always use Website-Banner-1.jpg regardless of theme
       if (isMobile) {
-        if (theme === 'dark') {
-          return {
-            ...image,
-            src: '/images/hero/hero-dark.jpg?v=1', // Added version parameter to prevent caching
-          };
-        } else {
-          return {
-            ...image,
-            src: '/images/hero/hero0.jpg?v=1', // Added version parameter to prevent caching
-          };
-        }
+        return {
+          ...image,
+          src: '/images/hero/Website-Banner-1.jpg'
+        };
+      }
+      // For desktop dark mode, use the dark version if the original is hero0.jpg
+      else if (!isMobile && theme === 'dark' && image.src.includes('/hero/hero.jpg')) {
+        return {
+          ...image,
+          src: '/images/hero/hero-dark.jpg'
+        };
       }
     }
     return image;
@@ -121,11 +122,6 @@ const HeroImageCarousel: React.FC<HeroImageCarouselProps> = ({
     return `translateX(${(-currentIndex * 100) + dragOffset}%)`;
   };
 
-  // Force re-render when mobile status or theme changes
-  useEffect(() => {
-    // This empty dependency array ensures this effect runs only once on mount
-  }, [isMobile, theme]);
-
   return (
     <div className="flex flex-col w-full h-full">
       {/* Image Carousel Container */}
@@ -161,7 +157,7 @@ const HeroImageCarousel: React.FC<HeroImageCarouselProps> = ({
         >
           {processedImages.map((image, index) => (
             <div
-              key={`${image.src}-${index}-${isMobile}-${theme}`}
+              key={index}
               className="relative flex-shrink-0"
               style={{ width: `${100 / processedImages.length}%` }}
             >

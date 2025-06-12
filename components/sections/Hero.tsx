@@ -5,7 +5,6 @@ import AnimatedContent from "@/components/reactbits/AnimatedContent/AnimatedCont
 import TiltedCard from "@/components/reactbits/TiltedCard/TiltedCard";
 import { useTheme } from "@/lib/theme-context";
 import Image from "next/image";
-import { heroData } from "@/data/hero";
 
 // Define your theme color
 const THEME_COLOR_HEX = "#324189";
@@ -13,7 +12,7 @@ const EXCELLENCE_COLOR_HEX = "#FFBF00"; // Amber/Gold for excellence
 
 // Property items for the TiltedCards - now 5 items
 const propertyItems = [
-  { imageSrc: "/images/hero/hero0.jpg", alt: "Hero 1", title: "Hero 1" },
+  { imageSrc: "/images/hero/hero.jpg", alt: "Hero 1", title: "Hero 1" },
   { imageSrc: "/images/projects/Aleta.jpg", alt: "Aleta", title: "Aleta" },
   { imageSrc: "/images/projects/Millennium Park.jpg", alt: "Millennium Park", title: "Millennium Park" },
   { imageSrc: "/images/projects/Laxmi Nova.jpg", alt: "Laxmi Nova", title: "Laxmi Nova" },
@@ -28,9 +27,8 @@ export default function Hero() {
   const titleLine3 = `Brick By Brick`;
   const baseDelaySplitText = 70;
   const overallTextAnimationDelay = 400; // ms, delay for the whole text block fade-in
-  
-  // Use heroData images for the carousel to ensure consistency
-  const carouselImages = heroData.images;
+
+  const carouselImages = propertyItems.map(item => ({ src: item.imageSrc, alt: item.alt }));
 
   return (
     <section className="bg-white dark:bg-black md:min-h-0 flex flex-col md:pt-20 lg:pt-24 md:pb-16 lg:pb-20 overflow-hidden">
