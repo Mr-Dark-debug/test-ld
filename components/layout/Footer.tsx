@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useTheme } from "@/lib/theme-context";
 import Aurora from "../reactbits/Aurora/Aurora";
+import SocialMediaLinks from "../ui/SocialMediaLinks";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -47,7 +48,9 @@ export default function Footer() {
                 </svg>
                 <a href="mailto:info@laxmidevelopers.com" className="text-gray-300 hover:text-white hover:opacity-75 transition-colors duration-300">info@laxmidevelopers.com</a>
               </div>
-              <p className="flex items-center pl-8 text-gray-300">Sunday: Closed</p>
+              <div className="pt-2">
+                <SocialMediaLinks />
+              </div>
             </address>
           </div>
 
@@ -106,7 +109,7 @@ export default function Footer() {
           </div>
 
           {/* Newsletter */}
-          <div className="md:max-w-xs">
+          <div>
             <h3 className={headingClass}>Subscribe</h3>
             <p className="mb-5 text-gray-300 text-base">Stay updated with our latest projects and offers.</p>
             <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
@@ -129,7 +132,7 @@ export default function Footer() {
         </div>
 
         {/* Bottom Section with RERA and Copyright */}
-        <div className="mt-16 border-t border-gray-700/50 pt-8">
+        <div className="mt-16 pt-8 border-t border-gray-800">
           <div className="flex flex-col md:flex-row justify-between items-center">
             {/* RERA Badge - Left */}
             <div className="mb-4 md:mb-0 flex items-center">

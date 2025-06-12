@@ -19,17 +19,44 @@ const HeroImageCarousel: React.FC<HeroImageCarouselProps> = ({
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const autoPlayTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Check if viewport is mobile
+  useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth < 768); // Standard mobile breakpoint
+    };
+    
+    // Check on mount
+    checkIsMobile();
+    
+    // Add event listener for resize
+    window.addEventListener('resize', checkIsMobile);
+    
+    // Cleanup
+    return () => window.removeEventListener('resize', checkIsMobile);
+  }, []);
+
   // Process images to use dark mode versions when available
-  const processedImages = images.map(image => {
-    // Check if this is the first hero image and we're in dark mode
-    if (theme === 'dark' && image.src.includes('/hero/hero0.jpg')) {
-      return {
-        ...image,
-        src: '/images/hero/hero-dark.jpg'
-      };
+  const processedImages = images.map((image, index) => {
+    // Only modify the first image (index 0) for theme adaptation
+    if (index === 0 && image.src.includes('/hero/hero0.jpg')) {
+      // For mobile + dark mode, use the dark version
+      if (isMobile && theme === 'dark') {
+        return {
+          ...image,
+          src: '/images/hero/hero-dark.jpg'
+        };
+      }
+      // For mobile + light mode, ensure we use the original hero0.jpg
+      else if (isMobile && theme === 'light') {
+        return {
+          ...image,
+          src: '/images/hero/hero0.jpg'
+        };
+      }
     }
     return image;
   });
