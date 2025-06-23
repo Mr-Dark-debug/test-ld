@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { Toaster, toast } from 'sonner'
 import { Plus, Search, Filter, Edit, Eye, Trash2, DownloadCloud, Star, Loader2 } from 'lucide-react'
+import { Button } from '@/components/ui/Button' // Import Button
 import { AddEditProjectForm } from '@/app/cms-admin/components/AddEditProjectForm'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -175,16 +176,18 @@ export default function ProjectsList() {
             <h1 className="text-2xl font-bold text-gray-900">Projects</h1>
             <p className="text-gray-600">Manage your real estate projects</p>
           </div>
-          <button
+          <Button
             onClick={() => {
               setEditProjectId(null);
               setShowAddForm(true);
             }}
-            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            // Consider adding a loading state if opening the form is slow,
+            // though typically just setting state is fast.
+            // loading={isLoadingForm}
           >
             <Plus className="w-4 h-4 mr-2" />
             Add New Project
-          </button>
+          </Button>
         </div>
 
         {/* Conditionally render the AddEditProjectForm or the projects list/filters */}
@@ -234,15 +237,16 @@ export default function ProjectsList() {
                     <option value="ongoing">Ongoing</option>
                     <option value="upcoming">Upcoming</option>
                   </select>
-                  <button
+                  <Button
                     type="button"
+                    variant="outline"
                     title="Reset filters"
                     aria-label="Reset all filters"
                     onClick={resetFilters}
-                    className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                    // This button typically doesn't need a loading state as it's client-side filtering
                   >
                     <Filter className="w-4 h-4" />
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>
@@ -258,24 +262,24 @@ export default function ProjectsList() {
               ) : error ? (
                 <div className="p-8 text-center">
                   <p className="text-red-600 mb-4">Error loading projects: {error}</p>
-                  <button
+                  <Button
                     type="button"
                     onClick={() => refetch()}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    loading={loading} // Use the main loading state for refetch
                   >
                     Try Again
-                  </button>
+                  </Button>
                 </div>
               ) : filteredProjects.length === 0 ? (
                 <div className="p-8 text-center">
                   <p className="text-gray-600 mb-4">No projects found matching your criteria.</p>
-                  <button
+                  <Button
                     type="button"
+                    variant="secondary" // Or outline
                     onClick={resetFilters}
-                    className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
                   >
                     Reset Filters
-                  </button>
+                  </Button>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
@@ -343,26 +347,18 @@ export default function ProjectsList() {
                             </span>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <button
+                            <Button
                               type="button"
                               onClick={() => handleToggleFeatured(project._id, project.featured)}
+                              loading={loadingStates.featured[project._id]}
                               disabled={loadingStates.featured[project._id]}
-                              className={`inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full transition-colors ${
-                                project.featured
-                                  ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200'
-                                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                              } ${loadingStates.featured[project._id] ? 'opacity-50 cursor-not-allowed' : ''}`}
+                              variant={project.featured ? 'default' : 'secondary'} // Example: change variant based on state
+                              size="sm"
+                              className={`text-xs ${project.featured ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
                             >
-                              {loadingStates.featured[project._id] ? (
-                                <Loader2 className="w-3 h-3 mr-1 animate-spin" />
-                              ) : (
-                                <Star className={`w-3 h-3 mr-1 ${project.featured ? 'fill-current' : ''}`} />
-                              )}
-                              {loadingStates.featured[project._id]
-                                ? 'Updating...'
-                                : project.featured ? 'Featured' : 'Not Featured'
-                              }
-                            </button>
+                              <Star className={`w-3 h-3 mr-1 ${project.featured ? 'fill-current' : ''}`} />
+                              {project.featured ? 'Featured' : 'Not Featured'}
+                            </Button>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <span className="text-sm text-gray-900">
@@ -376,38 +372,38 @@ export default function ProjectsList() {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center space-x-2">
-                              <Link href={`/projects/${project.slug}`} target="_blank">
-                                <button type="button" className="p-1 text-gray-400 hover:text-blue-600 transition-colors" title="View Project">
-                                  <Eye className="w-4 h-4" />
-                                </button>
+                              <Link href={`/projects/${project.slug}`} target="_blank" passHref>
+                                <Button variant="ghost" size="icon" title="View Project" asChild>
+                                  <a><Eye className="w-4 h-4 text-gray-400 group-hover:text-blue-600" /></a>
+                                </Button>
                               </Link>
-                              <button
+                              <Button
                                 type="button"
+                                variant="ghost"
+                                size="icon"
                                 onClick={() => handleEdit(project._id)}
-                                className="p-1 text-gray-400 hover:text-green-600 transition-colors"
                                 title="Edit Project"
+                                className="text-gray-400 hover:text-green-600"
+                                // Add loading state if opening edit form is async
                               >
                                 <Edit className="w-4 h-4" />
-                              </button>
-                              <button
+                              </Button>
+                              <Button
                                 type="button"
+                                variant="ghost"
+                                size="icon"
                                 onClick={() => handleDelete(project._id)}
+                                loading={loadingStates.delete[project._id]}
                                 disabled={loadingStates.delete[project._id]}
-                                className={`p-1 ${
-                                  loadingStates.delete[project._id]
-                                    ? 'text-gray-400 cursor-not-allowed'
-                                    : confirmDelete === project._id
-                                      ? 'text-red-600'
-                                      : 'text-gray-400 hover:text-red-600'
-                                } transition-colors`}
                                 title={loadingStates.delete[project._id] ? 'Deleting...' : 'Delete Project'}
+                                className={`${
+                                  confirmDelete === project._id && !loadingStates.delete[project._id]
+                                    ? 'text-red-600 animate-pulse' // Keep pulse if confirming but not yet loading
+                                    : 'text-gray-400 hover:text-red-600'
+                                }`}
                               >
-                                {loadingStates.delete[project._id] ? (
-                                  <Loader2 className="w-4 h-4 animate-spin" />
-                                ) : (
-                                  <Trash2 className="w-4 h-4" />
-                                )}
-                              </button>
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
                               {project.brochureUrl && (
                                 <a
                                   href={project.brochureUrl}

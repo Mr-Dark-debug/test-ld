@@ -16,6 +16,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { amenitiesApi } from '@/lib/api'
 import { logActivity } from '@/lib/activity'
 import { AddEditAmenityForm } from '../../components/AddEditAmenityForm'
+import { Button } from '@/components/ui/Button' // Import Button component
 
 // Amenity interface
 interface Amenity {
@@ -155,22 +156,23 @@ export default function AmenitiesList() {
             <p className="text-gray-600">Manage property amenities</p>
           </div>
           <div className="flex gap-2">
-            <button
+            <Button
               onClick={fetchData}
-              className="inline-flex items-center px-3 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-              disabled={loading}
+              variant="outline"
+              loading={loading}
+              disabled={loading} // Keep disabled prop for clarity, Button handles loading internally
             >
-              <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`w-4 h-4 mr-2 ${loading && !showAddForm && !editingAmenityId ? 'animate-spin' : ''}`} />
               Refresh
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => setShowAddForm(true)}
-              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              disabled={loading}
+              disabled={loading} // Keep disabled prop
+              loading={loading && (showAddForm || !!editingAmenityId)} // Show loading if form is opening due to this button
             >
               <Plus className="w-4 h-4 mr-2" />
               Add Amenity
-            </button>
+            </Button>
           </div>
         </div>
         
@@ -233,13 +235,16 @@ export default function AmenitiesList() {
                 : 'Get started by adding your first amenity'}
             </p>
             {!searchQuery && selectedCategoryFilter === 'all' && (
-              <button
+              <Button
                 onClick={() => setShowAddForm(true)}
-                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                // Loading state for this button can be tricky,
+                // as `loading` might be true for initial page load.
+                // We might not need a spinner here if the action is quick (just opening a form).
+                // Or, tie it to a specific state if opening the form involves async work.
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Add Amenity
-              </button>
+              </Button>
             )}
           </div>
         )}
@@ -257,16 +262,22 @@ export default function AmenitiesList() {
                     {renderIcon(amenity.icon)}
                   </div>
                   <div className="flex items-center space-x-2">
-                    <button
+                    <Button
+                      variant="ghost"
+                      size="icon"
                       onClick={() => setEditingAmenityId(amenity._id)}
-                      className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
+                      className="p-1 text-gray-400 hover:text-blue-600"
                       aria-label={`Edit ${amenity.name}`}
+                      // Loading state for edit can be added if opening edit form has async operations
                     >
                       <Edit className="w-4 h-4" />
-                    </button>
-                    <button
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
                       onClick={() => handleDelete(amenity._id)}
-                      className={`p-1 transition-colors ${
+                      loading={loading && confirmDelete === amenity._id} // Show loader when this specific delete is in progress
+                      className={`p-1 ${
                         confirmDelete === amenity._id 
                           ? 'text-red-600 animate-pulse' 
                           : 'text-gray-400 hover:text-red-600'
@@ -276,7 +287,7 @@ export default function AmenitiesList() {
                         : `Delete ${amenity.name}`}
                     >
                       <Trash2 className="w-4 h-4" />
-                    </button>
+                    </Button>
                   </div>
                 </div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-1">

@@ -692,19 +692,11 @@ export function AddEditProjectForm({ projectId, onClose }: AddEditProjectFormPro
             type="submit"
             form="project-form"
             disabled={loading}
+            loading={loading} // Added loading prop
             className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                {isEditing ? 'Updating...' : 'Creating...'}
-              </>
-            ) : (
-              <>
-                <Save className="w-4 h-4 mr-2" />
-                {isEditing ? 'Update Project' : 'Create Project'}
-              </>
-            )}
+            <Save className="w-4 h-4 mr-2" />
+            {isEditing ? 'Update Project' : 'Create Project'}
           </button>
         </div>
       </div>
@@ -1216,19 +1208,11 @@ export function AddEditProjectForm({ projectId, onClose }: AddEditProjectFormPro
           <button
             type="submit"
             disabled={loading}
+            loading={loading} // Added loading prop
             className="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                {isEditing ? 'Updating...' : 'Creating...'}
-              </>
-            ) : (
-              <>
-                <Save className="w-4 h-4 mr-2" />
-                {isEditing ? 'Update Project' : 'Create Project'}
-              </>
-            )}
+            <Save className="w-4 h-4 mr-2" />
+            {isEditing ? 'Update Project' : 'Create Project'}
           </button>
         </div>
       </form>

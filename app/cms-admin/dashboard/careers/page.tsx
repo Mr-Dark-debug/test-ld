@@ -16,7 +16,8 @@ import {
   Trash2,
   MoreHorizontal,
   FileText,
-  Clock
+  Clock,
+  Loader2 // Added Loader2
 } from 'lucide-react';
 import { toast } from 'sonner';
 import Link from 'next/link';
@@ -68,7 +69,8 @@ interface JobApplication {
 export default function CareersManagement() {
   const [jobOpenings, setJobOpenings] = useState<JobOpening[]>([]);
   const [applications, setApplications] = useState<JobApplication[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); // For overall page load
+  const [actionLoadingStates, setActionLoadingStates] = useState<{ [key: string]: boolean }>({}); // For specific button actions
   const [activeTab, setActiveTab] = useState('postings');
 
   // Fetch job openings
@@ -128,7 +130,7 @@ export default function CareersManagement() {
     if (!confirm('Are you sure you want to delete this job opening?')) {
       return;
     }
-
+    setActionLoadingStates(prev => ({ ...prev, [`delete_${id}`]: true }));
     try {
       const token = localStorage.getItem('token');
       const response = await fetch('/api/careers', {
@@ -152,11 +154,14 @@ export default function CareersManagement() {
     } catch (error) {
       console.error('Error deleting job opening:', error);
       toast.error('Failed to delete job opening');
+    } finally {
+      setActionLoadingStates(prev => ({ ...prev, [`delete_${id}`]: false }));
     }
   };
 
   // Toggle job opening status
   const toggleJobStatus = async (id: string, isActive: boolean) => {
+    setActionLoadingStates(prev => ({ ...prev, [`status_${id}`]: true }));
     try {
       const token = localStorage.getItem('token');
       const response = await fetch('/api/careers', {
@@ -180,6 +185,8 @@ export default function CareersManagement() {
     } catch (error) {
       console.error('Error updating job status:', error);
       toast.error('Failed to update job status');
+    } finally {
+      setActionLoadingStates(prev => ({ ...prev, [`status_${id}`]: false }));
     }
   };
 
@@ -333,20 +340,24 @@ export default function CareersManagement() {
                           variant="outline"
                           size="sm"
                           onClick={() => toggleJobStatus(job._id, job.isActive)}
+                          loading={actionLoadingStates[`status_${job._id}`]}
+                          disabled={actionLoadingStates[`status_${job._id}`]}
                         >
                           {job.isActive ? "Deactivate" : "Activate"}
                         </Button>
-                        <Button variant="outline" size="sm" asChild>
+                        <Button variant="outline" size="sm" asChild disabled={actionLoadingStates[`edit_${job._id}`]}>
                           <Link href={`/cms-admin/dashboard/careers/edit/${job._id}`}>
                             <Edit className="h-4 w-4 mr-1" />
                             Edit
                           </Link>
                         </Button>
                         <Button
-                          variant="outline"
+                          variant="destructive" // Changed to destructive for delete
                           size="sm"
                           onClick={() => deleteJobOpening(job._id)}
-                          className="text-red-600 hover:text-red-700"
+                          loading={actionLoadingStates[`delete_${job._id}`]}
+                          disabled={actionLoadingStates[`delete_${job._id}`]}
+                          className="hover:bg-red-700" // Ensure hover styles if needed
                         >
                           <Trash2 className="h-4 w-4 mr-1" />
                           Delete
