@@ -183,7 +183,8 @@ export default function BlogsPage() {
             Insights & Stories
           </AnimatedTitle>
           <p className="text-lg md:text-xl text-foreground/70 max-w-2xl mx-auto">
-            Stay updated with the latest news, trends, and insights from Laxmi Developers and the real estate world.
+            Welcome to the Laxmi Developers blog, your source for valuable insights, company news, and the latest trends in the real estate industry.
+            Discover expert advice, learn about our community involvement, and explore the stories behind our innovative projects.
           </p>
         </div>
       </section>

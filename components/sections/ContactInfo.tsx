@@ -118,7 +118,7 @@ export default function ContactInfo({
         {/* Section Header */}
         {(title || subtitle) && (
           <div className="text-center mb-16">
-            {title && <h2 className="text-3xl md:text-4xl font-display mb-4">{title}</h2>}
+            {title && <h1 className="text-3xl md:text-4xl lg:text-5xl font-display mb-4">{title}</h1>}
             {subtitle && (
               <p className="text-lg text-foreground/70 max-w-2xl mx-auto">
                 {subtitle}

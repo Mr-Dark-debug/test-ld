@@ -231,6 +231,12 @@ function ProjectsContent() {
         <p className="text-lg md:text-xl text-foreground/70 dark:text-gray-300/80 max-w-2xl mx-auto">
           Discover a diverse portfolio of residential and commercial properties tailored to your needs.
         </p>
+        {/* New paragraph for added content */}
+        <p className="text-md md:text-lg text-foreground/60 dark:text-gray-400/80 max-w-2xl mx-auto mt-4">
+          Whether you're looking for a dream home, a strategic commercial space, or a promising investment,
+          our projects are designed with quality, innovation, and customer satisfaction in mind.
+          Use the filters below to narrow down your search by category, status, or location.
+        </p>
       </section>
 
       {/* Search and Filters Section - Fixed at top with better sticky behavior */}

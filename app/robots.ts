@@ -16,16 +16,17 @@ export default function robots(): MetadataRoute.Robots {
           '/contact',
           '/career',
           '/information',
+          '/_next/static/', // Allow access to static assets
+          '/_next/image/',  // Allow access to optimized images
         ],
         disallow: [
           '/cms-admin/',
           '/api/',
-          '/_next/',
           '/admin/',
-          '*.json$',
-          '*.xml$',
+          // '*.json$', // Allowing sitemap.xml, removing this generally. If specific JSONs need disallowing, add them.
+          // '*.xml$', // Specifically allowing sitemap.xml by removing this.
         ],
-        crawlDelay: 1,
+        // crawlDelay: 1, // crawl-delay is not officially supported by Google, removing.
       },
     ],
     sitemap: `${baseUrl}/sitemap.xml`,

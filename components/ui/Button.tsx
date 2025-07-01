@@ -1,6 +1,7 @@
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
+import { Loader2 } from "lucide-react" // Added Loader2 icon
 
 import { cn } from "@/lib/utils"
 
@@ -37,20 +38,45 @@ export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean
+  loading?: boolean // Added loading prop
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
-    const Comp = asChild ? Slot : "button"
+  ({ className, variant, size, asChild = false, loading = false, children, ...props }, ref) => {
+    const Comp = asChild ? Slot : "button";
+
+    if (asChild) {
+      // When asChild is true, Slot expects 'children' to be a single ReactElement.
+      // We pass 'children' directly. The 'loading' visual (spinner) is not rendered by Button itself in this mode.
+      // The disabled state, affected by 'loading', is passed to the child component via merged props by Slot.
+      return (
+        <Comp
+          className={cn(buttonVariants({ variant, size, className }))}
+          ref={ref}
+          // Pass down the effective disabled state. Slot will merge this onto its child.
+          // Other props from {...props} are also passed and merged.
+          disabled={loading || props.disabled}
+          {...props}
+        >
+          {children}
+        </Comp>
+      );
+    }
+
+    // Default behavior for regular button (Comp is "button")
     return (
-      <Comp
+      <Comp // This will be <button>
         className={cn(buttonVariants({ variant, size, className }))}
         ref={ref}
+        disabled={loading || props.disabled}
         {...props}
-      />
-    )
-  },
-)
-Button.displayName = "Button"
+      >
+        {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+        {children}
+      </Comp>
+    );
+  }
+);
+Button.displayName = "Button";
 
-export { Button, buttonVariants }
+export { Button, buttonVariants };

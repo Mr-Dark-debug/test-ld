@@ -7,61 +7,61 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Static pages
   const staticPages: MetadataRoute.Sitemap = [
     {
-      url: baseUrl,
+      url: new URL('/', baseUrl).toString(),
       lastModified: currentDate,
       changeFrequency: 'weekly',
       priority: 1.0,
     },
     {
-      url: `${baseUrl}/projects`,
+      url: new URL('/projects', baseUrl).toString(),
       lastModified: currentDate,
       changeFrequency: 'weekly',
       priority: 0.9,
     },
     {
-      url: `${baseUrl}/about-us`,
+      url: new URL('/about-us', baseUrl).toString(),
       lastModified: currentDate,
       changeFrequency: 'monthly',
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/why-laxmi`,
+      url: new URL('/why-laxmi', baseUrl).toString(),
       lastModified: currentDate,
       changeFrequency: 'monthly',
       priority: 0.7,
     },
     {
-      url: `${baseUrl}/blogs`,
+      url: new URL('/blogs', baseUrl).toString(),
       lastModified: currentDate,
       changeFrequency: 'weekly',
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/contact`,
+      url: new URL('/contact', baseUrl).toString(),
       lastModified: currentDate,
       changeFrequency: 'monthly',
       priority: 0.6,
     },
     {
-      url: `${baseUrl}/career`,
+      url: new URL('/career', baseUrl).toString(),
       lastModified: currentDate,
       changeFrequency: 'monthly',
       priority: 0.6,
     },
     {
-      url: `${baseUrl}/information`,
+      url: new URL('/information', baseUrl).toString(),
       lastModified: currentDate,
       changeFrequency: 'monthly',
       priority: 0.5,
     },
     {
-      url: `${baseUrl}/information/emi-calculator`,
+      url: new URL('/information/emi-calculator', baseUrl).toString(),
       lastModified: currentDate,
       changeFrequency: 'monthly',
       priority: 0.5,
     },
     {
-      url: `${baseUrl}/information/why-invest`,
+      url: new URL('/information/why-invest', baseUrl).toString(),
       lastModified: currentDate,
       changeFrequency: 'monthly',
       priority: 0.5,
@@ -80,7 +80,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       const projectsData = await projectsResponse.json()
       if (projectsData.success && projectsData.data) {
         const projectPages: MetadataRoute.Sitemap = projectsData.data.map((project: any) => ({
-          url: `${baseUrl}/projects/${project.slug}`,
+          url: new URL(`/projects/${project.slug}`, baseUrl).toString(),
           lastModified: project.updatedAt ? new Date(project.updatedAt) : currentDate,
           changeFrequency: 'monthly' as const,
           priority: 0.7,
@@ -100,7 +100,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       const blogsData = await blogsResponse.json()
       if (blogsData.success && blogsData.data) {
         const blogPages: MetadataRoute.Sitemap = blogsData.data.map((blog: any) => ({
-          url: `${baseUrl}/blogs/${blog.slug}`,
+          url: new URL(`/blogs/${blog.slug}`, baseUrl).toString(),
           lastModified: blog.updatedAt ? new Date(blog.updatedAt) : currentDate,
           changeFrequency: 'monthly' as const,
           priority: 0.6,
