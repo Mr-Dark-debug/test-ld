@@ -39,11 +39,9 @@ export interface IProject extends Document {
   coverImage?: string;
   contactSales?: string;
   floorPlans: {
-    '1bhk': string[];
     '2bhk': string[];
     '3bhk': string[];
     '4bhk': string[];
-    '5bhk': string[];
   };
   featured: boolean;
   seoMeta?: {
@@ -159,11 +157,9 @@ const ProjectSchema = new Schema<IProject>({
     default: ''
   },
   floorPlans: {
-    '1bhk': [String],
     '2bhk': [String],
     '3bhk': [String],
-    '4bhk': [String],
-    '5bhk': [String]
+    '4bhk': [String]
   },
   featured: {
     type: Boolean,

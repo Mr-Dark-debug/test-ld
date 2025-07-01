@@ -1,36 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { withAuth, withErrorHandling, withCors, AuthenticatedRequest } from '@/middleware/auth';
-import { 
-  parseFormData, 
-  validateFile, 
-  generateFileName, 
-  processImage, 
-  saveFile, 
-  createThumbnail,
-  FILE_CONFIGS 
-} from '@/lib/upload';
+import {
+  parseFormData,
+  validateFile,
+  processAndSaveImage
+} from '@/lib/mongodb-upload';
 
-// POST /api/upload - Upload files (admin only)
+// POST /api/upload - Upload images (admin only)
 async function uploadHandler(req: AuthenticatedRequest) {
   try {
     const { fields, files } = await parseFormData(req);
-    const uploadType = fields.type || 'image'; // image, brochure, video
-    const generateThumbnails = fields.thumbnails === 'true';
-    
-    if (!['image', 'brochure', 'video'].includes(uploadType)) {
+    const uploadType = fields.type || 'image';
+
+    // Only support image uploads now
+    if (uploadType !== 'image') {
       return NextResponse.json(
-        { error: 'Invalid upload type. Must be image, brochure, or video' },
+        { error: 'Only image uploads are supported. Use URL links for other file types.' },
         { status: 400 }
       );
     }
 
     const uploadedFiles = [];
-    
+
     // Process each file
     for (const [fieldName, fileArray] of Object.entries(files)) {
       for (const file of fileArray) {
         // Validate file
-        const validation = validateFile(file, uploadType as keyof typeof FILE_CONFIGS);
+        const validation = validateFile(file);
         if (!validation.valid) {
           return NextResponse.json(
             { error: validation.error },
@@ -38,38 +34,37 @@ async function uploadHandler(req: AuthenticatedRequest) {
           );
         }
 
-        // Generate unique filename
-        const filename = generateFileName(file.filename, uploadType);
-        
-        let filePath: string;
-        let thumbnailPath: string | null = null;
-
-        if (uploadType === 'image') {
-          // Process and optimize image
-          filePath = await processImage(file.buffer, filename, {
+        // Process and save image to MongoDB
+        const result = await processAndSaveImage(
+          file.buffer,
+          file.filename,
+          file.mimetype,
+          file.size,
+          req.user!.userId,
+          {
             width: 1920,
             height: 1080,
             quality: 85,
             format: 'webp'
-          });
-
-          // Generate thumbnail if requested
-          if (generateThumbnails) {
-            thumbnailPath = await createThumbnail(file.buffer, filename, 300);
           }
-        } else {
-          // Save file as-is for brochures and videos
-          filePath = await saveFile(file.buffer, filename, uploadType as keyof typeof FILE_CONFIGS);
+        );
+
+        if (!result.success) {
+          return NextResponse.json(
+            { error: result.error || 'Failed to upload image' },
+            { status: 500 }
+          );
         }
 
         uploadedFiles.push({
           fieldName,
           originalName: file.filename,
-          filename,
-          path: filePath,
-          thumbnailPath,
+          filename: result.imageId,
+          path: result.url,
+          thumbnailPath: null,
           size: file.size,
-          type: file.mimetype
+          type: file.mimetype,
+          imageId: result.imageId
         });
       }
     }
@@ -89,39 +84,38 @@ async function uploadHandler(req: AuthenticatedRequest) {
   }
 }
 
-// DELETE /api/upload - Delete file (admin only)
+// DELETE /api/upload - Delete image (admin only)
 async function deleteFileHandler(req: AuthenticatedRequest) {
   try {
     const body = await req.json();
-    const { filePath } = body;
+    const { imageId } = body;
 
-    if (!filePath) {
+    if (!imageId) {
       return NextResponse.json(
-        { error: 'File path is required' },
+        { error: 'Image ID is required' },
         { status: 400 }
       );
     }
 
-    // Import deleteFile function
-    const { deleteFile } = await import('@/lib/upload');
-    const deleted = await deleteFile(filePath);
+    const { deleteImage } = await import('@/lib/mongodb-upload');
+    const deleted = await deleteImage(imageId);
 
     if (!deleted) {
       return NextResponse.json(
-        { error: 'Failed to delete file' },
+        { error: 'Failed to delete image' },
         { status: 500 }
       );
     }
 
     return NextResponse.json({
       success: true,
-      message: 'File deleted successfully'
+      message: 'Image deleted successfully'
     });
 
   } catch (error) {
-    console.error('Delete file error:', error);
+    console.error('Delete image error:', error);
     return NextResponse.json(
-      { error: 'Failed to delete file' },
+      { error: 'Failed to delete image' },
       { status: 500 }
     );
   }

@@ -1,13 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import BlogPost from '@/models/BlogPost';
+import User from '@/models/User'; // Import User model to ensure it's registered
+import { ensureModelsRegistered } from '@/lib/models';
 import { validateRequest, updateBlogSchema } from '@/lib/validation';
 import { withAuth, withErrorHandling, withCors, AuthenticatedRequest } from '@/middleware/auth';
 import mongoose from 'mongoose';
 
 // GET /api/blogs/[slug] - Get single blog post by slug or ID
 async function getBlogHandler(req: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
-  await connectDB();
+  try {
+    await connectDB();
+    // Ensure all models are registered
+    ensureModelsRegistered();
+  } catch (error) {
+    console.error('Database connection failed:', error);
+    return NextResponse.json(
+      {
+        success: false,
+        error: 'Database connection failed. Please try again.',
+        details: process.env.NODE_ENV === 'development' ? error : undefined
+      },
+      { status: 500 }
+    );
+  }
 
   try {
     const { slug } = await params;

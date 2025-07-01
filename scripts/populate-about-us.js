@@ -81,7 +81,7 @@ const aboutUsData = {
       {
         title: "Business Hub",
         category: "Commercial",
-        image: "/images/projects/MillenniumBusinessHub.jpg"
+        image: "/images/projects/Millennium Business Hub.jpg"
       },
       {
         title: "Laxmi Nova",

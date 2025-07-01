@@ -5,18 +5,15 @@ export interface Project {
   _id: string;
   title: string;
   slug: string;
-  type: 'residential' | 'commercial';
+  category: 'residential' | 'commercial';
   status: 'ongoing' | 'completed' | 'upcoming';
   description: string;
   coverImage?: string; // Direct cover image field
   location: {
-    address: string;
-    city: string;
-    state: string;
-    coordinates: {
-      lat: number;
-      lng: number;
-    };
+    address?: string;
+    lat?: string;
+    lng?: string;
+    mapEmbedUrl?: string;
   };
   images: {
     coverImage?: string;
@@ -47,11 +44,9 @@ export interface Project {
   brochureUrl?: string;
   contactSales: string;
   floorPlans: {
-    '1bhk': string[];
     '2bhk': string[];
     '3bhk': string[];
     '4bhk': string[];
-    '5bhk': string[];
   };
   featured: boolean;
   seoMeta?: {
@@ -221,9 +216,9 @@ export function transformProjectForComponent(project: Project) {
   return {
     id: project._id,
     title: project.title,
-    type: project.type,
+    type: project.category, // Map category to type for component compatibility
     status: project.status,
-    location: `${project.location.city}, ${project.location.state}`,
+    location: project.location?.address || 'Location not specified',
     imageSrc: coverImage,
     href: `/projects/${project.slug}`
   };

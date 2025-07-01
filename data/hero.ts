@@ -16,16 +16,20 @@ export const heroData = {
   backgroundType: "carousel" as const,
   images: [
     {
-      src: "/images/hero/hero-1.jpg",
+      src: "/images/hero/hero0.jpg",
       alt: "Luxury residential building by Laxmi Developers",
     },
     {
-      src: "/images/hero/hero-2.jpg",
+      src: "/images/hero/hero-1.jpg",
       alt: "Modern commercial complex developed by Laxmi Developers",
     },
     {
-      src: "/images/projects/Millennium Park.jpg",
+      src: "/images/hero/hero-2.jpg",
       alt: "Premium apartment by Laxmi Developers",
+    },
+    {
+      src: "/images/projects/Millennium Park.jpg",
+      alt: "Featured project by Laxmi Developers",
     },
   ],
 }; 

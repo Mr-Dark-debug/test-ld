@@ -23,8 +23,52 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'https://www.laxmideveloper.com'),
   title: "Laxmi Developers - Surat | Real Estate & Construction",
   description: "Discover premium residential and commercial properties by Laxmi Developers in Surat. Building excellence with quality, innovation, and customer satisfaction for over 20 years.",
+  keywords: ["Laxmi Developers", "Surat Real Estate", "Residential Properties", "Commercial Properties", "Construction Company", "Property Developer", "Gujarat Real Estate"],
+  authors: [{ name: "Laxmi Developers" }],
+  creator: "Laxmi Developers",
+  publisher: "Laxmi Developers",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'en_IN',
+    url: 'https://www.laxmideveloper.com',
+    siteName: 'Laxmi Developers',
+    title: 'Laxmi Developers - Premium Real Estate in Surat',
+    description: 'Discover premium residential and commercial properties by Laxmi Developers in Surat. Building excellence with quality, innovation, and customer satisfaction.',
+    images: [
+      {
+        url: '/images/logo/logo.png',
+        width: 1200,
+        height: 630,
+        alt: 'Laxmi Developers Logo',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Laxmi Developers - Premium Real Estate in Surat',
+    description: 'Discover premium residential and commercial properties by Laxmi Developers in Surat.',
+    images: ['/images/logo/logo.png'],
+  },
+  verification: {
+    google: 'your-google-verification-code', // Add your Google Search Console verification code
+  },
+  alternates: {
+    canonical: process.env.NEXT_PUBLIC_BASE_URL || 'https://www.laxmideveloper.com',
+  },
 };
 
 export default function RootLayout({

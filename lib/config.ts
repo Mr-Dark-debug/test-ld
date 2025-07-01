@@ -58,11 +58,11 @@ export const VALIDATION_CONFIG = {
 
 // MongoDB Connection Options
 export const MONGODB_OPTIONS = {
-  bufferCommands: true,
-  connectTimeoutMS: 30000,
-  socketTimeoutMS: 45000,
-  serverSelectionTimeoutMS: 30000,
-  maxPoolSize: 10,
+  bufferCommands: false, // Disable mongoose buffering for better error handling
+  connectTimeoutMS: 10000, // Reduced from 30s to 10s
+  socketTimeoutMS: 20000, // Reduced from 45s to 20s
+  serverSelectionTimeoutMS: 10000, // Reduced from 30s to 10s
+  maxPoolSize: 5, // Reduced from 10 to 5 for production
   minPoolSize: 1,
   retryWrites: true,
   retryReads: true,

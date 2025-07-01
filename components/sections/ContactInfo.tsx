@@ -5,6 +5,7 @@ import { ShimmerButton } from "@/components/magicui/shimmer-button";
 import useAnalytics from "@/hooks/useAnalytics";
 import { getApiUrl } from "@/lib/config";
 import PhoneInput from "@/components/ui/phone-input";
+import SocialMediaLinks from "@/components/ui/SocialMediaLinks";
 
 interface ContactInfoProps {
   title?: string;
@@ -117,7 +118,7 @@ export default function ContactInfo({
         {/* Section Header */}
         {(title || subtitle) && (
           <div className="text-center mb-16">
-            {title && <h2 className="text-3xl md:text-4xl font-display mb-4">{title}</h2>}
+            {title && <h1 className="text-3xl md:text-4xl lg:text-5xl font-display mb-4">{title}</h1>}
             {subtitle && (
               <p className="text-lg text-foreground/70 max-w-2xl mx-auto">
                 {subtitle}
@@ -367,6 +368,33 @@ export default function ContactInfo({
                         </p>
                       ))}
                     </div>
+                  </div>
+                </div>
+
+                <div className="flex items-start">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6 text-highlight mt-1 flex-shrink-0"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M10.172 13.828a4 4 0 015.656 0l4 4a4 4 0 01-5.656 5.656l-1.102-1.101"
+                    />
+                  </svg>
+                  <div className="ml-4">
+                    <h4 className="text-base font-medium mb-1">Follow Us</h4>
+                    <SocialMediaLinks iconColor="text-foreground/70 hover:text-highlight" />
                   </div>
                 </div>
               </div>

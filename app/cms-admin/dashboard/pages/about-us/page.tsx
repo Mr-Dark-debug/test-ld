@@ -107,7 +107,7 @@ const defaultContent: AboutUsContent = {
       {
         title: 'Business Hub',
         category: 'Commercial',
-        image: '/images/projects/MillenniumBusinessHub.jpg'
+        image: '/images/projects/Millennium Business Hub.jpg'
       },
       {
         title: 'Laxmi Nova',
@@ -117,7 +117,7 @@ const defaultContent: AboutUsContent = {
     ]
   },
   ctaSection: {
-    title: 'Ready to Start Your Journey',
+    title: 'Ready to Start Your Journey?',
     description: 'Let us help you find your perfect space or investment opportunity.',
     primaryButton: {
       text: 'Contact Us',

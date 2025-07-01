@@ -3,6 +3,8 @@ import SplitText from "@/components/reactbits/SplitText/SplitText";
 import HeroImageCarousel from "@/components/ui/HeroImageCarousel";
 import AnimatedContent from "@/components/reactbits/AnimatedContent/AnimatedContent";
 import TiltedCard from "@/components/reactbits/TiltedCard/TiltedCard";
+import { useTheme } from "@/lib/theme-context";
+import Image from "next/image";
 
 // Define your theme color
 const THEME_COLOR_HEX = "#324189";
@@ -10,7 +12,7 @@ const EXCELLENCE_COLOR_HEX = "#FFBF00"; // Amber/Gold for excellence
 
 // Property items for the TiltedCards - now 5 items
 const propertyItems = [
-  { imageSrc: "/images/hero/hero-1.jpg", alt: "Hero 1", title: "Hero 1" },
+  { imageSrc: "/images/hero/hero.jpg", alt: "Hero 1", title: "Hero 1" },
   { imageSrc: "/images/projects/Aleta.jpg", alt: "Aleta", title: "Aleta" },
   { imageSrc: "/images/projects/Millennium Park.jpg", alt: "Millennium Park", title: "Millennium Park" },
   { imageSrc: "/images/projects/Laxmi Nova.jpg", alt: "Laxmi Nova", title: "Laxmi Nova" },
@@ -24,7 +26,7 @@ export default function Hero() {
   const titleLine2 = `Building Excellence`;
   const titleLine3 = `Brick By Brick`;
   const baseDelaySplitText = 70;
-  const overallTextAnimationDelay = 500; // ms, delay for the whole text block fade-in
+  const overallTextAnimationDelay = 400; // ms, delay for the whole text block fade-in
 
   const carouselImages = propertyItems.map(item => ({ src: item.imageSrc, alt: item.alt }));
 
@@ -33,31 +35,38 @@ export default function Hero() {
       {/* Mobile Layout: Carousel + Text Block (height determined by content) */}
       <div className="md:hidden flex flex-col w-full"> {/* Removed h-screen, height now from content */}
         <div className="h-[70vh] w-full">
-          <HeroImageCarousel images={carouselImages} interval={5000} />
+          <HeroImageCarousel images={carouselImages} interval={2000} />
         </div>
         <div className="flex flex-col justify-center items-center p-6 py-8 text-center bg-background dark:bg-black flex-shrink-0"> {/* Increased py-8 for a bit more breathing room for text */}
-          <AnimatedContent distance={0} delay={overallTextAnimationDelay} direction="vertical"> 
-            <SplitText
-              text={titleLine1}
-              className="text-3xl font-serif leading-tight text-gray-900 dark:text-white block mb-1"
-              delay={baseDelaySplitText}
-              textAlign="center"
-              animationFrom={{ opacity: 0, transform: 'translate3d(0,20px,0)' }}
-              animationTo={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
-            />
-            <div style={{ color: THEME_COLOR_HEX }}>
+          <AnimatedContent distance={0} delay={overallTextAnimationDelay} direction="vertical">
+            {/* Corrected H1 structure for mobile */}
+            <h1 className="font-serif leading-tight text-gray-900 dark:text-white text-center">
               <SplitText
-                text={titleLine2}
-                className="text-2xl font-serif leading-tight block mb-1"
+                text={titleLine1}
+                className="text-3xl block mb-1"
                 delay={baseDelaySplitText}
                 textAlign="center"
                 animationFrom={{ opacity: 0, transform: 'translate3d(0,20px,0)' }}
                 animationTo={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
               />
-            </div>
-            <p className="text-3xl font-serif leading-tight text-gray-900 dark:text-white block">
-              {titleLine3}
-            </p>
+              <SplitText
+                text={titleLine2}
+                className="text-2xl block mb-1"
+                style={{ color: THEME_COLOR_HEX }}
+                delay={baseDelaySplitText}
+                textAlign="center"
+                animationFrom={{ opacity: 0, transform: 'translate3d(0,20px,0)' }}
+                animationTo={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
+              />
+              <SplitText
+                text={titleLine3}
+                className="text-3xl block"
+                delay={baseDelaySplitText}
+                textAlign="center"
+                animationFrom={{ opacity: 0, transform: 'translate3d(0,20px,0)' }}
+                animationTo={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
+              />
+            </h1>
           </AnimatedContent>
         </div>
       </div>
@@ -65,30 +74,35 @@ export default function Hero() {
       {/* Desktop Layout - Text part */}
       <div className="hidden md:flex md:flex-col md:justify-center container mx-auto px-4 sm:px-6 lg:px-8 flex-grow py-10">
         <div className="text-center relative">
-          <AnimatedContent distance={0} delay={overallTextAnimationDelay} direction="vertical"> 
-            <div className="relative z-10 max-w-4xl mx-auto">
+          <AnimatedContent distance={0} delay={overallTextAnimationDelay} direction="vertical">
+            {/* H1 structure for desktop */}
+            <h1 className="font-serif leading-tight text-gray-900 dark:text-white text-center">
               <SplitText
                 text={titleLine1}
-                className="text-4xl sm:text-5xl md:text-6xl lg:text-[68px] font-serif leading-tight text-gray-900 dark:text-white block mb-2 sm:mb-3"
+                className="text-4xl sm:text-5xl md:text-6xl lg:text-[68px] block mb-2 sm:mb-3"
                 delay={baseDelaySplitText}
                 textAlign="center"
                 animationFrom={{ opacity: 0, transform: 'translate3d(0,30px,0)' }}
                 animationTo={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
               />
-              <div style={{ color: THEME_COLOR_HEX }}>
-                <SplitText
-                  text={titleLine2}
-                  className="text-3xl sm:text-4xl md:text-5xl lg:text-[58px] font-serif leading-tight block mb-2 sm:mb-3"
-                  delay={baseDelaySplitText}
-                  textAlign="center"
-                  animationFrom={{ opacity: 0, transform: 'translate3d(0,30px,0)' }}
-                  animationTo={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
-                />
-              </div>
-              <p className="text-4xl sm:text-5xl md:text-6xl lg:text-[68px] font-serif leading-tight text-gray-900 dark:text-white block">
-                {titleLine3}
-              </p>
-            </div>
+              <SplitText
+                text={titleLine2}
+                className="text-3xl sm:text-4xl md:text-5xl lg:text-[58px] block mb-2 sm:mb-3"
+                style={{ color: THEME_COLOR_HEX }}
+                delay={baseDelaySplitText}
+                textAlign="center"
+                animationFrom={{ opacity: 0, transform: 'translate3d(0,30px,0)' }}
+                animationTo={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
+              />
+              <SplitText
+                text={titleLine3}
+                className="text-4xl sm:text-5xl md:text-6xl lg:text-[68px] block"
+                delay={baseDelaySplitText}
+                textAlign="center"
+                animationFrom={{ opacity: 0, transform: 'translate3d(0,30px,0)' }}
+                animationTo={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
+              />
+            </h1>
           </AnimatedContent>
         </div>
       </div>

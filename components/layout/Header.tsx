@@ -11,28 +11,28 @@ import { usePathname } from 'next/navigation';
 
 // Reorganized navigation items with two main categories
 const navItems = [
-  { 
+  {
     title: "Our Projects",
-    href: "/projects",
+    href: null, // No direct navigation - only dropdown
     submenu: [
-      { title: "Residential", href: "/residential", 
+      { title: "Residential", href: "/projects?type=residential",
         submenu: [
-          { title: "On-Going Projects", href: "/residential/on-going" },
-          { title: "Completed Projects", href: "/residential/completed" },
-        ] 
+          { title: "On-Going Projects", href: "/projects?type=residential&status=ongoing" },
+          { title: "Completed Projects", href: "/projects?type=residential&status=completed" },
+        ]
       },
-      { title: "Commercial", href: "/commercial", 
+      { title: "Commercial", href: "/projects?type=commercial",
         submenu: [
-          { title: "On-Going Projects", href: "/commercial/on-going" },
-          { title: "Completed Projects", href: "/commercial/completed" },
-          { title: "Up-Coming Projects", href: "/commercial/upcoming" },
-        ] 
+          { title: "On-Going Projects", href: "/projects?type=commercial&status=ongoing" },
+          { title: "Completed Projects", href: "/projects?type=commercial&status=completed" },
+          { title: "Up-Coming Projects", href: "/projects?type=commercial&status=upcoming" },
+        ]
       },
     ],
   },
-  { 
+  {
     title: "Our Story",
-    href: "/about-us",
+    href: null, // No direct navigation - only dropdown
     submenu: [
       { title: "About Us", href: "/about-us" },
       { title: "Why Laxmi?", href: "/why-laxmi" },
@@ -41,7 +41,7 @@ const navItems = [
         submenu: [
           { title: "EMI Calculator", href: "/information/emi-calculator" },
           { title: "Why Invest?", href: "/information/why-invest" },
-        ] 
+        ]
       },
       { title: "Contact", href: "/contact" },
       { title: "Career", href: "/career" },
@@ -231,7 +231,7 @@ export default function Header() {
                         active={active}
                         item={item.title}
                         href={item.href}
-                    >
+                      >
                         {item.submenu && renderNestedSubmenu(item.submenu)}
                       </MenuItem>
                     </div>

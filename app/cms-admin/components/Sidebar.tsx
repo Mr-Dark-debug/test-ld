@@ -190,21 +190,33 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname() || ''
   const { user } = useAuth()
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null)
+  const [initialLoad, setInitialLoad] = useState(true)
 
   // Get navigation items based on user role
   const navigation = user ? getNavigationItems(user.role) : [];
 
+  // Set initial open submenu based on current path (only on first load)
   useEffect(() => {
-    navigation.forEach(item => {
-      if (item.submenu && item.submenuItems?.some(subItem =>
-        pathname === subItem.href || pathname.startsWith(`${subItem.href}/`))) {
-        setOpenSubmenu(item.name);
-      }
-    });
-  }, [pathname, navigation]);
-  
+    if (initialLoad && navigation.length > 0) {
+      navigation.forEach(item => {
+        if (item.submenu && item.submenuItems?.some(subItem =>
+          pathname === subItem.href || pathname.startsWith(`${subItem.href}/`))) {
+          setOpenSubmenu(item.name);
+        }
+      });
+      setInitialLoad(false);
+    }
+  }, [pathname, navigation, initialLoad]);
+
   const toggleSubmenu = (name: string) => {
-    setOpenSubmenu(openSubmenu === name ? null : name)
+    // Always close the current submenu if it's the same, otherwise open the new one
+    setOpenSubmenu(prevOpen => prevOpen === name ? null : name)
+  }
+
+  // Close sidebar on mobile when navigating to a page
+  const handleNavigation = () => {
+    // Close sidebar on mobile when navigating
+    onClose();
   }
 
   const isCurrentPath = (itemPath: string) => {
@@ -290,7 +302,15 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                     <>
                       <button
                         onClick={() => toggleSubmenu(item.name)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            toggleSubmenu(item.name);
+                          }
+                        }}
                         className={`group flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-lg transition-colors ${isActive ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'}`}
+                        aria-expanded={openSubmenu === item.name}
+                        aria-controls={`submenu-${item.name.toLowerCase().replace(/\s+/g, '-')}`}
                       >
                         <div className="flex items-center">
                           <item.icon className="mr-3 h-5 w-5 flex-shrink-0" />
@@ -303,13 +323,18 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                         )}
                       </button>
                       {openSubmenu === item.name && (
-                        <div className="ml-6 mt-1 space-y-1">
+                        <div
+                          className="ml-6 mt-1 space-y-1"
+                          id={`submenu-${item.name.toLowerCase().replace(/\s+/g, '-')}`}
+                          role="menu"
+                        >
                           {item.submenuItems?.map((subItem) => {
                             const isSubItemActive = isCurrentPath(subItem.href);
                             return (
                               <Link
                                 key={subItem.name}
                                 href={subItem.href}
+                                onClick={handleNavigation}
                                 className={`group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${isSubItemActive ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-700' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'}`}
                               >
                                 <subItem.icon className="mr-3 h-4 w-4 flex-shrink-0" />
@@ -324,6 +349,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                     item.href && (
                       <Link
                         href={item.href}
+                        onClick={handleNavigation}
                         className={`group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${isCurrentPath(item.href) ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-700' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'}`}
                       >
                         <item.icon className="mr-3 h-5 w-5 flex-shrink-0" />

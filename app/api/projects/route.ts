@@ -45,7 +45,7 @@ async function getProjectsHandler(req: AuthenticatedRequest) {
     } else {
       // Apply other filters only if not searching by ID
       if (type && ['residential', 'commercial'].includes(type)) {
-        query.type = type;
+        query.category = type; // Map type parameter to category field in database
       }
 
       if (status && ['ongoing', 'completed', 'upcoming'].includes(status)) {
@@ -164,11 +164,9 @@ async function createProjectHandler(req: AuthenticatedRequest) {
         flooring: validatedData.specifications?.flooring || ''
       },
       floorPlans: {
-        '1bhk': [],
-        '2bhk': [],
+        '2bhk': validatedData.floorPlans?.['2bhk'] || [],
         '3bhk': validatedData.floorPlans?.['3bhk'] || [],
-        '4bhk': validatedData.floorPlans?.['4bhk'] || [],
-        '5bhk': validatedData.floorPlans?.['5bhk'] || []
+        '4bhk': validatedData.floorPlans?.['4bhk'] || []
       },
       amenities: validatedData.amenities || [],
       reraNumber: validatedData.reraNumber || '',

@@ -10,7 +10,7 @@ export const metricsData = [
     icon: <Building size={32} />,
   },
   {
-    value: "14500+",
+    value: "15000+",
     label: "Lives Impacted",
     icon: <Home size={32} />,
   },

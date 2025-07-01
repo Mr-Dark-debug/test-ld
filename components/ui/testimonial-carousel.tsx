@@ -137,23 +137,36 @@ const TestimonialSlide = ({ testimonial, index, current, handleSlideClick, total
 
       // Function to be called when YouTube API is ready
       const onYouTubeIframeAPIReady = () => {
-        if (!iframeRef.current) return;
-        
-        // Create new YouTube player with event handlers
-        if (window.YT && window.YT.Player) {
-          new window.YT.Player(iframeRef.current, {
-            events: {
-              onStateChange: (event: any) => {
-                // YouTube states: -1 (unstarted), 0 (ended), 1 (playing), 2 (paused), 3 (buffering), 5 (video cued)
-                if (event.data === 1) { // Playing
-                  onVideoStateChange(true);
-                } else if (event.data === 0 || event.data === 2) { // Ended or Paused
-                  onVideoStateChange(false);
+        // Add a small delay to ensure iframe is fully loaded and attached to DOM
+        setTimeout(() => {
+          if (!iframeRef.current || !document.body.contains(iframeRef.current)) {
+            console.warn('YouTube iframe not attached to DOM, skipping player initialization');
+            return;
+          }
+
+          // Create new YouTube player with event handlers
+          if (window.YT && window.YT.Player) {
+            try {
+              new window.YT.Player(iframeRef.current, {
+                events: {
+                  onReady: () => {
+                    console.log('YouTube player ready');
+                  },
+                  onStateChange: (event: any) => {
+                    // YouTube states: -1 (unstarted), 0 (ended), 1 (playing), 2 (paused), 3 (buffering), 5 (video cued)
+                    if (event.data === 1) { // Playing
+                      onVideoStateChange(true);
+                    } else if (event.data === 0 || event.data === 2) { // Ended or Paused
+                      onVideoStateChange(false);
+                    }
+                  }
                 }
-              }
+              });
+            } catch (error) {
+              console.warn('Failed to initialize YouTube player:', error);
             }
-          });
-        }
+          }
+        }, 100); // Small delay to ensure DOM attachment
       };
 
       // Setup the API callback if not already defined
@@ -215,6 +228,16 @@ const TestimonialSlide = ({ testimonial, index, current, handleSlideClick, total
               className="absolute inset-0 w-full h-full object-cover rounded-xl"
               style={{
                 opacity: 0.7,
+              }}
+              onError={(e) => {
+                // Fallback to hqdefault if maxresdefault fails
+                const target = e.target as HTMLImageElement;
+                if (target.src.includes('maxresdefault')) {
+                  target.src = `https://img.youtube.com/vi/${youtubeVideoId}/hqdefault.jpg`;
+                } else if (target.src.includes('hqdefault')) {
+                  // Final fallback to a placeholder
+                  target.src = '/images/testimonial-placeholder.jpg';
+                }
               }}
             />
           ) : videoSrc ? (

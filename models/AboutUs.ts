@@ -1,4 +1,4 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose, { Document, Schema, Model } from 'mongoose';
 
 export interface IAboutUs extends Document {
   _id: string;
@@ -55,6 +55,10 @@ export interface IAboutUs extends Document {
   updatedBy: string;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface IAboutUsModel extends Model<IAboutUs> {
+  findActive(): Promise<IAboutUs | null>;
 }
 
 const AboutUsSchema = new Schema<IAboutUs>({
@@ -246,7 +250,7 @@ AboutUsSchema.index({ createdAt: -1 });
 
 // Static methods
 AboutUsSchema.statics.findActive = function() {
-  return this.findOne({ isActive: true }).populate('createdBy updatedBy', 'name email');
+  return this.findOne({ isActive: true });
 };
 
 // Instance methods
@@ -255,6 +259,6 @@ AboutUsSchema.methods.toSafeObject = function() {
   return obj;
 };
 
-const AboutUs = mongoose.models.AboutUs || mongoose.model<IAboutUs>('AboutUs', AboutUsSchema);
+const AboutUs = (mongoose.models.AboutUs || mongoose.model<IAboutUs>('AboutUs', AboutUsSchema)) as IAboutUsModel;
 
 export default AboutUs;

@@ -23,8 +23,8 @@ export default function GlobalFloatingMenu() {
       label: 'WhatsApp Us',
       Icon: <Smartphone className="w-4 h-4" />,
       onClick: () => {
-        // IMPORTANT: Replace YOUR_WHATSAPP_NUMBER with your actual WhatsApp number
-        window.open('https://wa.me/YOUR_WHATSAPP_NUMBER?text=Hello%20Laxmi%20Developers', '_blank');
+        // Using the official WhatsApp number
+        window.open('https://wa.me/919978600222?text=Hello%20Laxmi%20Developers', '_blank');
       },
     },
     {
