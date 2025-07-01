@@ -2,9 +2,10 @@
 
 import React, { useState, useEffect } from 'react'
 import { Toaster, toast } from 'sonner'
-import { Plus, Search, Filter, Edit, Eye, Trash2, Calendar, User, Tag } from 'lucide-react'
+import { Plus, Search, Filter, Edit, Eye, Trash2, Calendar, User, Tag, Loader2 } from 'lucide-react' // Added Loader2
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { Button } from '@/components/ui/Button' // Import Button
 import { blogsApi } from '@/lib/api'
 import { useAuth } from '@/contexts/AuthContext'
 import { logActivity } from '@/lib/activity'
@@ -165,13 +166,14 @@ export default function BlogsList() {
               Manage your blog posts, create new content, and track performance.
             </p>
           </div>
-          <Link
-            href="/cms-admin/dashboard/blogs/create"
-            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Create Blog Post
-          </Link>
+          <Button asChild>
+            <Link
+              href="/cms-admin/dashboard/blogs/create"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Create Blog Post
+            </Link>
+          </Button>
         </div>
 
         {/* Filters */}
@@ -220,43 +222,45 @@ export default function BlogsList() {
             </select>
 
             {/* Refresh Button */}
-            <button
+            <Button
               onClick={() => fetchBlogs()}
-              className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+              variant="outline"
+              loading={loading && !confirmDelete} // Only show loading if not confirming delete
             >
               <Filter className="w-4 h-4 mr-2 inline" />
               Refresh
-            </button>
+            </Button>
           </div>
         </div>
 
         {/* Blog List */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-          {loading ? (
+          {loading && !confirmDelete ? ( // Adjusted loading condition
             <div className="p-8 text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+              <Loader2 className="animate-spin h-8 w-8 text-blue-600 mx-auto" />
               <p className="text-gray-500 mt-2">Loading blogs...</p>
             </div>
           ) : error ? (
             <div className="p-8 text-center">
               <p className="text-red-500">{error}</p>
-              <button
+              <Button
                 onClick={() => fetchBlogs()}
-                className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                loading={loading}
               >
                 Try Again
-              </button>
+              </Button>
             </div>
           ) : filteredBlogs.length === 0 ? (
             <div className="p-8 text-center">
               <p className="text-gray-500">No blog posts found.</p>
-              <Link
-                href="/cms-admin/dashboard/blogs/create"
-                className="mt-2 inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Create Your First Blog Post
-              </Link>
+              <Button asChild>
+                <Link
+                  href="/cms-admin/dashboard/blogs/create"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Create Your First Blog Post
+                </Link>
+              </Button>
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -354,29 +358,26 @@ export default function BlogsList() {
                         )}
                       </td>
                       <td className="px-6 py-4">
-                        <div className="flex items-center space-x-2">
-                          <Link
-                            href={`/blogs/${blog.slug}`}
-                            target="_blank"
-                            className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
-                            title="View Blog"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </Link>
-                          <Link
-                            href={`/cms-admin/dashboard/blogs/edit/${blog._id}`}
-                            className="p-1 text-gray-400 hover:text-green-600 transition-colors"
-                            title="Edit Blog"
-                          >
-                            <Edit className="w-4 h-4" />
-                          </Link>
-                          <button
+                        <div className="flex items-center space-x-1">
+                          <Button asChild variant="ghost" size="icon" title="View Blog">
+                            <Link href={`/blogs/${blog.slug}`} target="_blank">
+                              <Eye className="w-4 h-4" />
+                            </Link>
+                          </Button>
+                          <Button asChild variant="ghost" size="icon" title="Edit Blog">
+                            <Link href={`/cms-admin/dashboard/blogs/edit/${blog._id}`}>
+                              <Edit className="w-4 h-4" />
+                            </Link>
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
                             onClick={() => setConfirmDelete(blog._id)}
-                            className="p-1 text-gray-400 hover:text-red-600 transition-colors"
                             title="Delete Blog"
+                            className="text-gray-400 hover:text-red-600"
                           >
                             <Trash2 className="w-4 h-4" />
-                          </button>
+                          </Button>
                         </div>
                       </td>
                     </tr>
@@ -398,23 +399,25 @@ export default function BlogsList() {
                 Are you sure you want to delete this blog post? This action cannot be undone.
               </p>
               <div className="flex justify-end space-x-3">
-                <button
+                <Button
+                  variant="outline"
                   onClick={() => setConfirmDelete(null)}
-                  className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                  disabled={loading}
                 >
                   Cancel
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="destructive"
                   onClick={() => {
                     const blog = blogs.find(b => b._id === confirmDelete);
                     if (blog) {
                       handleDelete(confirmDelete, blog.title);
                     }
                   }}
-                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                  loading={loading && !!confirmDelete} // Show loading on this button when delete is in progress
                 >
                   Delete
-                </button>
+                </Button>
               </div>
             </div>
           </div>

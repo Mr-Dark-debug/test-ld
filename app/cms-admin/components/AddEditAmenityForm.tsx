@@ -284,18 +284,10 @@ export function AddEditAmenityForm({ amenityId, onClose }: AddEditAmenityFormPro
             type="submit"
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center"
             disabled={loading}
+            loading={loading} // Added loading prop
           >
-            {loading ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                {amenityId ? 'Updating...' : 'Creating...'}
-              </>
-            ) : (
-              <>
-                <Save className="w-4 h-4 mr-2" />
-                {amenityId ? 'Update Amenity' : 'Create Amenity'}
-              </>
-            )}
+            <Save className="w-4 h-4 mr-2" />
+            {amenityId ? 'Update Amenity' : 'Create Amenity'}
           </button>
         </div>
       </form>
